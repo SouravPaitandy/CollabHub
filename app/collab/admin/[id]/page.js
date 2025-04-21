@@ -142,7 +142,7 @@ function CollabAdminPanel({ params }) {
       });
       if (response.ok) {
         toast.success("Collaboration deleted successfully");
-        setTimeout(() => router.push("/dashboard"), 1500);
+        setTimeout(() => window.history.back(), 1500);
       } else {
         throw new Error("Failed to delete collaboration");
       }

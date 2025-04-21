@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+/* Define a custom variant for dark mode */
+@custom-variant dark (&:is(.dark *));
+
+
+
+
+/* 
+.chat-body.chat-page #navbar,
+.chat-body.chat-page #footer,
+.chat-body.chat-page header,
+.chat-body.chat-page footer {
+  display: none !important;
+}
+
+.chat-body.chat-page {
+  overflow: hidden;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+} */

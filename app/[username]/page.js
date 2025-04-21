@@ -16,12 +16,12 @@ export default async function UserDashboard({ params }) {
       notFound()
     }
     
-    const userExists = await checkIfUserExists(username)
-    if (!userExists) {
-      // If username doesn't exist in the database, trigger not-found page
-      console.log("Username does not exist in database:", username)
-      notFound()
-    }
+    // const userExists = await checkIfUserExists(username)
+    // if (!userExists) {
+    //   // If username doesn't exist in the database, trigger not-found page
+    //   console.log("Username does not exist in database:", username)
+    //   notFound()
+    // }
 
     // After confirming username exists, proceed with session checks
     const session = await getServerSession(authOptions)
@@ -45,13 +45,13 @@ export default async function UserDashboard({ params }) {
 }
 
 // Function to check if username exists in your database
-async function checkIfUserExists(username) {
-  try {
-    await dbConnect();
-    const userData = await User.findOne({username: username})
-    return !!userData // Returns true if user exists, false otherwise
-  } catch (error) {
-    console.error("Error checking if user exists:", error)
-    return false
-  }
-}
+// async function checkIfUserExists(username) {
+//   try {
+//     await dbConnect();
+//     const userData = await User.findOne({username: username})
+//     return !!userData // Returns true if user exists, false otherwise
+//   } catch (error) {
+//     console.error("Error checking if user exists:", error)
+//     return false
+//   }
+// }

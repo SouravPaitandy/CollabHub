@@ -1,8 +1,8 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import SessionWrapper from "@/components/SessionWrapper";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
-import FooterWrapper from "@/components/FooterWrapper";
+// import FooterWrapper from "@/components/FooterWrapper";
 import ClientSessionProvider from "@/app/SessionProvider";
 // import { ThemeProvider } from "next-themes";
 import ThemeProviderWrapper from "./ThemeProvider";
@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "CollabHub: Sync, Create, Succeed",

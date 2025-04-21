@@ -83,7 +83,7 @@ export async function POST(request, { params }) {
         await transporter.sendMail({
             from: process.env.EMAIL_FROM || '"CollabHub" <noreply@collabhub.com>',
             to: email,
-            subject: `Join "${collab.name}" on CollabHub`,
+            subject: `Invitation to join "${collab.name}" on CollabHub`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;">
                     <h2 style="color: #4a6fa5;">You've been invited to collaborate!</h2>

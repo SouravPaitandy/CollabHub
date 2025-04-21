@@ -1,5 +1,6 @@
 // components/Footer.js
 "use client"
+import { Globe } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -70,12 +71,12 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-600 dark:text-gray-400">&copy; 2024 CollabHub. All rights reserved.</p>
+          <p className="text-gray-600 dark:text-gray-400">&copy; 2024-2025 CollabHub. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <SocialIcon href="https://twitter.com" icon={<TwitterIcon />} />
-            <SocialIcon href="https://facebook.com" icon={<FacebookIcon />} />
-            <SocialIcon href="https://linkedin.com" icon={<LinkedInIcon />} />
-            <SocialIcon href="https://github.com" icon={<GitHubIcon />} />
+            <SocialIcon href="https://x.com/PaitandySourav" icon={<TwitterIcon/>} />
+            <SocialIcon href="https://portfolio-sourav-paitandy.vercel.app/" icon={<Globe />} />
+            <SocialIcon href="https://www.linkedin.com/in/sourav-paitandy/" icon={<LinkedInIcon />} />
+            <SocialIcon href="https://github.com/SouravPaitandy" icon={<GitHubIcon />} />
           </div>
         </div>
       </div>

@@ -18,11 +18,11 @@ export async function GET(request, { params }) {
     const { id } = params;
     console.log("id: ", id)
 
+     // Connect to the database
+     await dbConnect();
+
     const userid = await User.findOne({email: session.user.email})
     console.log("userid", userid.id)
-
-    // Connect to the database
-    await dbConnect();
 
     // Check if the user is an admin of the collaboration
     const isAdmin = await CollabParticipant.findOne({

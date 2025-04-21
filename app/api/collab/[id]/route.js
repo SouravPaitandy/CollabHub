@@ -16,11 +16,12 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+     // Connect to the database
+     await dbConnect();
+
     const { id } = params;
     const user = await User.findOne({email: userSession?.user?.email})
-    // Connect to the database
-    await dbConnect();
-
+   
     // Fetch the Collab
     const collab = await Collab.findById(id);
     // console.log("collab: ",collab)

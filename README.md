@@ -26,7 +26,7 @@ Once the server is running, open your browser and navigate to:
 
 ```
 ├── components/     # Reusable React components
-├── pages/          # Application routes and pages
+├── app/            # Application routes and pages
 ├── styles/         # Global and component-specific styles
 ├── utils/          # Helper functions and utilities
 ```

@@ -3,6 +3,7 @@
 import { Globe } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'react-hot-toast'; // Install if not already: npm install react-hot-toast
 
 const FooterLink = ({ href, children }) => (
   <Link href={href} className="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 transition-colors">
@@ -18,11 +19,41 @@ const SocialIcon = ({ href, icon }) => (
 
 export default function Footer() {
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Newsletter signup:', email);
-    setEmail('');
+    
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success(data.message);
+        setEmail('');
+      } else {
+        toast.error(data.message || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
+      toast.error('Failed to subscribe. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -60,12 +91,24 @@ export default function Footer() {
                 placeholder="Enter your email"
                 className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-gray-800 dark:text-gray-200 shadow-sm"
                 required
+                disabled={isSubmitting}
               />
               <button
                 type="submit"
-                className="w-full px-3 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-md transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                className={`w-full px-3 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-md transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={isSubmitting}
               >
-                Subscribe to Newsletter
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  'Subscribe to Newsletter'
+                )}
               </button>
             </form>
           </div>

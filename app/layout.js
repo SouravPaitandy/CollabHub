@@ -6,6 +6,7 @@ import NavbarWrapper from "@/components/NavbarWrapper";
 import ClientSessionProvider from "@/app/SessionProvider";
 // import { ThemeProvider } from "next-themes";
 import ThemeProviderWrapper from "./ThemeProvider";
+import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
             <ThemeProviderWrapper>
               <NavbarWrapper />
               {children}    
+              <Toaster position="top-right" />
             </ThemeProviderWrapper>
           </ClientSessionProvider>
         </SessionWrapper>

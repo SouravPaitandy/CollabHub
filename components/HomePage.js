@@ -6,6 +6,7 @@ import KeyFeatures from '@/components/KeyFeatures';
 import FooterWrapper from "./FooterWrapper";
 import { useSession } from "next-auth/react";
 import { FiArrowDown, FiArrowUp } from 'react-icons/fi';
+import Link from "next/link";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -240,17 +241,17 @@ export default function HomePage() {
               className="mt-10 flex justify-center"
               whileHover={{ scale: 1.02 }}
             >
-              <Button 
-                href={!session ? "/auth" : `/${session?.user?.username || session?.username || 'dashboard'}`} 
+              <Button  
+                href={!session ? "/auth" : `/${session?.user?.username || session?.username || 'dashboard'}`}
                 className="text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 dark:from-blue-500 dark:to-indigo-600 dark:hover:from-blue-600 dark:hover:to-indigo-700 transform transition duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30 dark:hover:shadow-blue-500/30 px-8 py-4 text-lg rounded-xl"
               >
-                <motion.span 
-                  className="flex items-center"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Start Collaborating
-                </motion.span>
+                  <motion.span 
+                    className="flex items-center"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Start Collaborating
+                  </motion.span>
               </Button>
             </motion.div>
             

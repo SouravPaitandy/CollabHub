@@ -26,7 +26,7 @@ export async function POST(request, { params }) {
             return NextResponse.json({ error: "Email is required" }, { status: 400 });
         }
         
-        const { id } = params;
+        const { id } = await params;
         const currentUser = await User.findOne({ email: userSession.user.email });
         
         if (!currentUser) {

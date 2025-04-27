@@ -1,13 +1,14 @@
 "use client";
 import React from "react";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Loader from "./Loading";
 import { motion } from "framer-motion";
 import GitHubRepos from "./GithubRepos.js";
+import { ArrowBigDown } from "lucide-react";
 
 const Dashboard = ({ username }) => {
   const { data: session } = useSession();
@@ -17,6 +18,8 @@ const Dashboard = ({ username }) => {
   const [error, setError] = useState(null);
   const { theme } = useTheme();
   const router = useRouter();
+
+  const githubRepoRef = useRef(null);
 
   if (!session) {
     router.push("/auth");
@@ -108,7 +111,9 @@ const Dashboard = ({ username }) => {
     <div>
       {/* Background */}
       <div className="fixed -z-10 h-full w-full top-0 left-0">
-        {theme === "dark" ? (
+        {theme === "dark" ||
+        (theme === "system" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches) ? (
           <div className="absolute inset-0 -z-10 h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"></div>
         ) : (
           <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
@@ -120,7 +125,6 @@ const Dashboard = ({ username }) => {
       {/* Main Content */}
       <div className="relative min-h-screen text-gray-800 dark:text-white">
         <div className="max-w-7xl mx-auto p-6 py-20">
-          {/* Header */}
           <motion.header
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -144,12 +148,20 @@ const Dashboard = ({ username }) => {
                   repeatType: "reverse",
                 }}
               >
-                <Link
-                  href="/collab/join-create"
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const confirmed = confirm(
+                      "Would you like to create a collaboration manually? Click 'OK' to proceed or 'Cancel' to use GitHub repository integration instead."
+                    );
+                    if (confirmed) {
+                      router.push("/collab/join-create");
+                    }
+                  }}
                   className="px-8 py-3 rounded-full text-white font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 dark:from-blue-500 dark:to-indigo-600 dark:hover:from-blue-600 dark:hover:to-indigo-700 shadow-lg transform transition-all duration-300 hover:scale-105"
                 >
                   Get Started 🚀
-                </Link>
+                </button>
               </motion.div>
             </div>
           </motion.header>
@@ -208,13 +220,19 @@ const Dashboard = ({ username }) => {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex flex-col gap-2">
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">
                     Active
                   </p>
+                  <div className="flex gap-2 justify-center items-center">
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     Import repositories with one click
                   </p>
+                  <button onClick={() => githubRepoRef.current.scrollIntoView({ behavior: 'smooth' })} 
+                          className="text-md text-green-800 hover:text-green-400 dark:text-green-400 dark:hover:text-green-600 cursor-pointer">
+                            <ArrowBigDown/>
+                  </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -266,13 +284,33 @@ const Dashboard = ({ username }) => {
                       key={collab.collabId}
                       className="p-3 rounded-md transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
                     >
-                      <Link
-                        href={`/collab/admin/${collab.collabId}`}
-                        className="flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200"
-                      >
-                        <span className="mr-2">🔧</span> {collab.collabName}{" "}
-                        (Admin Panel)
-                      </Link>
+                      <div className="flex flex-col md:flex-row md:items-center">
+                        <Link
+                          href={`/collab/admin/${collab.collabId}`}
+                          className="flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200 mb-2 md:mb-0"
+                        >
+                          <span className="mr-2">🔧</span> {collab.collabName}{" "}
+                          (Admin Panel)
+                        </Link>
+                        <div className="flex space-x-2 md:ml-auto">
+                          <Link
+                            href={`/chat/${collab.collabId}`}
+                            className="flex items-center text-sm px-3 py-1 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-300"
+                          >
+                            <span className="mr-1">💬</span> Chat
+                          </Link>
+                          <Link
+                            href={`/collab/${collab.collabId}`}
+                            className="flex items-center text-sm px-3 py-1 rounded-full bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-800/50 text-purple-600 dark:text-purple-300"
+                          >
+                            {console.log(
+                              "Collab ID, from dashboard: ",
+                              collab.collabId
+                            )}
+                            <span className="mr-1">📋</span> Tasks
+                          </Link>
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -283,7 +321,7 @@ const Dashboard = ({ username }) => {
               )}
             </section>
 
-            {/* Member Collaborations */}
+            {/* Member Collaborations - Update this section similarly */}
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
                 Your Joined Collaborations
@@ -295,13 +333,25 @@ const Dashboard = ({ username }) => {
                       key={collab.collabId}
                       className="p-3 rounded-md transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
                     >
-                      <Link
-                        href={`/chat/${collab.collabId}`}
-                        className="flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200"
-                      >
-                        <span className="mr-2">💬</span> {collab.collabName}{" "}
-                        (Chat Room)
-                      </Link>
+                      <div className="flex flex-col md:flex-row md:items-center">
+                        <div className="font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-0">
+                          {collab.collabName}
+                        </div>
+                        <div className="flex space-x-2 md:ml-auto">
+                          <Link
+                            href={`/chat/${collab.collabId}`}
+                            className="flex items-center text-sm px-3 py-1 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-300"
+                          >
+                            <span className="mr-1">💬</span> Chat
+                          </Link>
+                          <Link
+                            href={`/collab/${collab.collabId}`}
+                            className="flex items-center text-sm px-3 py-1 rounded-full bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-800/50 text-purple-600 dark:text-purple-300"
+                          >
+                            <span className="mr-1">📋</span> Tasks
+                          </Link>
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -316,6 +366,7 @@ const Dashboard = ({ username }) => {
           {/* Repository Activity - Only show if using GitHub */}
           {session?.provider === "github" && (
             <motion.div
+              ref={githubRepoRef}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -325,7 +376,7 @@ const Dashboard = ({ username }) => {
                 Repository Integration
               </h2>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
+              <div ref={githubRepoRef} className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
                 <p className="text-blue-800 dark:text-blue-200">
                   Convert any of your GitHub repositories into collaborations!
                   This will create a new collaboration space where you can:

@@ -8,7 +8,7 @@ import User from "@/models/User";
 
 export default async function UserDashboard({ params }) {
     // Ensure params is properly resolved
-    const username = params?.username
+      const {username} = await params;
     
     // Check if the username exists in your database FIRST before any session checks
     if(!username) {

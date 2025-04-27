@@ -15,7 +15,12 @@ export default function ThemeProviderWrapper({ children }) {
   }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableColorScheme={true} enableSystem>
+    <ThemeProvider 
+      attribute="class" 
+      defaultTheme="system" // Changed from "dark" to "system"
+      enableColorScheme={true} 
+      enableSystem={true} // Explicitly set to true
+    >
       {children}
     </ThemeProvider>
   )

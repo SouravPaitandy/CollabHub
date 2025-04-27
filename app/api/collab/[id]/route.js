@@ -19,7 +19,7 @@ export async function GET(request, { params }) {
      // Connect to the database
      await dbConnect();
 
-    const { id } = params;
+    const { id } = await params;
     const user = await User.findOne({email: userSession?.user?.email})
    
     // Fetch the Collab
@@ -65,7 +65,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const user = await User.findOne({email: userSession?.user?.email})
     
     // Connect to the database

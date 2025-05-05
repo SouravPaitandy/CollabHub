@@ -80,7 +80,7 @@ export async function PUT(request, { params }) {
     const { id, taskid } = await params;
     const collabId = id;
     const taskId = taskid;
-    const { title, description, status, dueDate } = await request.json();
+    const { title, description, status, dueDate, priority, assignee } = await request.json();
     
     // Check if user has access
     const user = await checkUserAccess(collabId, session.user.email);
@@ -100,6 +100,8 @@ export async function PUT(request, { params }) {
         description, 
         status,
         dueDate,
+        priority,
+        assignee,
         updatedAt: new Date()
       },
       { new: true }

@@ -1,7 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import Dashboard from '@/components/Dashboard'
+import Dashboard from '@/components/dashboard/Dashboard'
 import dbConnect from "@/lib/mongoose";
 import User from "@/models/User";
 // import { NextResponse } from "next/server";

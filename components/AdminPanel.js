@@ -536,7 +536,7 @@ function AdminPanel({ id }) {
                                 >
                                   {participant.role}
                                 </span>
-                                <motion.button
+                                {session.user.name !== participant.user.name && <motion.button
                                   className="text-red-500 hover:text-red-600 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
@@ -545,7 +545,7 @@ function AdminPanel({ id }) {
                                   }
                                 >
                                   <FaUserMinus />
-                                </motion.button>
+                                </motion.button>}
                               </div>
                             </motion.li>
                           ))}

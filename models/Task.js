@@ -23,6 +23,16 @@ const TaskSchema = new mongoose.Schema({
       return date;
     }
   },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high'],
+    default: 'medium'
+  },
+  assignee: {
+    type: String,
+    trim: true,
+    default: null
+  },
   collabId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Collab',

@@ -70,7 +70,7 @@ export async function POST(request, { params }) {
     await dbConnect();
     const { id } = await params;
     const collabId = id;
-    const { title, description, status, dueDate } = await request.json();
+    const { title, description, status, dueDate, priority, assignee } = await request.json();
 
     // Get the current user
     const user = await User.findOne({ email: session.user.email });
@@ -94,6 +94,8 @@ export async function POST(request, { params }) {
       description,
       status: status || 'todo',
       dueDate: dueDate || null,
+      priority: priority || 'medium',
+      assignee: assignee || null,
       collabId,
       createdBy: user._id
     });

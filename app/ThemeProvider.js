@@ -1,4 +1,3 @@
-// In a separate ThemeProvider.js component
 'use client'
 import { useState, useEffect } from 'react'
 import { ThemeProvider } from 'next-themes'
@@ -17,7 +16,7 @@ export default function ThemeProviderWrapper({ children }) {
   return (
     <ThemeProvider 
       attribute="class" 
-      defaultTheme="system" // Changed from "dark" to "system"
+      defaultTheme="system" 
       enableColorScheme={true} 
       enableSystem={true} // Explicitly set to true
     >

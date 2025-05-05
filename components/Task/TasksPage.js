@@ -14,30 +14,40 @@ export default function TasksPage( { collabId } )  {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch collaboration info
-  useEffect(() => {
-    const fetchCollabInfo = async () => {
-      if (session?.user?.email && collabId) {
-        try {
-          setLoading(true);
-          const response = await fetch(`/api/collab/${collabId}`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch collaboration");
-          }
-          const data = await response.json();
-          setCollabInfo(data);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-  
+// Add this state variable to store admin status
+const [isAdmin, setIsAdmin] = useState(false);
+
+// Update your useEffect to check admin status
+useEffect(() => {
+  const fetchCollabInfo = async () => {
     if (session?.user?.email && collabId) {
-      fetchCollabInfo();
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/collab/${collabId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch collaboration");
+        }
+        const data = await response.json();
+        setCollabInfo(data);        
+        // Check if current user is an admin
+        const isUserAdmin = data.userRole === "ADMIN";
+        setIsAdmin(isUserAdmin);
+        
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [session, collabId]);
+  };
+
+  if (session?.user?.email && collabId) {
+    fetchCollabInfo();
+  }
+}, [session, collabId]);
+
+
+  
   // Show loader only on initial data fetch, not during tab switches
   if (status === "loading" || (loading && !collabInfo && status !== "authenticated")) {
     return (<Loader />);
@@ -110,33 +120,49 @@ export default function TasksPage( { collabId } )  {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="max-w-7xl mx-auto p-5 md:p-8 py-10 md:py-16"
+      className="max-w-8xl mx-auto p-4 md:p-8 py-8 md:py-12"
     >
       {/* Header with back link */}
       <motion.div 
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         transition={{ delay: 0.1 }}
-        className="mb-10"
+        className="mb-8"
       >
         <motion.button 
           whileHover={{ x: -5 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => router.back()}
-          className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors duration-200 mb-6 font-medium text-lg"
+          className="group mt-8 inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors duration-200 mb-4 font-medium text-lg"
           aria-label="Go back"
         >
-          <FaArrowLeft className="mr-2" /> Back to Collaboration
+          <FaArrowLeft className="mr-2 transform group-hover:translate-x-[-3px] transition-transform" /> 
+          Back to Collaboration
         </motion.button>
         
         <motion.div 
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="border-b dark:border-gray-700 pb-6 mb-8"
+          className="border-b dark:border-gray-700 pb-5 mb-6"
         >
-          <h1 className="text-3xl md:text-4xl font-bold mb-3 text-gray-800 dark:text-white">{collabInfo.name}</h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg">{collabInfo.description}</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                {collabInfo.name}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl">
+                {collabInfo.description}
+              </p>
+            </div>
+            {isAdmin && (
+              <div className="mt-4 md:mt-0">
+                <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-sm font-medium">
+                  Admin Access
+                </span>
+              </div>
+            )}
+          </div>
         </motion.div>
       </motion.div>
       
@@ -145,9 +171,9 @@ export default function TasksPage( { collabId } )  {
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4 md:p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-shadow duration-300"
       >
-        <TaskBoard collabId={collabId} />
+        <TaskBoard collabId={collabId} isAdmin={isAdmin}/>
       </motion.div>
     </motion.div>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { FiSettings, FiMessageSquare, FiClipboard, FiExternalLink, FiUser, FiUsers, FiLayers, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiSettings, FiMessageSquare, FiClipboard, FiExternalLink, FiUser, FiUsers, FiLayers, FiChevronLeft, FiChevronRight, FiFileText } from 'react-icons/fi';
 import { HiOutlineSparkles } from 'react-icons/hi';
 
 const DashboardCollabs = ({adminCollabs, memberCollabs}) => {
@@ -250,6 +250,12 @@ const DashboardCollabs = ({adminCollabs, memberCollabs}) => {
                               >
                                 <FiClipboard className="mr-2" /> Tasks
                               </Link>
+                              <Link
+                                href={`/collab/documents/${collab.collabId}`}
+                                className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 transition-colors duration-200"
+                              >
+                                <FiFileText className="mr-2" /> Documents
+                              </Link>
                             </div>
                           </div>
                         </motion.li>
@@ -367,6 +373,12 @@ const DashboardCollabs = ({adminCollabs, memberCollabs}) => {
                                 className="flex-1 flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/40 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 transition-colors duration-200"
                               >
                                 <FiClipboard className="mr-2" /> Tasks
+                              </Link>
+                              <Link
+                                href={`/collab/documents/${collab.collabId}`}
+                                className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 transition-colors duration-200"
+                              >
+                                <FiFileText className="mr-2" /> Documents
                               </Link>
                             </div>
                           </div>

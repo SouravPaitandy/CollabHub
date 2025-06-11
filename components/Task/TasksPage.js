@@ -129,16 +129,36 @@ useEffect(() => {
         transition={{ delay: 0.1 }}
         className="mb-8"
       >
-        <motion.button 
-          whileHover={{ x: -5 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => router.back()}
-          className="group mt-8 inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors duration-200 mb-4 font-medium text-lg"
-          aria-label="Go back"
-        >
-          <FaArrowLeft className="mr-2 transform group-hover:translate-x-[-3px] transition-transform" /> 
-          Back to Collaboration
-        </motion.button>
+        {/* Breadcrumb navigation */}
+          <nav className="flex mt-8 mb-4 text-sm">
+            <ol className="inline-flex items-center space-x-1 md:space-x-3">
+          <li className="inline-flex items-center">
+            <button 
+              onClick={() => router.push(`/${session?.username}`)}
+              className="inline-flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+            >
+              Dashboard
+            </button>
+          </li>
+          {isAdmin && <li>
+            <div className="flex items-center">
+              <span className="mx-2 text-gray-400">/</span>
+              <button 
+            onClick={() => router.push(`/collab/admin/${collabId}`)}
+            className="inline-flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+              >
+            {collabInfo.name}
+              </button>
+            </div>
+          </li>}
+          <li>
+            <div className="flex items-center">
+              <span className="mx-2 text-gray-400">/</span>
+              <span className="text-indigo-600 dark:text-indigo-400 font-medium">Documents</span>
+            </div>
+          </li>
+            </ol>
+          </nav>
         
         <motion.div 
           initial={{ y: 10, opacity: 0 }}

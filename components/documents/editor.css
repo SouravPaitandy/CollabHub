@@ -1,0 +1,274 @@
+/* Collaboration cursor styles */
+.collaboration-cursor {
+  position: relative;
+  pointer-events: none;
+  word-break: normal;
+  z-index: 30;
+  transition: opacity 0.2s ease;
+}
+
+.collaboration-cursor-label {
+  animation: fadeIn 0.3s ease, float 2s ease-in-out infinite;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+  transform-origin: left bottom;
+}
+
+/* Remote selection styles */
+.ProseMirror .selection {
+  background-color: rgba(var(--user-color-rgb), 0.2);
+  border-radius: 2px;
+}
+
+/* Pulse animation for new cursors */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Slight floating animation for cursor labels */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Smooth fade-in for new cursors */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fade-out effect when user is idle */
+.collaboration-cursor.idle {
+  opacity: 0.5;
+  transition: opacity 1s ease;
+}
+
+/* Mobile responsiveness for cursor labels */
+@media (max-width: 640px) {
+  .collaboration-cursor-label {
+    font-size: 10px !important;
+    padding: 1px 4px !important;
+  }
+}
+
+/* Basic editor styles */
+.ProseMirror {
+  padding: 1rem 0;
+  outline: none;
+}
+
+/* Placeholder (empty editor) */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Custom heading styles */
+.ProseMirror h1 {
+  font-size: 1.75rem;
+  color: #1f2937;
+  margin-top: 1.75rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25rem;
+  color: #1f2937;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Dark mode heading colors */
+.dark .ProseMirror h1,
+.dark .ProseMirror h2,
+.dark .ProseMirror h3 {
+  color: #f3f4f6;
+}
+
+/* Custom list styles */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror li {
+  margin: 0.5rem 0;
+}
+
+.ProseMirror li > p {
+  margin: 0;
+}
+
+/* Code blocks */
+.ProseMirror pre {
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dark .ProseMirror pre {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+.ProseMirror code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 0.2em 0.4em;
+  background-color: #f3f4f6;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.dark .ProseMirror code {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+/* Blockquote styles */
+.ProseMirror blockquote {
+  border-left: 3px solid #6366f1;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  color: #4b5563;
+}
+
+.dark .ProseMirror blockquote {
+  color: #9ca3af;
+}
+
+/* Horizontal rule */
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+.dark .ProseMirror hr {
+  border-top: 2px solid #374151;
+}
+
+/* Table styles */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+}
+
+.dark .ProseMirror table th {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.ProseMirror table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+}
+
+.dark .ProseMirror table td {
+  border-color: #4b5563;
+}
+
+/* Collaboration cursor */
+.collaboration-cursor__caret {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+/* Highlight styles */
+.ProseMirror mark {
+  background-color: #fef3c7;
+  border-radius: 0.25rem;
+  padding: 0.1em 0.2em;
+  color: #92400e;
+}
+
+.dark .ProseMirror mark {
+  background-color: rgba(253, 230, 138, 0.2);
+  color: #fcd34d;
+}
+
+/* Link styles */
+.ProseMirror a {
+  color: #3b82f6;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.ProseMirror a:hover {
+  color: #2563eb;
+}
+
+.dark .ProseMirror a {
+  color: #60a5fa;
+}
+
+.dark .ProseMirror a:hover {
+  color: #93c5fd;
+}
+
+/* Image styles */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* Animation for typing */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.collaboration-cursor__caret {
+  animation: blink 1s ease-in-out infinite;
+}
+
+/* Selected text */
+.ProseMirror ::selection {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.dark .ProseMirror ::selection {
+  background: rgba(99, 102, 241, 0.3);
+}

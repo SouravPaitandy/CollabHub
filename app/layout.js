@@ -7,6 +7,7 @@ import ClientSessionProvider from "@/app/SessionProvider";
 // import { ThemeProvider } from "next-themes";
 import ThemeProviderWrapper from "./ThemeProvider";
 import { Toaster } from 'react-hot-toast';
+import '../styles/scrollbars.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

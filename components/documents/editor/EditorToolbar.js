@@ -92,6 +92,22 @@ export default function EditorToolbar({ editor, theme }) {
   const [linkUrl, setLinkUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [showImageUrlInput, setShowImageUrlInput] = useState(false);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile screen on mount and when window resizes
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Color picker presets
   const colorPresets = [
@@ -434,25 +450,78 @@ export default function EditorToolbar({ editor, theme }) {
         {/* Image dropdown */}
         <div className="dropdown-container relative">
           <ToolbarButton
-            onClick={() => {
-              // Create a hidden file input element for image upload
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*';
-              
-              input.onchange = async (event) => {
-                if (input.files?.length) {
-                  const file = input.files[0];
-                  const url = URL.createObjectURL(file);
-                  editor.chain().focus().setImage({ src: url }).run();
-                }
-              };
-              
-              input.click();
-            }}
-            title="Add Image"
-            icon={<FaImage />}
-          />
+  onClick={() => {
+    // Create a hidden file input element for image upload
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = async (event) => {
+      if (input.files?.length) {
+        const file = input.files[0];
+        
+        // Check file size (limit to 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+          toast.error("Image too large. Maximum size is 5MB.");
+          return;
+        }
+        
+        // Create a temporary URL for preview while uploading
+        const tempUrl = URL.createObjectURL(file);
+        
+        // Show loading indicator
+        const loadingToast = toast.loading("Uploading image...");
+        
+        try {
+          // Create form data for file upload
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('collabId', collabId); // Ensure this prop is passed to EditorToolbar
+          
+          // Use your existing upload API or the new one we defined
+          const response = await fetch('/api/documents/upload-image', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to upload image');
+          }
+          
+          const data = await response.json();
+          
+          // Insert the image with the returned URL and default attributes
+          editor.chain().focus().insertContent({
+            type: 'enhancedImage',
+            attrs: { 
+              src: data.imageUrl,
+              alt: file.name,
+              title: file.name,
+              width: '75%',
+              alignment: 'center',
+            }
+          }).run();
+          
+          // Revoke the temporary object URL to free memory
+          URL.revokeObjectURL(tempUrl);
+          
+          toast.dismiss(loadingToast);
+          toast.success("Image uploaded successfully");
+        } catch (error) {
+          console.error('Upload error:', error);
+          URL.revokeObjectURL(tempUrl);
+          toast.dismiss(loadingToast);
+          toast.error("Error uploading image");
+        }
+      }
+    };
+    
+    input.click();
+  }}
+  title="Add Image"
+  icon={<FaImage />}
+/>
           
           {/* Option to add image by URL could go here */}
         </div>
@@ -540,55 +609,54 @@ export default function EditorToolbar({ editor, theme }) {
 
   // Color picker
   const colorPickerOption = useMemo(() => {
-    if (!editor) return null;
+  if (!editor) return null;
 
-    const isDarkMode = theme === 'dark';
+  const isDarkMode = theme === 'dark';
 
-    return (
-      <ToolbarDropdown
-        title="Text Color"
-        icon={<FaPalette />}
-        isOpen={showColorPicker}
-        toggleOpen={() => setShowColorPicker(!showColorPicker)}
-        showChevron={false}
-      >
-        <div className="p-2 w-48">
-          <div className="grid grid-cols-3 gap-1 mb-2">
-            {colorPresets.map((color) => {
-              const colorValue = isDarkMode && color.darkValue ? color.darkValue : color.value;
-              return (
-                <button
-                  key={color.name}
-                  onClick={() => {
-                    editor.chain().focus().setColor(colorValue).run();
-                    setShowColorPicker(false);
-                  }}
-                  className="w-full p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex flex-col items-center justify-center"
-                  title={color.name}
-                >
-                  <div
-                    className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600 mb-1"
-                    style={{ backgroundColor: colorValue }}
-                  ></div>
-                  <span className="text-xs truncate">{color.name}</span>
-                </button>
-              );
-            })}
-          </div>
-          <button
-            onClick={() => {
-              editor.chain().focus().unsetColor().run();
-              setShowColorPicker(false);
-            }}
-            className="w-full text-center px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 mt-1"
-          >
-            Reset to Default
-          </button>
+  return (
+    <ToolbarDropdown
+      title="Text Color"
+      icon={<FaPalette />}
+      isOpen={showColorPicker}
+      toggleOpen={() => setShowColorPicker(!showColorPicker)}
+      showChevron={false}
+    >
+      <div className="p-2 w-48 z-40">
+        <div className="grid grid-cols-3 gap-1 mb-2">
+          {colorPresets.map((color) => {
+            const colorValue = isDarkMode && color.darkValue ? color.darkValue : color.value;
+            return (
+              <button
+                key={color.name}
+                onClick={() => {
+                  editor.chain().focus().setColor(colorValue).run();
+                  setShowColorPicker(false);
+                }}
+                className="w-full p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex flex-col items-center justify-center"
+                title={color.name}
+              >
+                <div
+                  className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600 mb-1"
+                  style={{ backgroundColor: colorValue }}
+                ></div>
+                <span className="text-xs truncate">{color.name}</span>
+              </button>
+            );
+          })}
         </div>
-      </ToolbarDropdown>
-    );
-  }, [editor, showColorPicker, theme]);
-
+        <button
+          onClick={() => {
+            editor.chain().focus().unsetColor().run();
+            setShowColorPicker(false);
+          }}
+          className="w-full text-center px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 mt-1"
+        >
+          Reset to Default
+        </button>
+      </div>
+    </ToolbarDropdown>
+  );
+}, [editor, showColorPicker, theme]);
   // History options
   const historyOptions = useMemo(() => {
     if (!editor) return null;
@@ -611,42 +679,125 @@ export default function EditorToolbar({ editor, theme }) {
     );
   }, [editor]);
 
+  const mobileCoreTools = useMemo(() => {
+    if (!editor) return null;
+    
+    return (
+      <>
+        <ToolbarButton
+          isActive={editor.isActive("bold")}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          title="Bold"
+          icon={<FaBold />}
+        />
+        <ToolbarButton
+          isActive={editor.isActive("italic")}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          title="Italic"
+          icon={<FaItalic />}
+        />
+        <ToolbarButton
+          isActive={editor.isActive("bulletList")}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          title="Bullet List"
+          icon={<FaListUl />}
+        />
+        <ToolbarButton
+          isActive={editor.isActive("orderedList")}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          title="Numbered List"
+          icon={<FaListOl />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          title="Undo"
+          icon={<FaUndo />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          title="Redo"
+          icon={<FaRedo />}
+        />
+      </>
+    );
+  }, [editor]);
+
+   const [showedMobileHint, setShowedMobileHint] = useState(false);
+
+    // Mobile notice component
+  const MobileEditorHint = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-700 p-2 mb-2 mx-2 rounded-r"
+    >
+      <div className="flex">
+        <div className="flex-shrink-0 text-blue-500 dark:text-blue-400">
+          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div className="ml-3">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
+            Basic formatting tools are available on mobile. For advanced editing options like tables, colors, and more, please switch to a larger screen.
+          </p>
+          <button 
+            className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1"
+            onClick={() => setShowedMobileHint(true)}
+          >
+            Got it, don&apos;t show again
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+
   if (!editor) {
     return <div className="h-12 bg-gray-100 dark:bg-gray-800 animate-pulse"></div>;
   }
 
   return (
     <div className="sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm transition-all duration-200">
-      <div className="">
-        <div className="flex items-center p-1 min-w-max">
-          {/* Format group */}
+      {isMobile ? (
+        <div className="transition-all duration-300">
+          {/* Show hint only once per session */}
+          <AnimatePresence>
+            {isMobile && !showedMobileHint && <MobileEditorHint />}
+          </AnimatePresence>
+          
+          {/* Mobile Toolbar - Simplified, core functions only */}
+          <div className="flex items-center justify-center p-1 overflow-x-auto scrollbar-hide gap-1">
+            {mobileCoreTools}
+          </div>
+        </div>
+      ) : (
+        /* Desktop Toolbar */
+        <div className="flex items-center p-1 scrollbar-hide">
           <div className="flex items-center">{formatOptions}</div>
           <ToolbarDivider />
           
-          {/* Headings group */}
           <div className="flex items-center">{headingOptions}</div>
           <ToolbarDivider />
           
-          {/* List group */}
           <div className="flex items-center">{listOptions}</div>
           <ToolbarDivider />
           
-          {/* Alignment group */}
           <div className="flex items-center">{alignmentOptions}</div>
           <ToolbarDivider />
           
-          {/* Media group */}
           <div className="flex items-center">{mediaOptions}</div>
           <ToolbarDivider />
           
-          {/* Color picker */}
           <div className="flex items-center">{colorPickerOption}</div>
           <ToolbarDivider />
           
-          {/* History group */}
           <div className="flex items-center">{historyOptions}</div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

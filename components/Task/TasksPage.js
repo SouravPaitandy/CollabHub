@@ -6,21 +6,35 @@ import { FaArrowLeft } from "react-icons/fa";
 import TaskBoard from "./TaskBoard";
 import { motion } from "framer-motion";
 import Loader from "@/components/Loading";
+import Link from "next/link";
 
-export default function TasksPage( { collabId } )  {
+export default function TasksPage( { collabId, initialSession=null } )  {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [collabInfo, setCollabInfo] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Use provided session from server or client session
+  const effectiveSession = session || initialSession;
+
+
 // Add this state variable to store admin status
 const [isAdmin, setIsAdmin] = useState(false);
+
+// Demo mode detection
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
 // Update your useEffect to check admin status
 useEffect(() => {
   const fetchCollabInfo = async () => {
-    if (session?.user?.email && collabId) {
+    if (!effectiveSession?.user?.email) {
+        setIsDemoMode(true);
+        setLoading(false);
+        return;
+    }
+
+    if (effectiveSession?.user?.email && collabId) {
       try {
         setLoading(true);
         const response = await fetch(`/api/collab/${collabId}`);
@@ -38,6 +52,9 @@ useEffect(() => {
       } finally {
         setLoading(false);
       }
+    } else {
+      // setError("Collaboration ID is required");
+      setLoading(false);
     }
   };
 
@@ -46,11 +63,44 @@ useEffect(() => {
   }
 }, [session, collabId]);
 
-
+// Handle session changes or expiration
+  useEffect(() => {
+    // If session changes from valid to null, we're in demo mode
+    if (status === "unauthenticated" && !isDemoMode) {
+      setIsDemoMode(true);
+    }
+  }, [status, isDemoMode]);
   
   // Show loader only on initial data fetch, not during tab switches
   if (status === "loading" || (loading && !collabInfo && status !== "authenticated")) {
     return (<Loader />);
+  }
+
+  // If session expired or we're in demo mode
+  if (isDemoMode || (!effectiveSession && status !== "loading")) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ duration: 0.4 }}
+        className="min-h-screen flex items-center justify-center p-4"
+      >
+        <motion.div 
+          initial={{ y: 20 }} 
+          animate={{ y: 0 }} 
+          className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-300 p-8 rounded-xl shadow-lg max-w-md w-full border border-yellow-200 dark:border-yellow-800"
+        >
+          <h2 className="text-2xl font-bold mb-4">Session Expired</h2>
+          <p className="mb-6">Your session has expired or you are not logged in. Please log in again to access this page.</p>
+          <Link
+            href="/auth"
+            className="w-full px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center shadow-md hover:shadow-lg"
+          >
+            Log In
+          </Link>
+        </motion.div>
+      </motion.div>
+    );
   }
 
   // If we're authenticated but still loading data, don't reload the component
@@ -134,7 +184,7 @@ useEffect(() => {
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
             <button 
-              onClick={() => router.push(`/${session?.username}`)}
+              onClick={() => router.push(`/${effectiveSession?.username}`)}
               className="inline-flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
             >
               Dashboard

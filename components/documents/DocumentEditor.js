@@ -131,73 +131,77 @@ export default function DocumentEditor({
     }
   }, [initialContent, editor]);
 
-const exportAsPDF = useCallback(() => {
-  // Set a small delay to ensure styling is applied
-  setTimeout(() => {
-    // Get the editor content container
-    const element = document.querySelector(".editor-content-container");
-    
-    if (!element) {
-      toast.error("Could not generate PDF");
-      return;
-    }
-    
-    // Show loading indicator
-    const loadingToast = toast.loading("Generating PDF...");
-    
-    // Use a direct conversion approach
-    Promise.all([
-      import('html2canvas'),
-      import('jspdf')
-    ]).then(([html2canvasModule, jsPDFModule]) => {
-      const html2canvas = html2canvasModule.default;
-      const jsPDF = jsPDFModule.default || jsPDFModule.jsPDF;
-      
-      // Handle dark mode
-      const originalBackground = element.style.backgroundColor;
-      const originalColor = element.style.color;
-      
-      // Force simple colors for export
-      element.style.backgroundColor = theme === 'dark' ? '#1f2937' : '#ffffff';
-      element.style.color = theme === 'dark' ? '#f9fafb' : '#111827';
-      
-      html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff'
-      }).then(canvas => {
-        // Restore original styles
-        element.style.backgroundColor = originalBackground;
-        element.style.color = originalColor;
-        
-        // Create PDF
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.addImage(
-          canvas.toDataURL('image/jpeg', 0.95), 
-          'JPEG', 
-          10, 10, 
-          190, (canvas.height * 190) / canvas.width
-        );
-        pdf.save(`${documentTitle || "document"}.pdf`);
-        
-        toast.dismiss(loadingToast);
-        toast.success("PDF generated successfully");
-      }).catch(error => {
-        // Restore original styles
-        element.style.backgroundColor = originalBackground;
-        element.style.color = originalColor;
-        
-        toast.dismiss(loadingToast);
-        console.error("Canvas generation error:", error);
-        toast.error("Failed to generate PDF");
-      });
-    }).catch(error => {
-      toast.dismiss(loadingToast);
-      console.error("Failed to load PDF libraries:", error);
-      toast.error("Could not load PDF generation libraries");
-    });
-  }, 250);
-}, [documentTitle, theme]);
+  const exportAsPDF = useCallback(() => {
+    // Set a small delay to ensure styling is applied
+    setTimeout(() => {
+      // Get the editor content container
+      const element = document.querySelector(".editor-content-container");
+
+      if (!element) {
+        toast.error("Could not generate PDF");
+        return;
+      }
+
+      // Show loading indicator
+      const loadingToast = toast.loading("Generating PDF...");
+
+      // Use a direct conversion approach
+      Promise.all([import("html2canvas"), import("jspdf")])
+        .then(([html2canvasModule, jsPDFModule]) => {
+          const html2canvas = html2canvasModule.default;
+          const jsPDF = jsPDFModule.default || jsPDFModule.jsPDF;
+
+          // Handle dark mode
+          const originalBackground = element.style.backgroundColor;
+          const originalColor = element.style.color;
+
+          // Force simple colors for export
+          element.style.backgroundColor =
+            theme === "dark" ? "#1f2937" : "#ffffff";
+          element.style.color = theme === "dark" ? "#f9fafb" : "#111827";
+
+          html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: theme === "dark" ? "#1f2937" : "#ffffff",
+          })
+            .then((canvas) => {
+              // Restore original styles
+              element.style.backgroundColor = originalBackground;
+              element.style.color = originalColor;
+
+              // Create PDF
+              const pdf = new jsPDF("p", "mm", "a4");
+              pdf.addImage(
+                canvas.toDataURL("image/jpeg", 0.95),
+                "JPEG",
+                10,
+                10,
+                190,
+                (canvas.height * 190) / canvas.width
+              );
+              pdf.save(`${documentTitle || "document"}.pdf`);
+
+              toast.dismiss(loadingToast);
+              toast.success("PDF generated successfully");
+            })
+            .catch((error) => {
+              // Restore original styles
+              element.style.backgroundColor = originalBackground;
+              element.style.color = originalColor;
+
+              toast.dismiss(loadingToast);
+              console.error("Canvas generation error:", error);
+              toast.error("Failed to generate PDF");
+            });
+        })
+        .catch((error) => {
+          toast.dismiss(loadingToast);
+          console.error("Failed to load PDF libraries:", error);
+          toast.error("Could not load PDF generation libraries");
+        });
+    }, 250);
+  }, [documentTitle, theme]);
 
   // Add this function for version history
   const showVersionHistory = useCallback(() => {
@@ -291,9 +295,10 @@ const exportAsPDF = useCallback(() => {
         saveDocument={saveDocument}
         exportDocument={exportAsPDF}
         navigateBack={handleNavigateToDocuments}
+        userName={session.userName}
       />
 
-      <EditorToolbar editor={editor} theme={theme} />
+      <EditorToolbar editor={editor} theme={theme} collabId={collabId} />
 
       <div className="bg-gray-50 dark:bg-gray-800/50 transition-all duration-200">
         <ActiveUsersDisplay activeUsers={activeUsers} />
@@ -305,11 +310,11 @@ const exportAsPDF = useCallback(() => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
-        className="editor-content-container px-6 py-8 min-h-[60vh] bg-white dark:bg-gray-900 transition-all duration-200"
+        className="editor-content-container px-6 py-8 h-[60vh] overflow-y-auto bg-white dark:bg-gray-900 transition-all duration-200"
       >
         <EditorContent
           editor={editor}
-          className="prose dark:prose-invert max-w-4xl mx-auto min-h-[60vh] focus:outline-none"
+          className="editor-content prose dark:prose-invert max-w-4xl mx-auto min-h-[60vh] focus:outline-none"
         />
       </motion.div>
 

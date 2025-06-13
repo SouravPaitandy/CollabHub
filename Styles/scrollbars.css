@@ -1,0 +1,94 @@
+/* Global scrollbar styling for CollabHub */
+
+/* Main scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px; /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.35); /* Indigo with low opacity */
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(79, 70, 229, 0.5); /* Brighter on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 70, 229, 0.35) transparent;
+}
+
+/* Dark mode support */
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.5); /* Slightly brighter in dark mode */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(99, 102, 241, 0.6); /* Even brighter on hover in dark mode */
+}
+
+.dark * {
+  scrollbar-color: rgba(79, 70, 229, 0.5) transparent;
+}
+
+/* High-contrast mode for accessibility */
+@media (prefers-contrast: high) {
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(67, 56, 202, 0.8); /* Higher contrast */
+  }
+  
+  * {
+    scrollbar-color: rgba(67, 56, 202, 0.8) transparent;
+  }
+}
+
+/* Specific styling for code blocks and pre elements */
+pre::-webkit-scrollbar {
+  height: 4px; /* Smaller height for code blocks */
+}
+
+/* Table containers with horizontal scroll */
+.table-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+/* Modals and dropdowns can have more visible scrollbars */
+.modal-content::-webkit-scrollbar-thumb,
+.dropdown-content::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.4);
+}
+
+/* Document editor specific tweaks */
+.editor-content-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.editor-content-container::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.3);
+}
+
+.editor-content-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(99, 102, 241, 0.5);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px; /* Even smaller on mobile */
+  }
+}
+
+/* Print - hide scrollbars */
+@media print {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}

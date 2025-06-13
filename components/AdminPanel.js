@@ -259,6 +259,28 @@ function AdminPanel({ id }) {
         </div>
       </div>
     );
+  if(!session || !session.user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center p-6 bg-red-100 dark:bg-red-900/30 rounded-xl shadow-lg">
+          <h2 className="text-2xl font-bold mb-2 text-red-600">Access Denied</h2>
+          <p className="mb-4">You do not have permission to access this page. It might be due to expired session, if so then please relogin to Continue.</p>
+          <button
+            onClick={() => window.history.back()}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Return to Dashboard
+          </button>
+          <button
+            onClick={() => router.push("/auth")}
+            className="ml-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+            Back to Login page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">

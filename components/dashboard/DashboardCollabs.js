@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { FiSettings, FiMessageSquare, FiClipboard, FiExternalLink, FiUser, FiUsers, FiLayers, FiChevronLeft, FiChevronRight, FiFileText } from 'react-icons/fi';
 import { HiOutlineSparkles } from 'react-icons/hi';
 
-const DashboardCollabs = ({adminCollabs, memberCollabs}) => {
+const DashboardCollabs = ({adminCollabs, memberCollabs, username}) => {
+
+  console.log('username came:', username);
   // State for active tab
   const [activeTab, setActiveTab] = useState('admin'); // 'admin' or 'member'
   
@@ -250,12 +252,13 @@ const DashboardCollabs = ({adminCollabs, memberCollabs}) => {
                               >
                                 <FiClipboard className="mr-2" /> Tasks
                               </Link>
-                              <Link
+                              {/* This is for the test purpose only */}
+                              { username === 'SouravPaitandy' && <Link
                                 href={`/collab/documents/${collab.collabId}`}
                                 className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 transition-colors duration-200"
                               >
                                 <FiFileText className="mr-2" /> Documents
-                              </Link>
+                              </Link> }
                             </div>
                           </div>
                         </motion.li>
@@ -374,12 +377,13 @@ const DashboardCollabs = ({adminCollabs, memberCollabs}) => {
                               >
                                 <FiClipboard className="mr-2" /> Tasks
                               </Link>
-                              <Link
+                              {/* This is for the test purpose only */}
+                              { username === 'SouravPaitandy' && <Link
                                 href={`/collab/documents/${collab.collabId}`}
                                 className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 transition-colors duration-200"
                               >
                                 <FiFileText className="mr-2" /> Documents
-                              </Link>
+                              </Link> }
                             </div>
                           </div>
                         </motion.li>

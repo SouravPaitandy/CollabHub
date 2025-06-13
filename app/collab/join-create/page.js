@@ -86,7 +86,7 @@ const JoinCreateCollab = () => {
             whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)" }}
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium transition duration-300 flex items-center justify-center gap-2"
-            onClick={() => router.push('/auth/signin')}
+            onClick={() => router.push('/auth')}
           >
             <FaKey /> Sign In to Continue
           </motion.button>
@@ -115,7 +115,32 @@ const JoinCreateCollab = () => {
         variants={fadeInUp}
         className="min-h-screen text-gray-900 dark:text-white p-6 flex flex-col items-center justify-center"
       >
-        <div className="max-w-4xl w-full">
+        <div className="relative max-w-4xl w-full">
+          <div className="absolute top-2 -left-60">
+                  <motion.button
+                    onClick={() => window.history.back()}
+                    className="mb-4 ml-24 flex items-center text-[#4a6fa5] dark:text-blue-400 hover:text-[#3a5a8c] dark:hover:text-blue-300 transition-colors duration-200"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    whileHover={{ x: -3 }}
+                  >
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                    Back
+                  </motion.button>
+          </div>
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

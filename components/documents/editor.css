@@ -272,3 +272,82 @@
 .dark .ProseMirror ::selection {
   background: rgba(99, 102, 241, 0.3);
 }
+
+/* Add these styles to your editor.css */
+
+.image-component {
+  position: relative;
+  transition: all 0.2s ease;
+  margin: 1rem 0;
+}
+
+.image-component.selected {
+  z-index: 10;
+}
+
+.image-component img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.image-component .image-controls {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.image-component:hover .image-controls,
+.image-component.selected .image-controls {
+  opacity: 1;
+}
+
+.image-component[data-alignment="left"] img {
+  margin-right: auto;
+}
+
+.image-component[data-alignment="center"] img {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.image-component[data-alignment="right"] img {
+  margin-left: auto;
+}
+
+/* Add this to your editor.css file */
+.editor-content-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.editor-content-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor-content-container::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.3);
+  border-radius: 9999px;
+}
+
+.editor-content-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(79, 70, 229, 0.5);
+}
+
+/* For Firefox */
+.editor-content-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 70, 229, 0.3) transparent;
+}
+
+/* Dark mode support */
+.dark .editor-content-container::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.5);
+}
+
+.dark .editor-content-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(79, 70, 229, 0.7);
+}
+
+.dark .editor-content-container {
+  scrollbar-color: rgba(79, 70, 229, 0.5) transparent;
+}

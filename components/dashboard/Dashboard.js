@@ -15,7 +15,45 @@ import Image from "next/image";
 // Lazy load the GitHub repos component
 const GitHubRepos = lazy(() => import("./GithubRepos.js"));
 
-const Dashboard = ({ username }) => {
+const SessionExpiredBanner = ({ onLogin }) => {
+  return (
+    <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-8 rounded-r-lg shadow-md">
+      <div className="flex items-start">
+        <div className="flex-shrink-0">
+          <svg
+            className="h-5 w-5 text-red-600 dark:text-red-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
+        <div className="ml-3 flex-1 md:flex md:justify-between md:items-center">
+          <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+            Your session has expired or you&apos;ve been logged out. You&apos;re
+            currently viewing in demo mode.
+          </p>
+          <div className="mt-3 md:mt-0 md:ml-6">
+            <button
+              onClick={onLogin}
+              className="whitespace-nowrap px-4 py-2 bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100 rounded-md hover:bg-red-200 dark:hover:bg-red-700 font-medium text-sm transition-colors"
+            >
+              Log in again
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Dashboard = ({ username = "User", isSessionExpired = false }) => {
   const { data: session } = useSession();
   const [adminCollabs, setAdminCollabs] = useState([]);
   const [memberCollabs, setMemberCollabs] = useState([]);
@@ -23,6 +61,7 @@ const Dashboard = ({ username }) => {
   const [error, setError] = useState(null);
   const [showGithubRepos, setShowGithubRepos] = useState(false);
   const [isStatsLoading, setIsStatsLoading] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(isSessionExpired);
 
   const [taskStats, setTaskStats] = useState({
     totalProjects: 0,
@@ -35,15 +74,83 @@ const Dashboard = ({ username }) => {
   const { theme } = useTheme();
   const router = useRouter();
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const githubRepoRef = useRef(null);
 
-  if (!session) {
+  /// Update session expired state if session changes to null after it was previously available
+  useEffect(() => {
+    // If server already determined session is expired, we don't need client checks
+    if (isSessionExpired) return;
+
+    // If initially loading, wait for session check to complete
+    if (isLoading) return;
+
+    // Check if session is missing (expired/logged out)
+    if (!session) {
+      console.log(
+        "Dashboard: No active session detected, switching to demo mode"
+      );
+      setSessionExpired(true);
+
+      // Set demo data for better UX
+      setAdminCollabs([
+        {
+          id: "demo-1",
+          name: "Demo Project",
+          description:
+            "This is a demo project shown because your session has expired",
+          role: "ADMIN",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+
+      setMemberCollabs([
+        {
+          id: "demo-2",
+          name: "Example Collaboration",
+          description: "Please log in again to see your real collaborations",
+          role: "MEMBER",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+
+      setTaskStats({
+        totalProjects: 2,
+        totalTasks: 8,
+        completedTasks: 3,
+        highPriorityTasks: 2,
+        tasksDueSoon: 1,
+      });
+    }
+  }, [session, isLoading, isSessionExpired]);
+
+  // Replace the previous session check with this
+  // useEffect(() => {
+  //   // Set a periodic check for session validity without redirect
+  //   const intervalId = setInterval(() => {
+  //     if (session === null && !isSessionExpired && !isLoading) {
+  //       setIsSessionExpired(true);
+  //     }
+  //   }, 60000); // Check every minute
+
+  //   return () => clearInterval(intervalId);
+  // }, [session, isSessionExpired, isLoading]);
+
+  // Handle login button click
+  const handleLogin = () => {
     router.push("/auth");
-  }
+  };
 
   // Load core data first (collaborations)
+  // Load core data only if we have a session
   useEffect(() => {
     const fetchCollabs = async () => {
+      if (sessionExpired) {
+        // In demo mode, just finish loading
+        setIsLoading(false);
+        // setIsStatsLoading(false);
+        return;
+      }
       if (session?.user?.email) {
         try {
           const response = await fetch("/api/user/collabs");
@@ -58,15 +165,24 @@ const Dashboard = ({ username }) => {
         } finally {
           setIsLoading(false);
         }
+      } else {
+        // No session, just finish loading
+        setIsLoading(false);
       }
     };
 
     fetchCollabs();
-  }, [session]);
+  }, [session, sessionExpired]);
 
   // Load non-critical stats data.
   useEffect(() => {
     const fetchStats = async () => {
+      if (sessionExpired) {
+        // In demo mode, just finish loading
+        setIsLoading(false);
+        setIsStatsLoading(false);
+        return;
+      }
       if (session?.user?.email && !isLoading) {
         try {
           const statsResponse = await fetch("/api/user/task-stats");
@@ -80,11 +196,14 @@ const Dashboard = ({ username }) => {
         } finally {
           setIsStatsLoading(false);
         }
+      } else {
+        // No session, just finish loading stats
+        setIsStatsLoading(false);
       }
     };
 
     fetchStats();
-  }, [session, isLoading]);
+  }, [session, isLoading, sessionExpired]);
 
   const createCollabFromRepo = async (repo) => {
     try {
@@ -140,7 +259,7 @@ const Dashboard = ({ username }) => {
   };
 
   if (isLoading) return <Loader />;
-  if (error)
+  if (error && !isSessionExpired)
     return <div className="h-screen text-center pt-80">Error: {error}</div>;
 
   const stats = [
@@ -155,6 +274,11 @@ const Dashboard = ({ username }) => {
       icon: "🤝",
     },
   ];
+
+  // Determine display name
+  const displayName = isSessionExpired
+    ? "Demo User"
+    : session?.username || username || "User";
 
   return (
     <div>
@@ -175,6 +299,9 @@ const Dashboard = ({ username }) => {
       {/* Main Content */}
       <div className="relative min-h-screen text-gray-800 dark:text-white">
         <div className="max-w-7xl mx-auto p-6 py-20">
+          {/* Show session expired banner if needed */}
+          {isSessionExpired && <SessionExpiredBanner onLogin={handleLogin} />}
+
           <motion.header
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -182,11 +309,14 @@ const Dashboard = ({ username }) => {
             className="mb-12 text-center"
           >
             <h1 className="text-5xl font-extrabold pb-4 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 animate-gradient">
-              Welcome, {username} 👋
+              {isSessionExpired
+                ? "Dashboard Preview"
+                : `Welcome, ${displayName} 👋`}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Ready to collaborate and achieve your goals? Let&apos;s make today
-              productive and impactful!
+              {isSessionExpired
+                ? "Your session has expired. Please log in again to access your full dashboard."
+                : "Ready to collaborate and achieve your goals? Let's make today productive and impactful!"}
             </p>
             <div className="mt-6 flex justify-center">
               <motion.div
@@ -201,18 +331,23 @@ const Dashboard = ({ username }) => {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    const confirmed = confirm(
-                      "Would you like to create a collaboration manually? Click 'OK' to proceed or 'Cancel' to use GitHub repository integration instead."
-                    );
-                    if (confirmed) {
-                      router.push("/collab/join-create");
-                    } else if (session?.provider === "github") {
-                      handleShowGithubRepos();
+                    if (isSessionExpired) {
+                      handleLogin();
+                    } else {
+                      // Original logic
+                      const confirmed = confirm(
+                        "Would you like to create a collaboration manually? Click 'OK' to proceed or 'Cancel' to use GitHub repository integration instead."
+                      );
+                      if (confirmed) {
+                        router.push("/collab/join-create");
+                      } else if (session?.provider === "github") {
+                        handleShowGithubRepos();
+                      }
                     }
                   }}
                   className="px-8 py-3 cursor-pointer rounded-full text-white font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 dark:from-blue-500 dark:to-indigo-600 dark:hover:from-blue-600 dark:hover:to-indigo-700 shadow-lg transform transition-all duration-300 hover:scale-105"
                 >
-                  Get Started 🚀
+                  {isSessionExpired ? "Log In Again" : "Get Started 🚀"}
                 </button>
               </motion.div>
             </div>
@@ -227,7 +362,7 @@ const Dashboard = ({ username }) => {
           >
             <div className="flex items-center mb-6 md:mb-0">
               <Image
-                src={session?.user?.image || "/default-avatar.png"}
+                src={session?.user?.image || "/default-pic.png"}
                 alt="Profile"
                 width={96}
                 height={96}
@@ -236,23 +371,23 @@ const Dashboard = ({ username }) => {
               />
               <div>
                 <h2 className="text-2xl font-semibold text-indigo-700 dark:text-indigo-300">
-                  {session?.user?.name}
+                  {session?.user?.name || displayName}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  {session?.user?.email}
+                  {session?.user?.email || "Demo Mode"}
                 </p>
               </div>
             </div>
             <Link
-              href="/collab/join-create"
+              href={ session ? "/collab/join-create" : "/auth" }
               className="px-6 py-3 rounded-full text-white font-semibold transition-all transform hover:scale-105 bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700 shadow-lg"
             >
-              Create or Join a new Collab
+              { session ? 'Create or Join a new Collab' : 'Log In to Create a Collab' }
             </Link>
           </motion.div>
 
           {/* GitHub Integration Status - Only show if using GitHub */}
-          {session?.provider === "github" && (
+          {session?.provider === "github" && !isSessionExpired && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -285,7 +420,7 @@ const Dashboard = ({ username }) => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Connected as{" "}
                           <span className="font-medium text-green-600 dark:text-green-400">
-                            @{session.username || "user"}
+                            @{session?.username || displayName || "user"}
                           </span>
                         </p>
                       </div>
@@ -418,10 +553,13 @@ const Dashboard = ({ username }) => {
           />
 
           {/* Collaborations Section */}
-          <DashboardCollabs
+          { session && <DashboardCollabs
             adminCollabs={adminCollabs}
             memberCollabs={memberCollabs}
-          />
+            username={
+              session?.username || session?.user?.name || displayName || "User"
+            }
+          /> }
 
           {/* Repository Activity - Only show if using GitHub and explicitly requested */}
           {session?.provider === "github" &&
@@ -528,16 +666,46 @@ const Dashboard = ({ username }) => {
       </div>
 
       {/* Footer */}
-      <hr className="my-8 border-t dark:border-indigo-300 opacity-20" />
-      <footer className="py-6 text-center">
-        <p className="text-gray-600 dark:text-gray-400">
-          &copy; {new Date().getFullYear()} CollabHub. All rights reserved.
-        </p>
-        <p className="text-5xl font-extrabold mt-2 opacity-40">
-          <span className="text-indigo-600 dark:text-indigo-300">✨</span>
-          <span className="text-gray-600 dark:text-gray-400">
-            Made with ❤️ by the CollabHub Team
+      <footer className="mb-16 px-4">
+        <p className="text-6xl font-extrabold mt-2  md:text-center">
+          <span className="text-gray-600 dark:text-gray-400 opacity-40">
+            Crafted with{" "}
           </span>
+          <span>❤️ </span>
+          <span className="text-gray-600 dark:text-gray-400 opacity-40">
+            for the CollabHub Family
+          </span>
+        </p>
+        {/* <hr className="my-6 border-t dark:border-indigo-300 opacity-50" /> */}
+        <svg
+          id="wave"
+          // style="transform:rotate(180deg); transition: 0.3s"
+          className="my-6 md:px-20 opacity-50 rotate-180 transition-all duration-300 md:text-center"
+          viewBox="0 0 1440 100"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0">
+              <stop
+                stopColor="rgba(100.549, 100.549, 100.549, 1)"
+                offset="0%"
+              ></stop>
+              <stop
+                stopColor="rgba(237.156, 237.156, 237.156, 1)"
+                offset="100%"
+              ></stop>
+            </linearGradient>
+          </defs>
+          <path
+            // style="transform:translate(0, 0px); opacity:1"
+            className="translate opacity-100"
+            fill="url(#sw-gradient-0)"
+            d="M0,90L40,81.7C80,73,160,57,240,56.7C320,57,400,73,480,76.7C560,80,640,70,720,68.3C800,67,880,73,960,78.3C1040,83,1120,87,1200,75C1280,63,1360,37,1440,30C1520,23,1600,37,1680,38.3C1760,40,1840,30,1920,33.3C2000,37,2080,53,2160,55C2240,57,2320,43,2400,35C2480,27,2560,23,2640,18.3C2720,13,2800,7,2880,6.7C2960,7,3040,13,3120,16.7C3200,20,3280,20,3360,26.7C3440,33,3520,47,3600,50C3680,53,3760,47,3840,48.3C3920,50,4000,60,4080,58.3C4160,57,4240,43,4320,35C4400,27,4480,23,4560,30C4640,37,4720,53,4800,58.3C4880,63,4960,57,5040,56.7C5120,57,5200,63,5280,60C5360,57,5440,43,5520,38.3C5600,33,5680,37,5720,38.3L5760,40L5760,100L5720,100C5680,100,5600,100,5520,100C5440,100,5360,100,5280,100C5200,100,5120,100,5040,100C4960,100,4880,100,4800,100C4720,100,4640,100,4560,100C4480,100,4400,100,4320,100C4240,100,4160,100,4080,100C4000,100,3920,100,3840,100C3760,100,3680,100,3600,100C3520,100,3440,100,3360,100C3280,100,3200,100,3120,100C3040,100,2960,100,2880,100C2800,100,2720,100,2640,100C2560,100,2480,100,2400,100C2320,100,2240,100,2160,100C2080,100,2000,100,1920,100C1840,100,1760,100,1680,100C1600,100,1520,100,1440,100C1360,100,1280,100,1200,100C1120,100,1040,100,960,100C880,100,800,100,720,100C640,100,560,100,480,100C400,100,320,100,240,100C160,100,80,100,40,100L0,100Z"
+          ></path>
+        </svg>
+        <p className="text-xl font-bold text-gray-500 dark:text-gray-400 ml-32">
+          CollabHub
         </p>
       </footer>
     </div>

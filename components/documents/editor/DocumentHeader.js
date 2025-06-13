@@ -9,6 +9,7 @@ import {
   FaHistory,
   FaEllipsisV,
 } from "react-icons/fa";
+import { printUtils } from "./printUtils"; // Import from printUtils
 
 export default function DocumentHeader({
   documentTitle,
@@ -16,8 +17,8 @@ export default function DocumentHeader({
   connected,
   isSaving,
   saveDocument,
-  exportDocument,
   navigateBack,
+  userName = null,
 }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [titleEditing, setTitleEditing] = useState(false);
@@ -40,12 +41,29 @@ export default function DocumentHeader({
 
   // Handle key press
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleTitleChange();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setInputTitle(documentTitle);
       setTitleEditing(false);
     }
+  };
+
+  // Handle PDF export
+  // const handleExportPDF = () => {
+  //   exportAsPDF(documentTitle, userName)
+  //     .then(() => {
+  //       if (setShowDropdown) setShowDropdown(false);
+  //     })
+  //     .catch(error => {
+  //       console.error("PDF export failed:", error);
+  //       alert("Failed to export PDF. Please try again.");
+  //     });
+  // };
+
+  // Handle print
+  const handlePrint = () => {
+    printUtils(documentTitle, setShowDropdown, userName);
   };
 
   return (
@@ -83,7 +101,7 @@ export default function DocumentHeader({
             </h1>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-1">
           <div className="hidden sm:flex items-center mr-3">
             <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -100,7 +118,27 @@ export default function DocumentHeader({
               )}
             </div>
           </div>
-          
+
+          <div className="flex sm:hidden items-center mr-3">
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              {connected ? (
+                <div className="flex items-center">
+                  <span
+                    className="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full animate-pulse"
+                    aria-label="Connected status"
+                  ></span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span
+                    className="w-3 h-3 bg-red-500 dark:bg-red-400 rounded-full"
+                    aria-label="Disconnected status"
+                  ></span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="flex items-center gap-1 sm:gap-2">
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -110,9 +148,11 @@ export default function DocumentHeader({
               className="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md flex items-center disabled:bg-indigo-300 dark:disabled:bg-indigo-800/50 transition-all duration-200 text-sm shadow-sm hover:shadow"
             >
               <FaSave className="mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">{isSaving ? "Saving..." : "Save"}</span>
+              <span className="hidden sm:inline">
+                {isSaving ? "Saving..." : "Save"}
+              </span>
             </motion.button>
-            
+
             {/* Responsive design: show actions in dropdown on small screens */}
             <div className="relative sm:hidden">
               <motion.button
@@ -123,67 +163,71 @@ export default function DocumentHeader({
               >
                 <FaEllipsisV />
               </motion.button>
-              
+
               {showDropdown && (
-                <div className="absolute right-0 mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-md p-2 z-10 w-48 border border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => {
-                      exportDocument();
-                      setShowDropdown(false);
-                    }}
+                <div className="absolute right-0 mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-md p-2 z-40 w-48 border border-gray-200 dark:border-gray-700">
+                  {/* <button
+                    onClick={handleExportPDF}
                     className="w-full text-left p-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300"
                   >
                     <FaDownload className="mr-2" /> Export as PDF
-                  </button>
+                  </button> */}
                   <button
-                    onClick={() => {
-                      window.print();
-                      setShowDropdown(false);
-                    }}
+                    onClick={handlePrint}
                     className="w-full text-left p-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300"
                   >
                     <FaPrint className="mr-2" /> Print
                   </button>
-                  <button
-                    onClick={() => setShowDropdown(false)}
+                  {/* <button
+                    onClick={() => {
+                      alert("Share functionality is not implemented yet.");
+                      setShowDropdown(false);
+                    }}
                     className="w-full text-left p-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300"
                   >
                     <FaShareAlt className="mr-2" /> Share
-                  </button>
+                  </button> */}
                 </div>
               )}
             </div>
-            
+
             {/* Regular buttons for larger screens */}
             <div className="hidden sm:flex items-center">
-              <motion.button
+              {/* <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={exportDocument}
+                onClick={handleExportPDF}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 title="Export as PDF"
               >
                 <FaDownload />
-              </motion.button>
-              
+              </motion.button> */}
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.print()}
+                onClick={handlePrint}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 title="Print"
               >
                 <FaPrint />
               </motion.button>
-              
-              <motion.button
+
+              {/* <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 title="Share Document"
+                onClick={() =>
+                      {
+                        // Handle share functionality here
+                        alert("Share functionality is not implemented yet.");
+                        // You can integrate with a sharing service or open a share dialog                       
+                       setShowDropdown(false)
+                      }}
               >
                 <FaShareAlt />
-              </motion.button>
+              </motion.button> */}
             </div>
           </div>
         </div>

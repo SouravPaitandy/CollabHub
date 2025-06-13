@@ -5,7 +5,7 @@ import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Strike from "@tiptap/extension-strike";
 import Highlight from "@tiptap/extension-highlight";
-import Image from "@tiptap/extension-image";
+import { ImageExtension } from './extensions/ImageExtension';
 import Link from "@tiptap/extension-link";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
@@ -34,7 +34,11 @@ export const createEditorConfig = ({
         class: 'text-blue-600 underline hover:text-blue-800',
       },
     }),
-    Image,
+    ImageExtension.configure({
+      HTMLAttributes: {
+        class: 'rounded-md max-w-full',
+      },
+    }),
     TextAlign.configure({
       types: ['heading', 'paragraph'],
       alignments: ['left', 'center', 'right'],

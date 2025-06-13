@@ -104,7 +104,7 @@ const AuthPage = () => {
         >
           <motion.button
             onClick={handleGitHubSignIn}
-            className="group relative w-full flex justify-center py-3 px-4 border-2 border-gray-600 text-sm font-medium rounded-lg text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
+            className="group relative cursor-pointer w-full flex justify-center py-3 px-4 border-2 border-gray-600 text-sm font-medium rounded-lg text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
             whileHover={{ scale: 1.03, boxShadow: "0 0 15px rgba(79, 70, 229, 0.5)" }}
             whileTap={{ scale: 0.97 }}
           >
@@ -153,6 +153,7 @@ const AuthPage = () => {
             <FaUserAstronaut />
           </motion.div>
           Welcome aboard, {session.user.email}!
+          Redirecting you to your profile...
         </motion.div>
       )}
     </div>

@@ -30,57 +30,54 @@ const Feature = ({ icon, title, description }) => {
 
   return (
     <div
-      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-8 rounded-xl shadow-lg h-full 
-                transition-all duration-500 transform border border-gray-100 dark:border-gray-700
-                relative overflow-hidden group"
+      className="bg-card/50 backdrop-blur-md p-8 rounded-xl shadow-sm h-full 
+                transition-all duration-500 transform border border-border
+                relative overflow-hidden group hover:shadow-md hover:border-primary/20"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Background gradient that animates on hover */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 
-                    dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900 opacity-0 
-                    group-hover:opacity-15 transition-opacity duration-500"
+        className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500"
       ></div>
 
       {/* Animated corner accents */}
       <div
         className="absolute top-0 left-0 w-16 h-16 -translate-x-8 -translate-y-8 
-                    bg-indigo-500/10 rounded-full group-hover:translate-x-0 group-hover:translate-y-0 
+                    bg-primary/10 rounded-full group-hover:translate-x-0 group-hover:translate-y-0 
                     transition-all duration-700 ease-out"
       ></div>
       <div
         className="absolute bottom-0 right-0 w-16 h-16 translate-x-8 translate-y-8 
-                    bg-purple-500/10 rounded-full group-hover:translate-x-0 group-hover:translate-y-0 
+                    bg-secondary/10 rounded-full group-hover:translate-x-0 group-hover:translate-y-0 
                     transition-all duration-700 ease-out"
       ></div>
 
       <div className="relative z-10 flex flex-col justify-between h-full">
         <div>
           <div
-            className="flex items-center justify-center w-16 h-16 mb-6 rounded-full 
-                        bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-700 
-                        dark:from-indigo-600 dark:via-purple-700 dark:to-indigo-800
-                        text-white shadow-lg transform transition-transform duration-500
-                        group-hover:rotate-3 group-hover:scale-110"
+            className="flex items-center justify-center w-16 h-16 mb-6 rounded-2xl 
+                        bg-primary/10 text-primary shadow-sm transform transition-transform duration-500
+                        group-hover:rotate-3 group-hover:scale-110 border border-primary/20"
           >
             {icon}
           </div>
           <h4
-            className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 
-                       group-hover:text-indigo-700 dark:group-hover:text-indigo-300 
+            className="text-xl font-bold text-foreground mb-3 
+                       group-hover:text-primary 
                        transition-colors duration-300"
           >
             {title}
           </h4>
-          <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+          <p className="text-muted-foreground mb-6 leading-relaxed">
             {description}
           </p>
         </div>
         <Link
           href="/features"
-          className="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 
-                   dark:hover:text-indigo-400 flex items-center w-fit font-medium
+          className="text-primary hover:text-primary/80 
+                   flex items-center w-fit font-medium
                    relative overflow-hidden group/link"
         >
           <span className="relative z-10 flex items-center">
@@ -91,7 +88,7 @@ const Feature = ({ icon, title, description }) => {
             />
           </span>
           <span
-            className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 
+            className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary 
                          group-hover/link:w-full transition-all duration-300 ease-out"
           ></span>
         </Link>
@@ -129,8 +126,8 @@ const KeyFeatures = () => {
       /* Slide transitions */
       .swiper-slide {
         transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        opacity: 0.7;
-        filter: blur(1px);
+        opacity: 0.4;
+        filter: blur(10px);
       }
       .swiper-slide-active {
         transform: scale(1.08);
@@ -139,8 +136,8 @@ const KeyFeatures = () => {
         z-index: 2;
       }
       .swiper-slide-prev, .swiper-slide-next {
-        opacity: 0.85;
-        filter: blur(0.5px);
+        opacity: 0.25;
+        filter: blur(10px);
         z-index: 1;
       }
       
@@ -227,10 +224,7 @@ const KeyFeatures = () => {
 
   if (!mounted) {
     return (
-      <div
-        className="h-[500px] bg-gradient-to-r from-gray-100/80 to-gray-200/80 
-                     dark:from-gray-800/80 dark:to-gray-700/80 animate-pulse rounded-xl"
-      ></div>
+      <div className="h-[500px] bg-muted/50 animate-pulse rounded-xl"></div>
     );
   }
 
@@ -247,20 +241,20 @@ const KeyFeatures = () => {
   };
 
   return (
-    <section className="py-24 overflow-hidden bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
+    <section className="py-24 overflow-hidden bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
-            <div className="h-1.5 w-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mb-1"></div>
-            <div className="h-1.5 w-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full ml-6"></div>
+            <div className="h-1.5 w-16 bg-gradient-to-r from-primary to-indigo-500 rounded-full mb-1"></div>
+            <div className="h-1.5 w-10 bg-gradient-to-r from-primary to-indigo-500 rounded-full ml-6"></div>
           </div>
           <h2
-            className="text-4xl pb-4 font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 mb-4 
+            className="text-4xl pb-4 font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-primary to-foreground mb-4 
                          animate-text-shimmer bg-[length:200%_100%]"
           >
             Key Features
           </h2>
-          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-muted-foreground max-w-3xl mx-auto">
             Powerful tools to enhance your collaboration
           </p>
         </div>
@@ -307,8 +301,8 @@ const KeyFeatures = () => {
                 className={`w-2 h-2 rounded-full transition-all duration-300 
                   ${
                     activeIndex === index
-                      ? "bg-indigo-600 w-6"
-                      : "bg-gray-300 dark:bg-gray-600"
+                      ? "bg-primary w-6"
+                      : "bg-muted-foreground/30"
                   }`}
                 onClick={() => {
                   if (swiperRef.current && swiperRef.current.swiper) {
@@ -384,8 +378,7 @@ const KeyFeatures = () => {
         <button
           onClick={handlePrev}
           className="p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110
-                   bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700
-                   hover:bg-indigo-50 dark:hover:bg-indigo-900/30 group"
+                   bg-card border border-border text-foreground hover:bg-muted group"
           aria-label="Previous slide"
         >
           <svg
@@ -394,8 +387,8 @@ const KeyFeatures = () => {
             viewBox="0 0 24 24"
             strokeWidth={2.5}
             stroke="currentColor"
-            className="w-5 h-5 text-indigo-600 dark:text-indigo-400
-                                               group-hover:text-indigo-700 dark:group-hover:text-indigo-300
+            className="w-5 h-5 text-muted-foreground
+                                               group-hover:text-primary
                                                transition-transform duration-300 group-hover:-translate-x-0.5"
           >
             <path
@@ -408,8 +401,7 @@ const KeyFeatures = () => {
         <button
           onClick={handleNext}
           className="p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110
-                   bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700
-                   hover:bg-indigo-50 dark:hover:bg-indigo-900/30 group"
+                   bg-card border border-border text-foreground hover:bg-muted group"
           aria-label="Next slide"
         >
           <svg
@@ -418,8 +410,8 @@ const KeyFeatures = () => {
             viewBox="0 0 24 24"
             strokeWidth={2.5}
             stroke="currentColor"
-            className="w-5 h-5 text-indigo-600 dark:text-indigo-400
-                                               group-hover:text-indigo-700 dark:group-hover:text-indigo-300
+            className="w-5 h-5 text-muted-foreground
+                                               group-hover:text-primary
                                                transition-transform duration-300 group-hover:translate-x-0.5"
           >
             <path
@@ -446,18 +438,18 @@ const KeyFeatures = () => {
           >
             <span
               className={`w-3 h-3 rounded-full mb-2 transition-all duration-500
-                         ${
-                           activeIndex === index
-                             ? "bg-gradient-to-r from-indigo-500 to-purple-600 scale-125"
-                             : "bg-gray-300 dark:bg-gray-600 group-hover:bg-indigo-300 dark:group-hover:bg-indigo-700"
-                         }`}
+                          ${
+                            activeIndex === index
+                              ? "bg-gradient-to-r from-primary to-indigo-500 scale-125"
+                              : "bg-muted-foreground/30 group-hover:bg-primary/50"
+                          }`}
             />
             <span
               className={`text-xs font-medium transition-all duration-300
                           ${
                             activeIndex === index
-                              ? "text-indigo-600 dark:text-indigo-400"
-                              : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
+                              ? "text-primary"
+                              : "text-muted-foreground group-hover:text-foreground"
                           }`}
             >
               {feature.title.split(" ")[0]}

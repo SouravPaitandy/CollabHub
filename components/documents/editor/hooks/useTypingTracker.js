@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 
-export function useTypingTracker({ editor, wsProviderRef, userData, setTypingUsers }) {
+export function useTypingTracker({
+  editor,
+  wsProviderRef,
+  userData,
+  setTypingUsers,
+}) {
   useEffect(() => {
     if (!editor || !wsProviderRef.current || !userData) {
       return;
@@ -113,5 +118,5 @@ export function useTypingTracker({ editor, wsProviderRef, userData, setTypingUse
         wsProvider.awareness.off("change", updateTypingUsers);
       }
     };
-  }, [editor, wsProviderRef.current, userData, setTypingUsers]);
+  }, [editor, userData, setTypingUsers]);
 }

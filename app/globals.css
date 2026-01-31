@@ -1,34 +1,167 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
 
 /* Define a custom variant for dark mode */
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  /* Ceramic Light Mode */
+  --background: 210 40% 98%; /* Slightly cool white */
+  --foreground: 230 25% 15%; /* Deep navy text */
 
+  --card: 0 0% 100%;
+  --card-foreground: 230 25% 15%;
 
+  --popover: 0 0% 100%;
+  --popover-foreground: 230 25% 15%;
 
-/* 
-.chat-body.chat-page #navbar,
-.chat-body.chat-page #footer,
-.chat-body.chat-page header,
-.chat-body.chat-page footer {
-  display: none !important;
+  /* Electric Indigo */
+  --primary: 245 80% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Soft Lavender */
+  --secondary: 240 20% 96%;
+  --secondary-foreground: 240 40% 20%;
+
+  --muted: 240 20% 96%;
+  --muted-foreground: 230 20% 50%;
+
+  --accent: 240 20% 96%;
+  --accent-foreground: 240 40% 20%;
+
+  --destructive: 0 85% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 230 20% 92%;
+  --input: 230 20% 92%;
+  --ring: 245 80% 60%;
+
+  --radius: 1rem; /* More rounded premium feel */
 }
 
-.chat-body.chat-page {
-  overflow: hidden;
+.dark {
+  /* Cosmic Midnight Mode */
+  --background: 230 35% 7%; /* Deep space blue-black */
+  --foreground: 210 20% 98%;
+
+  /* Glass Card - Semi-transparent deep blue */
+  --card: 230 40% 12%;
+  --card-foreground: 210 20% 98%;
+
+  --popover: 230 40% 12%;
+  --popover-foreground: 210 20% 98%;
+
+  /* Neon Indigo */
+  --primary: 245 90% 65%;
+  --primary-foreground: 210 20% 98%;
+
+  /* Deep Violet Base */
+  --secondary: 250 30% 15%;
+  --secondary-foreground: 210 20% 98%;
+
+  --muted: 250 30% 15%;
+  --muted-foreground: 230 20% 65%;
+
+  --accent: 250 30% 15%;
+  --accent-foreground: 210 20% 98%;
+
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 210 20% 98%;
+
+  --border: 240 30% 20%; /* Subtle purple border */
+  --input: 240 30% 20%;
+  --ring: 245 90% 65%;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Cosmic Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 99px;
+  transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
+
+/* Premium Glassmorphism */
+.glass {
+  @apply bg-white/70 dark:bg-[#0B1020]/70 border border-white/40 dark:border-white/5 backdrop-blur-xl shadow-lg;
+}
+.glass-card {
+  @apply bg-white/80 dark:bg-[#121629]/60 border border-white/50 dark:border-white/10 backdrop-blur-2xl shadow-xl transition-all duration-300;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+.dark .glass-card {
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+.glass-card:hover {
+  @apply border-indigo-500/30 dark:border-indigo-400/30;
+  box-shadow: 0 12px 40px -10px rgba(99, 102, 241, 0.2);
+}
+
+/* Aura / Glow Effects */
+.aura-glow {
+  box-shadow: 0 0 80px -20px var(--color-primary) / 0.2;
+}
+.aura-text-glow {
+  text-shadow: 0 0 30px var(--color-primary) / 0.6;
+}
+
+/* Utility Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0px);
   }
 }
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.3s ease-out;
-} */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}

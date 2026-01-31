@@ -53,5 +53,5 @@ export function useActivityTracker({ wsProviderRef, userData }) {
       });
       clearInterval(inactivityInterval);
     };
-  }, [userData, wsProviderRef.current]);
+  }, [userData]);
 }

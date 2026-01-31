@@ -1,416 +1,301 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
-import { FiSettings, FiMessageSquare, FiClipboard, FiExternalLink, FiUser, FiUsers, FiLayers, FiChevronLeft, FiChevronRight, FiFileText } from 'react-icons/fi';
-import { HiOutlineSparkles } from 'react-icons/hi';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import {
+  FiSettings,
+  FiMessageSquare,
+  FiClipboard,
+  FiExternalLink,
+  FiUser,
+  FiUsers,
+  FiLayers,
+  FiChevronLeft,
+  FiChevronRight,
+  FiFileText,
+  FiActivity,
+} from "react-icons/fi";
+import SpotlightCard from "../ui/SpotlightCard";
 
-const DashboardCollabs = ({adminCollabs, memberCollabs, username}) => {
-
-  console.log('username came:', username);
-  // State for active tab
-  const [activeTab, setActiveTab] = useState('admin'); // 'admin' or 'member'
-  
-  // State for pagination
+const DashboardCollabs = ({ adminCollabs, memberCollabs, username }) => {
+  const [activeTab, setActiveTab] = useState("admin"); // 'admin' or 'member'
   const [adminPage, setAdminPage] = useState(0);
   const [memberPage, setMemberPage] = useState(0);
-  const itemsPerPage = 4; // Show 4 items per page (2x2 grid)
-  
-  // Calculate pagination
-  const adminMaxPage = Math.max(0, Math.ceil(adminCollabs.length / itemsPerPage) - 1);
-  const memberMaxPage = Math.max(0, Math.ceil(memberCollabs.length / itemsPerPage) - 1);
-  
-  // Get current page items
-  const currentAdminCollabs = adminCollabs.slice(
-    adminPage * itemsPerPage, 
-    adminPage * itemsPerPage + itemsPerPage
-  );
-  
-  const currentMemberCollabs = memberCollabs.slice(
-    memberPage * itemsPerPage, 
-    memberPage * itemsPerPage + itemsPerPage
-  );
-  
-  // Animation variants
+  const itemsPerPage = 6; // Increased density for modern feel
+
+  // Pagination Logic
+  const paginate = (items, page) => {
+    return items.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+  };
+
+  const currentAdminCollabs = paginate(adminCollabs, adminPage);
+  const currentMemberCollabs = paginate(memberCollabs, memberPage);
+
+  const adminMaxPage = Math.ceil(adminCollabs.length / itemsPerPage) - 1;
+  const memberMaxPage = Math.ceil(memberCollabs.length / itemsPerPage) - 1;
+
+  // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
-  
+
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { 
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
-
-  const tabContentVariants = {
-    hidden: { opacity: 0, x: 20 },
-    visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: { duration: 0.3 } 
+      transition: { type: "spring", stiffness: 120 },
     },
-    exit: { 
-      opacity: 0, 
-      x: -20,
-      transition: { duration: 0.2 }
-    }
-  };
-
-  // Pagination controls
-  const nextAdminPage = () => {
-    if (adminPage < adminMaxPage) setAdminPage(adminPage + 1);
-  };
-  
-  const prevAdminPage = () => {
-    if (adminPage > 0) setAdminPage(adminPage - 1);
-  };
-  
-  const nextMemberPage = () => {
-    if (memberPage < memberMaxPage) setMemberPage(memberPage + 1);
-  };
-  
-  const prevMemberPage = () => {
-    if (memberPage > 0) setMemberPage(memberPage - 1);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="rounded-2xl p-8 bg-gradient-to-b from-white to-indigo-50/30 dark:from-gray-800 dark:to-indigo-950/20 shadow-xl dark:shadow-2xl border border-indigo-100/50 dark:border-indigo-900/30"
+      className="w-full"
     >
-      <div className="flex items-center mb-6">
-        <HiOutlineSparkles className="text-3xl text-indigo-600 dark:text-indigo-400 mr-3" />
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-          Your Collaborations
-        </h1>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3 aura-text-glow">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Manage your projects and collaborations in one place.
+          </p>
+        </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex items-center border-b border-gray-200 dark:border-gray-700 mb-6 pb-1">
-        <button
-          onClick={() => setActiveTab('admin')}
-          className={`flex items-center py-3 px-4 font-medium text-sm transition-colors rounded-t-lg relative ${
-            activeTab === 'admin'
-              ? 'text-indigo-600 dark:text-indigo-400'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-          }`}
+      {/* Tabs */}
+      <div className="border-b border-border mb-8">
+        <div className="flex space-x-8">
+          <TabButton
+            isActive={activeTab === "admin"}
+            onClick={() => setActiveTab("admin")}
+            icon={<FiLayers className="w-4 h-4" />}
+            label="My Projects"
+            count={adminCollabs.length}
+          />
+          <TabButton
+            isActive={activeTab === "member"}
+            onClick={() => setActiveTab("member")}
+            icon={<FiUsers className="w-4 h-4" />}
+            label="Joined Projects"
+            count={memberCollabs.length}
+          />
+        </div>
+      </div>
+
+      {/* Grid Content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          transition={{ duration: 0.2 }}
         >
-          <FiLayers className="mr-2" />
-          Projects You Manage
-          <span className="ml-2 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs px-2 py-0.5 rounded-full">
-            {adminCollabs.length}
-          </span>
-          
-          {/* Active indicator */}
-          {activeTab === 'admin' && (
-            <motion.div 
-              layoutId="activeTabIndicator"
-              className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" 
-              initial={false}
+          {activeTab === "admin" && (
+            <ProjectGrid
+              collabs={currentAdminCollabs}
+              page={adminPage}
+              maxPage={adminMaxPage}
+              setPage={setAdminPage}
+              isEmpty={adminCollabs.length === 0}
+              emptyMessage="You haven't created any projects yet."
+              variants={containerVariants}
+              itemVariants={itemVariants}
+              username={username}
+              isAdmin={true}
             />
           )}
-        </button>
-        
-        <button
-          onClick={() => setActiveTab('member')}
-          className={`flex items-center py-3 px-4 font-medium text-sm transition-colors rounded-t-lg relative ${
-            activeTab === 'member'
-              ? 'text-purple-600 dark:text-purple-400'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-          }`}
-        >
-          <FiUsers className="mr-2" />
-          Projects You&apos;ve Joined
-          <span className="ml-2 bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 text-xs px-2 py-0.5 rounded-full">
-            {memberCollabs.length}
-          </span>
-          
-          {/* Active indicator */}
-          {activeTab === 'member' && (
-            <motion.div 
-              layoutId="activeTabIndicator"
-              className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-purple-400" 
-              initial={false}
+
+          {activeTab === "member" && (
+            <ProjectGrid
+              collabs={currentMemberCollabs}
+              page={memberPage}
+              maxPage={memberMaxPage}
+              setPage={setMemberPage}
+              isEmpty={memberCollabs.length === 0}
+              emptyMessage="You haven't joined any projects yet."
+              variants={containerVariants}
+              itemVariants={itemVariants}
+              username={username}
+              isAdmin={false}
             />
           )}
-        </button>
-      </div>
-
-      {/* Tab Content Container */}
-      <div className="min-h-[400px]">
-        <AnimatePresence mode="wait">
-          {/* Admin Tab Content */}
-          {activeTab === 'admin' && (
-            <motion.div
-              key="admin-content"
-              variants={tabContentVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              {/* Pagination controls */}
-              {adminCollabs.length > itemsPerPage && (
-                <div className="flex justify-end mb-4">
-                  <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={prevAdminPage}
-                      disabled={adminPage === 0}
-                      className={`p-1 rounded-full ${adminPage === 0 
-                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' 
-                        : 'text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'}`}
-                      aria-label="Previous page"
-                    >
-                      <FiChevronLeft className="w-5 h-5" />
-                    </button>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                      {adminPage + 1}/{adminMaxPage + 1}
-                    </span>
-                    <button 
-                      onClick={nextAdminPage}
-                      disabled={adminPage >= adminMaxPage}
-                      className={`p-1 rounded-full ${adminPage >= adminMaxPage 
-                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' 
-                        : 'text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'}`}
-                      aria-label="Next page"
-                    >
-                      <FiChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm shadow-inner min-h-[350px]">
-                {adminCollabs.length > 0 ? (
-                  <motion.div
-                    key={`admin-page-${adminPage}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <motion.ul 
-                      className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      {currentAdminCollabs.map((collab) => (
-                        <motion.li
-                          key={collab.collabId}
-                          variants={itemVariants}
-                          whileHover={{ scale: 1.02 }}
-                          className="relative p-4 rounded-xl bg-gradient-to-br from-white to-indigo-50 dark:from-gray-700 dark:to-indigo-900/20 shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-100/50 dark:border-indigo-800/30 overflow-hidden group"
-                        >
-                          {/* Background decoration */}
-                          <div className="absolute -right-6 -top-6 w-16 h-16 bg-indigo-200/30 dark:bg-indigo-800/20 rounded-full z-0 transition-transform duration-300 group-hover:scale-150"></div>
-                          
-                          <div className="flex flex-col space-y-3 relative z-10">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center">
-                                <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 mr-3">
-                                  <FiSettings className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <div className="font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                                    {collab.collabName}
-                                  </div>
-                                  <div className="text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-md inline-flex items-center">
-                                    <FiUser className="mr-1" /> Admin
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-2 mt-3">
-                              <Link
-                                href={`/collab/admin/${collab.collabId}`}
-                                className="flex-1 flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duration-200"
-                              >
-                                <FiSettings className="mr-2" /> Manage
-                              </Link>
-                              <Link
-                                href={`/chat/${collab.collabId}`}
-                                className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-800/60 text-blue-700 dark:text-blue-300 transition-colors duration-200"
-                              >
-                                <FiMessageSquare className="mr-2" /> Chat
-                              </Link>
-                              <Link
-                                href={`/collab/${collab.collabId}`}
-                                className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/40 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 transition-colors duration-200"
-                              >
-                                <FiClipboard className="mr-2" /> Tasks
-                              </Link>
-                              {/* This is for the test purpose only */}
-                              { username === 'SouravPaitandy' && <Link
-                                href={`/collab/documents/${collab.collabId}`}
-                                className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 transition-colors duration-200"
-                              >
-                                <FiFileText className="mr-2" /> Documents
-                              </Link> }
-                            </div>
-                          </div>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  </motion.div>
-                ) : (
-                  <div className="text-center py-12">
-                    <FiSettings className="mx-auto h-10 w-10 text-gray-400 dark:text-gray-600 mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-2">
-                      You&apos;re not managing any collaborations yet
-                    </p>
-                    <Link
-                      href="/collab/join-create"
-                      className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    >
-                      <FiExternalLink className="mr-1" /> Create your first project
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Member Tab Content */}
-          {activeTab === 'member' && (
-            <motion.div
-              key="member-content"
-              variants={tabContentVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              {/* Pagination controls */}
-              {memberCollabs.length > itemsPerPage && (
-                <div className="flex justify-end mb-4">
-                  <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={prevMemberPage}
-                      disabled={memberPage === 0}
-                      className={`p-1 rounded-full ${memberPage === 0 
-                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' 
-                        : 'text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
-                      aria-label="Previous page"
-                    >
-                      <FiChevronLeft className="w-5 h-5" />
-                    </button>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                      {memberPage + 1}/{memberMaxPage + 1}
-                    </span>
-                    <button 
-                      onClick={nextMemberPage}
-                      disabled={memberPage >= memberMaxPage}
-                      className={`p-1 rounded-full ${memberPage >= memberMaxPage 
-                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' 
-                        : 'text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
-                      aria-label="Next page"
-                    >
-                      <FiChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm shadow-inner min-h-[350px]">
-                {memberCollabs.length > 0 ? (
-                  <motion.div
-                    key={`member-page-${memberPage}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <motion.ul 
-                      className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      {currentMemberCollabs.map((collab) => (
-                        <motion.li
-                          key={collab.collabId}
-                          variants={itemVariants}
-                          whileHover={{ scale: 1.02 }}
-                          className="relative p-4 rounded-xl bg-gradient-to-br from-white to-purple-50 dark:from-gray-700 dark:to-purple-900/20 shadow-md hover:shadow-lg transition-all duration-300 border border-purple-100/50 dark:border-purple-800/30 overflow-hidden group"
-                        >
-                          {/* Background decoration */}
-                          <div className="absolute -right-6 -top-6 w-16 h-16 bg-purple-200/30 dark:bg-purple-800/20 rounded-full z-0 transition-transform duration-300 group-hover:scale-150"></div>
-                          
-                          <div className="flex flex-col space-y-3 relative z-10">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center">
-                                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 mr-3">
-                                  <FiUsers className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <div className="font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                                    {collab.collabName}
-                                  </div>
-                                  <div className="text-xs bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 px-2 py-0.5 rounded-md inline-flex items-center">
-                                    <FiUser className="mr-1" /> Member
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-2 mt-3">
-                              <Link
-                                href={`/chat/${collab.collabId}`}
-                                className="flex-1 flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-800/60 text-blue-700 dark:text-blue-300 transition-colors duration-200"
-                              >
-                                <FiMessageSquare className="mr-2" /> Chat
-                              </Link>
-                              <Link
-                                href={`/collab/${collab.collabId}`}
-                                className="flex-1 flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/40 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 transition-colors duration-200"
-                              >
-                                <FiClipboard className="mr-2" /> Tasks
-                              </Link>
-                              {/* This is for the test purpose only */}
-                              { username === 'SouravPaitandy' && <Link
-                                href={`/collab/documents/${collab.collabId}`}
-                                className="flex items-center justify-center text-sm px-3 py-2 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 transition-colors duration-200"
-                              >
-                                <FiFileText className="mr-2" /> Documents
-                              </Link> }
-                            </div>
-                          </div>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  </motion.div>
-                ) : (
-                  <div className="text-center py-12">
-                    <FiUsers className="mx-auto h-10 w-10 text-gray-400 dark:text-gray-600 mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-2">
-                      You haven&apos;t joined any collaborations yet
-                    </p>
-                    <Link
-                      href="/collab/join-create"
-                      className="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"
-                    >
-                      <FiExternalLink className="mr-1" /> Join a project with an invite code
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   );
 };
+
+// --- Sub Components ---
+
+const TabButton = ({ isActive, onClick, icon, label, count }) => (
+  <button
+    onClick={onClick}
+    className={`pb-4 text-sm font-medium flex items-center gap-2 transition-colors duration-300 relative ${
+      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+    }`}
+  >
+    {icon}
+    {label}
+    <span
+      className={`ml-1 text-xs px-2 py-0.5 rounded-full transition-colors duration-300 ${
+        isActive ? "bg-white/10 text-primary" : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {count}
+    </span>
+    {isActive && (
+      <motion.div
+        layoutId="activeTab"
+        className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-t-full"
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      />
+    )}
+  </button>
+);
+
+const ProjectGrid = ({
+  collabs,
+  page,
+  maxPage,
+  setPage,
+  isEmpty,
+  emptyMessage,
+  variants,
+  itemVariants,
+  username,
+  isAdmin,
+}) => {
+  if (isEmpty)
+    return (
+      <div className="flex flex-col items-center justify-center py-20 border border-dashed border-border rounded-xl bg-muted/30">
+        <FiLayers className="w-12 h-12 text-muted-foreground mb-3 opacity-50" />
+        <p className="text-muted-foreground font-medium">{emptyMessage}</p>
+      </div>
+    );
+
+  return (
+    <>
+      <motion.div
+        variants={variants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        {collabs.map((collab) => (
+          <motion.div
+            key={collab.collabId}
+            variants={itemVariants}
+            className="h-full"
+          >
+            <SpotlightCard className="h-full flex flex-col overflow-hidden bg-card/50 backdrop-blur-sm border-border/50">
+              {/* Card Header image pattern (abstract) */}
+              <div className="h-24 w-full bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 group-hover:from-indigo-50 group-hover:to-purple-50 dark:group-hover:from-indigo-950/30 dark:group-hover:to-purple-950/30 transition-colors duration-300 relative z-10" />
+
+              <div className="p-5 flex-1 flex flex-col relative z-20">
+                {/* Icon Badge */}
+                <div className="absolute -top-6 left-5">
+                  <div className="w-12 h-12 rounded-lg bg-background border border-border flex items-center justify-center shadow-lg text-primary z-30">
+                    {isAdmin ? (
+                      <FiLayers className="w-6 h-6" />
+                    ) : (
+                      <FiUsers className="w-6 h-6" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                    {collab.collabName}
+                  </h3>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+                    <span className="flex items-center gap-1">
+                      <FiUser className="w-3 h-3" />{" "}
+                      {isAdmin ? "Admin" : "Member"}
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <FiUsers className="w-3 h-3" /> Team
+                    </span>
+                  </div>
+
+                  {/* Actions Grid */}
+                  <div className="grid grid-cols-1 gap-2 mt-auto pt-4 border-t border-border/50">
+                    <ActionButton
+                      href={`/collab/${collab.collabId}`}
+                      icon={<FiActivity />}
+                      label="Go to Workspace"
+                      title="Go to Workspace"
+                    />
+                    {/* <ActionButton
+                      href={`/collab/${collab.collabId}?view=tasks`}
+                      icon={<FiClipboard />}
+                      label="Tasks"
+                    />
+                    <ActionButton
+                      href={`/collab/${collab.collabId}?view=docs`}
+                      icon={<FiFileText />}
+                      label="Docs"
+                    /> */}
+
+                    {isAdmin && (
+                      <Link
+                        href={`/collab/admin/${collab.collabId}`}
+                        className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-colors z-30"
+                      >
+                        <FiSettings className="w-4 h-4" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </SpotlightCard>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Pagination */}
+      {(page > 0 || maxPage > 0) && (
+        <div className="flex justify-end mt-8 gap-2">
+          <button
+            onClick={() => page > 0 && setPage(page - 1)}
+            disabled={page === 0}
+            className="p-2 rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <FiChevronLeft />
+          </button>
+          <span className="flex items-center px-2 text-sm text-muted-foreground">
+            Page {page + 1} of {maxPage + 1}
+          </span>
+          <button
+            onClick={() => page < maxPage && setPage(page + 1)}
+            disabled={page >= maxPage}
+            className="p-2 rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <FiChevronRight />
+          </button>
+        </div>
+      )}
+    </>
+  );
+};
+
+const ActionButton = ({ href, icon, label }) => (
+  <Link
+    href={href}
+    className="flex flex-col md:flex-row items-center justify-center md:gap-2 p-2 rounded-lg hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all gap-1 group relative z-30"
+  >
+    <span className="text-lg group-hover:scale-110 transition-transform duration-200">
+      {icon}
+    </span>
+    <span className="text-[10px] font-medium uppercase tracking-wider">
+      {label}
+    </span>
+  </Link>
+);
 
 export default DashboardCollabs;

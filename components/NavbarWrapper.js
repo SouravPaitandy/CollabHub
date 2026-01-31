@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import Navbar from './Navbar';
+import { usePathname } from "next/navigation";
+import Navbar from "./Navbar";
 
 export default function NavbarWrapper() {
   const pathname = usePathname();
-  const isChatPage = pathname.startsWith('/chat');
+  const isChatPage =
+    pathname.startsWith("/chat") || pathname.startsWith("/collab/");
 
   if (isChatPage) {
     return null;

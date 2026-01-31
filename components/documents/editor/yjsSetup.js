@@ -3,11 +3,11 @@ import { WebsocketProvider } from "y-websocket";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
 
-export const setupYjsProvider = ({ 
-  documentId, 
-  ydocRef, 
-  wsProviderRef, 
-  setConnected 
+export const setupYjsProvider = ({
+  documentId,
+  ydocRef,
+  wsProviderRef,
+  setConnected,
 }) => {
   // Clean up any existing connection first
   if (wsProviderRef.current) {
@@ -25,9 +25,15 @@ export const setupYjsProvider = ({
 
   // Initialize WebsocketProvider
   try {
-    const wsProtocol = process.env.NODE_ENV === "production" ? "wss" : "ws";
-    const wsUrl =  process.env.NEXT_PUBLIC_WS_URL;
-    // `${wsProtocol}://localhost:8080` ||
+    // Robust URL handling - force ws:// for localhost
+    let wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+
+    // Force ws:// protocol for localhost (not wss://)
+    if (wsUrl.includes("localhost") && wsUrl.startsWith("wss://")) {
+      wsUrl = wsUrl.replace("wss://", "ws://");
+    }
+
+    console.log(`[DocumentEditor] Connecting YJS to: ${wsUrl}`);
 
     wsProviderRef.current = new WebsocketProvider(
       wsUrl,
@@ -59,11 +65,7 @@ export const setupYjsProvider = ({
   };
 };
 
-export const setupAwareness = ({ 
-  wsProvider, 
-  userData, 
-  setActiveUsers 
-}) => {
+export const setupAwareness = ({ wsProvider, userData, setActiveUsers }) => {
   // Update local user state in the provider
   wsProvider.awareness.setLocalStateField("user", userData);
 

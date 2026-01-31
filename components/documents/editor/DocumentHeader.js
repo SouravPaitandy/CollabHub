@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  FaSave,
-  FaShareAlt,
-  FaDownload,
-  FaPrint,
-  FaArrowLeft,
-  FaHistory,
-  FaEllipsisV,
-} from "react-icons/fa";
-import { printUtils } from "./printUtils"; // Import from printUtils
+  ArrowLeft,
+  Save,
+  Printer,
+  Share2,
+  MoreVertical,
+  Check,
+} from "lucide-react";
+import Image from "next/image";
 
 export default function DocumentHeader({
   documentTitle,
@@ -17,220 +16,120 @@ export default function DocumentHeader({
   connected,
   isSaving,
   saveDocument,
+  exportDocument,
   navigateBack,
-  userName = null,
+  userName,
 }) {
-  const [showDropdown, setShowDropdown] = useState(false);
   const [titleEditing, setTitleEditing] = useState(false);
   const [inputTitle, setInputTitle] = useState(documentTitle);
 
-  // Update local state when document title changes
   useEffect(() => {
     setInputTitle(documentTitle);
   }, [documentTitle]);
 
-  // Handle title change
   const handleTitleChange = () => {
-    if (inputTitle.trim()) {
+    if (inputTitle.trim() !== "") {
       setDocumentTitle(inputTitle);
     } else {
-      setInputTitle(documentTitle); // Reset to original if empty
+      setInputTitle(documentTitle);
     }
     setTitleEditing(false);
   };
 
-  // Handle key press
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleTitleChange();
-    } else if (e.key === "Escape") {
-      setInputTitle(documentTitle);
-      setTitleEditing(false);
     }
   };
 
-  // Handle PDF export
-  // const handleExportPDF = () => {
-  //   exportAsPDF(documentTitle, userName)
-  //     .then(() => {
-  //       if (setShowDropdown) setShowDropdown(false);
-  //     })
-  //     .catch(error => {
-  //       console.error("PDF export failed:", error);
-  //       alert("Failed to export PDF. Please try again.");
-  //     });
-  // };
-
-  // Handle print
-  const handlePrint = () => {
-    printUtils(documentTitle, setShowDropdown, userName);
-  };
-
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center">
-          <motion.button
-            whileHover={{ x: -3 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={navigateBack}
-            className="mr-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            aria-label="Go back"
-          >
-            <FaArrowLeft />
-          </motion.button>
+    <div className="absolute top-0 left-0 w-full p-6 z-50 pointer-events-none flex justify-between items-start">
+      {/* Left Group: Back & Title */}
+      <div className="flex items-center gap-4 pointer-events-auto">
+        {/* <motion.button
+          whileHover={{ scale: 1.1, x: -2 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={navigateBack}
+          className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-gray-700 dark:text-white/80 backdrop-blur-md border border-white/10 shadow-sm transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </motion.button> */}
 
+        <div className="flex flex-col">
           {titleEditing ? (
             <input
-              type="text"
+              autoFocus
               value={inputTitle}
               onChange={(e) => setInputTitle(e.target.value)}
               onBlur={handleTitleChange}
               onKeyDown={handleKeyDown}
-              className="text-xl font-semibold bg-transparent border border-indigo-300 dark:border-indigo-700 focus:ring-2 focus:ring-indigo-500 rounded p-1 w-full max-w-md dark:text-white"
-              placeholder="Document Title"
-              autoFocus
+              className="text-xl font-bold bg-transparent border-b-2 border-indigo-500 focus:outline-none text-gray-900 dark:text-white min-w-[200px]"
             />
           ) : (
-            <h1
+            <motion.h1
               onClick={() => setTitleEditing(true)}
-              className="text-xl font-semibold dark:text-white cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 truncate max-w-md transition-colors duration-150"
-              title="Click to edit title"
+              className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-200 dark:to-gray-400 cursor-pointer hover:opacity-80 transition-opacity"
             >
               {documentTitle || "Untitled Document"}
-            </h1>
+            </motion.h1>
           )}
-        </div>
-
-        <div className="flex items-center space-x-1">
-          <div className="hidden sm:flex items-center mr-3">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {connected ? (
-                <span className="flex items-center text-green-500 dark:text-green-400">
-                  <span className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                  Connected
-                </span>
-              ) : (
-                <span className="flex items-center text-red-500 dark:text-red-400">
-                  <span className="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></span>
-                  Disconnected
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="flex sm:hidden items-center mr-3">
-            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-              {connected ? (
-                <div className="flex items-center">
-                  <span
-                    className="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full animate-pulse"
-                    aria-label="Connected status"
-                  ></span>
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <span
-                    className="w-3 h-3 bg-red-500 dark:bg-red-400 rounded-full"
-                    aria-label="Disconnected status"
-                  ></span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1 sm:gap-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={saveDocument}
-              disabled={isSaving || !connected}
-              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md flex items-center disabled:bg-indigo-300 dark:disabled:bg-indigo-800/50 transition-all duration-200 text-sm shadow-sm hover:shadow"
-            >
-              <FaSave className="mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">
-                {isSaving ? "Saving..." : "Save"}
+          <div className="flex items-center gap-2 mt-0.5">
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-red-500"}`}
+            />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-400">
+              {connected ? "Live" : "Offline"}
+            </span>
+            {isSaving && (
+              <span className="text-[10px] text-gray-400 animate-pulse ml-2">
+                Saving...
               </span>
-            </motion.button>
-
-            {/* Responsive design: show actions in dropdown on small screens */}
-            <div className="relative sm:hidden">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-              >
-                <FaEllipsisV />
-              </motion.button>
-
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-md p-2 z-40 w-48 border border-gray-200 dark:border-gray-700">
-                  {/* <button
-                    onClick={handleExportPDF}
-                    className="w-full text-left p-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300"
-                  >
-                    <FaDownload className="mr-2" /> Export as PDF
-                  </button> */}
-                  <button
-                    onClick={handlePrint}
-                    className="w-full text-left p-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300"
-                  >
-                    <FaPrint className="mr-2" /> Print
-                  </button>
-                  {/* <button
-                    onClick={() => {
-                      alert("Share functionality is not implemented yet.");
-                      setShowDropdown(false);
-                    }}
-                    className="w-full text-left p-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300"
-                  >
-                    <FaShareAlt className="mr-2" /> Share
-                  </button> */}
-                </div>
-              )}
-            </div>
-
-            {/* Regular buttons for larger screens */}
-            <div className="hidden sm:flex items-center">
-              {/* <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleExportPDF}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                title="Export as PDF"
-              >
-                <FaDownload />
-              </motion.button> */}
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handlePrint}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                title="Print"
-              >
-                <FaPrint />
-              </motion.button>
-
-              {/* <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                title="Share Document"
-                onClick={() =>
-                      {
-                        // Handle share functionality here
-                        alert("Share functionality is not implemented yet.");
-                        // You can integrate with a sharing service or open a share dialog                       
-                       setShowDropdown(false)
-                      }}
-              >
-                <FaShareAlt />
-              </motion.button> */}
-            </div>
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Right Group: Actions */}
+      <div className="flex items-center gap-2 pointer-events-auto">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={saveDocument}
+          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-medium text-sm transition-colors"
+        >
+          {isSaving ? (
+            <span className="animate-spin mr-1">↻</span>
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          <span>Save</span>
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={exportDocument}
+          className="p-2 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm transition-colors"
+          title="Print / PDF"
+        >
+          <Printer className="w-4 h-4" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="p-2 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm transition-colors"
+        >
+          <Share2 className="w-4 h-4" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="sm:hidden p-2 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm transition-colors"
+        >
+          <MoreVertical className="w-4 h-4" />
+        </motion.button>
       </div>
     </div>
   );

@@ -24,15 +24,14 @@ export async function GET(request, { params }) {
     const userid = await User.findOne({email: session.user.email})
     console.log("userid", userid.id)
 
-    // Check if the user is an admin of the collaboration
-    const isAdmin = await CollabParticipant.findOne({
+    // Check if the user is a member of the collaboration
+    const isMember = await CollabParticipant.findOne({
       collabId: id,
       userId: userid.id,
-      role: 'ADMIN'
     });
-    console.log("isAdmin",isAdmin)
+    console.log("isMember", isMember)
 
-    if (!isAdmin) {
+    if (!isMember) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

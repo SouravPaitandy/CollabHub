@@ -1,11 +1,12 @@
 import { toast } from "react-hot-toast";
 
-export async function saveDocumentToAPI({ 
-  collabId, 
-  documentId, 
-  documentTitle, 
-  content, 
-  onSave 
+export async function saveDocumentToAPI({
+  collabId,
+  documentId,
+  documentTitle,
+  content,
+  onSave,
+  isAutoSave = false,
 }) {
   const response = await fetch(
     `/api/collab/${collabId}/documents/${documentId}`,
@@ -13,7 +14,7 @@ export async function saveDocumentToAPI({
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: documentTitle, content }),
-    }
+    },
   );
 
   if (!response.ok) {
@@ -22,5 +23,8 @@ export async function saveDocumentToAPI({
   }
 
   if (onSave) onSave(documentTitle, content);
-  toast.success("Document saved successfully");
+
+  if (!isAutoSave) {
+    toast.success("Document saved successfully");
+  }
 }

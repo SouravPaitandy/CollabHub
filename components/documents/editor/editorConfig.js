@@ -5,7 +5,7 @@ import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Strike from "@tiptap/extension-strike";
 import Highlight from "@tiptap/extension-highlight";
-import { ImageExtension } from './extensions/ImageExtension';
+import { ImageExtension } from "./extensions/ImageExtension";
 import Link from "@tiptap/extension-link";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
@@ -15,33 +15,33 @@ import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import { getRandomColor, getRandomDarkColor } from "./colorUtils";
 
-export const createEditorConfig = ({ 
-  ydocRef, 
-  wsProviderRef, 
-  userData, 
+export const createEditorConfig = ({
+  ydocRef,
+  wsProviderRef,
+  userData,
   initialContent,
-  theme
+  theme,
 }) => {
   // Define base extensions with all required features
   const extensions = [
     StarterKit,
     Underline,
-    Strike,
+    // Strike, // Removed to prevent duplicate extension error
     Highlight,
     Link.configure({
       openOnClick: false,
       HTMLAttributes: {
-        class: 'text-blue-600 underline hover:text-blue-800',
+        class: "text-blue-600 underline hover:text-blue-800",
       },
     }),
     ImageExtension.configure({
       HTMLAttributes: {
-        class: 'rounded-md max-w-full',
+        class: "rounded-md max-w-full",
       },
     }),
     TextAlign.configure({
-      types: ['heading', 'paragraph'],
-      alignments: ['left', 'center', 'right'],
+      types: ["heading", "paragraph"],
+      alignments: ["left", "center", "right"],
     }),
     Table.configure({
       resizable: true,
@@ -50,11 +50,13 @@ export const createEditorConfig = ({
     TableHeader,
     TableCell,
     TextStyle,
-    Color
+    Color,
   ];
 
-  const isDarkMode = theme === "dark" || 
-    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDarkMode =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   if (ydocRef.current && wsProviderRef.current) {
     extensions.push(
@@ -78,6 +80,7 @@ export const createEditorConfig = ({
     content: initialContent || "<p>Start typing here...</p>",
     autofocus: false,
     editable: true,
+    immediatelyRender: false, // Fix for SSR hydration mismatch
   };
 };
 
@@ -97,7 +100,7 @@ function createCursorElement(user) {
     "style",
     `background-color: ${user.color}; color: black; font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 4px 4px 4px 0; position: absolute; top: -1.4em; left: -2px; white-space: nowrap; pointer-events: none; user-select: none;`
   );
-  
+
   // Extract first name from full name
   const firstName = user.name.split(" ")[0];
   label.textContent = firstName;

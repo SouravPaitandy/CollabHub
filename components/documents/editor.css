@@ -8,7 +8,9 @@
 }
 
 .collaboration-cursor-label {
-  animation: fadeIn 0.3s ease, float 2s ease-in-out infinite;
+  animation:
+    fadeIn 0.3s ease,
+    float 2s ease-in-out infinite;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
   transform-origin: left bottom;
 }
@@ -21,22 +23,40 @@
 
 /* Pulse animation for new cursors */
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.6; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Slight floating animation for cursor labels */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-2px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 /* Smooth fade-in for new cursors */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Fade-out effect when user is idle */
@@ -57,6 +77,7 @@
 .ProseMirror {
   padding: 1rem 0;
   outline: none;
+  min-height: 100%;
 }
 
 /* Placeholder (empty editor) */
@@ -125,7 +146,9 @@
   padding: 0.75rem 1rem;
   margin: 1rem 0;
   overflow-x: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
 
 .dark .ProseMirror pre {
@@ -134,7 +157,9 @@
 }
 
 .ProseMirror code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   padding: 0.2em 0.4em;
   background-color: #f3f4f6;
   border-radius: 0.25rem;
@@ -255,9 +280,15 @@
 
 /* Animation for typing */
 @keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .collaboration-cursor__caret {

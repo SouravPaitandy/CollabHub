@@ -1,9 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, useRef, Suspense, lazy } from "react";
 import { useSession } from "next-auth/react";
-import { useState, useEffect, useRef, Suspense, lazy } from "react";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Loader from "../Loading";
 import { motion } from "framer-motion";
@@ -11,6 +9,16 @@ import { ArrowBigDown } from "lucide-react";
 import DashboardStats from "./DashboardStats";
 import DashboardCollabs from "./DashboardCollabs";
 import Image from "next/image";
+import SpotlightCard from "../ui/SpotlightCard";
+import CreateJoinCollabModal from "./CreateJoinCollabModal";
+import { useNetworkStatus } from "../hooks/useNetworkStatus";
+import ErrorState from "../common/ErrorState";
+import OfflineBanner from "../common/OfflineBanner";
+import {
+  DEMO_COLLABS_ADMIN,
+  DEMO_COLLABS_MEMBER,
+  DEMO_TASK_STATS,
+} from "@/constants/demoData";
 
 // Lazy load the GitHub repos component
 const GitHubRepos = lazy(() => import("./GithubRepos.js"));
@@ -53,12 +61,22 @@ const SessionExpiredBanner = ({ onLogin }) => {
   );
 };
 
-const Dashboard = ({ username = "User", isSessionExpired = false }) => {
+const Dashboard = ({
+  username = "User",
+  isSessionExpired = false,
+  joinCode: initialJoinCode = null,
+}) => {
   const { data: session } = useSession();
+  const { isOnline } = useNetworkStatus(); // Network status detection
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState("create");
+  const [joinCode, setJoinCode] = useState(initialJoinCode || "");
   const [adminCollabs, setAdminCollabs] = useState([]);
   const [memberCollabs, setMemberCollabs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDemo, setIsDemo] = useState(false); // Track if showing demo data
   const [showGithubRepos, setShowGithubRepos] = useState(false);
   const [isStatsLoading, setIsStatsLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(isSessionExpired);
@@ -72,10 +90,24 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
   });
 
   const { theme } = useTheme();
-  const router = useRouter();
+  // REMOVED: const router = useRouter();
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const githubRepoRef = useRef(null);
+
+  // Handle join code from URL (passed as prop from server)
+  useEffect(() => {
+    if (initialJoinCode) {
+      setJoinCode(initialJoinCode);
+      setModalTab("join");
+      setIsModalOpen(true);
+
+      // Clean up URL without reload (only if we have a username)
+      if (typeof window !== "undefined" && username) {
+        window.history.replaceState({}, "", `/${username}`);
+      }
+    }
+  }, [initialJoinCode, username]);
 
   /// Update session expired state if session changes to null after it was previously available
   useEffect(() => {
@@ -88,7 +120,7 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
     // Check if session is missing (expired/logged out)
     if (!session) {
       console.log(
-        "Dashboard: No active session detected, switching to demo mode"
+        "Dashboard: No active session detected, switching to demo mode",
       );
       setSessionExpired(true);
 
@@ -103,42 +135,24 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
           createdAt: new Date().toISOString(),
         },
       ]);
-
-      setMemberCollabs([
-        {
-          id: "demo-2",
-          name: "Example Collaboration",
-          description: "Please log in again to see your real collaborations",
-          role: "MEMBER",
-          createdAt: new Date().toISOString(),
-        },
-      ]);
+      setMemberCollabs([]); // Reduced for brevity in demo
 
       setTaskStats({
-        totalProjects: 2,
-        totalTasks: 8,
-        completedTasks: 3,
-        highPriorityTasks: 2,
+        totalProjects: 1,
+        totalTasks: 5,
+        completedTasks: 2,
+        highPriorityTasks: 1,
         tasksDueSoon: 1,
       });
     }
   }, [session, isLoading, isSessionExpired]);
 
-  // Replace the previous session check with this
-  // useEffect(() => {
-  //   // Set a periodic check for session validity without redirect
-  //   const intervalId = setInterval(() => {
-  //     if (session === null && !isSessionExpired && !isLoading) {
-  //       setIsSessionExpired(true);
-  //     }
-  //   }, 60000); // Check every minute
-
-  //   return () => clearInterval(intervalId);
-  // }, [session, isSessionExpired, isLoading]);
-
-  // Handle login button click
+  // Handle login button click with Callback URL
   const handleLogin = () => {
-    router.push("/auth");
+    if (typeof window !== "undefined") {
+      const callbackUrl = encodeURIComponent(window.location.href);
+      window.location.href = `/auth?callbackUrl=${callbackUrl}`;
+    }
   };
 
   // Load core data first (collaborations)
@@ -146,27 +160,48 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
   useEffect(() => {
     const fetchCollabs = async () => {
       if (sessionExpired) {
-        // In demo mode, just finish loading
+        // In demo mode, load demo data
+        setAdminCollabs(DEMO_COLLABS_ADMIN);
+        setMemberCollabs([]);
+        setIsDemo(true);
         setIsLoading(false);
-        // setIsStatsLoading(false);
         return;
       }
       if (session?.user?.email) {
         try {
+          setError(null); // Clear previous errors
           const response = await fetch("/api/user/collabs");
+
           if (!response.ok) {
-            throw new Error("Failed to fetch collaborations");
+            throw new Error(
+              `Server error (${response.status}): Failed to load collaborations`,
+            );
           }
+
           const data = await response.json();
           setAdminCollabs(data.filter((collab) => collab.role === "ADMIN"));
           setMemberCollabs(data.filter((collab) => collab.role === "MEMBER"));
+          setIsDemo(false);
         } catch (err) {
-          setError(err.message);
+          console.error("Error fetching collabs:", err);
+
+          // Check if it's a network error
+          const isNetworkError =
+            !navigator.onLine || err.message.includes("fetch");
+
+          if (isNetworkError) {
+            // Use demo data for network errors
+            setAdminCollabs(DEMO_COLLABS_ADMIN);
+            setMemberCollabs(DEMO_COLLABS_MEMBER);
+            setIsDemo(true);
+          } else {
+            // For other errors, set error state
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
       } else {
-        // No session, just finish loading
         setIsLoading(false);
       }
     };
@@ -233,15 +268,15 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
       if (collabsResponse.ok) {
         const collabsData = await collabsResponse.json();
         setAdminCollabs(
-          collabsData.filter((collab) => collab.role === "ADMIN")
+          collabsData.filter((collab) => collab.role === "ADMIN"),
         );
         setMemberCollabs(
-          collabsData.filter((collab) => collab.role === "MEMBER")
+          collabsData.filter((collab) => collab.role === "MEMBER"),
         );
       }
 
       alert(
-        `Collaboration created for ${repo.name}! Invite code: ${data.inviteCode}`
+        `Collaboration created for ${repo.name}! Invite code: ${data.inviteCode}`,
       );
     } catch (err) {
       console.error("Error creating collaboration:", err);
@@ -258,9 +293,42 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
     }, 100);
   };
 
+  // Retry function for error states
+  const handleRetry = () => {
+    setError(null);
+    setIsLoading(true);
+    // Trigger re-fetch by updating a dependency
+    window.location.reload();
+  };
+
+  const switchToDemo = () => {
+    setError(null);
+    setAdminCollabs(DEMO_COLLABS_ADMIN);
+    setMemberCollabs(DEMO_COLLABS_MEMBER);
+    setTaskStats(DEMO_TASK_STATS);
+    setIsDemo(true);
+  };
+
   if (isLoading) return <Loader />;
-  if (error && !isSessionExpired)
-    return <div className="h-screen text-center pt-80">Error: {error}</div>;
+
+  // Show error state with retry option
+  if (error && !isSessionExpired && !isDemo) {
+    return (
+      <ErrorState
+        icon="network"
+        title="Unable to Load Dashboard"
+        message={error}
+        action={{
+          label: "Retry",
+          onClick: handleRetry,
+        }}
+        secondaryAction={{
+          label: "View Demo Mode",
+          onClick: switchToDemo,
+        }}
+      />
+    );
+  }
 
   const stats = [
     { label: "Projects", value: taskStats.totalProjects, icon: "📁" },
@@ -281,433 +349,325 @@ const Dashboard = ({ username = "User", isSessionExpired = false }) => {
     : session?.username || username || "User";
 
   return (
-    <div>
-      {/* Background */}
-      <div className="fixed -z-10 h-full w-full top-0 left-0">
-        {theme === "dark" ||
-        (theme === "system" &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches) ? (
-          <div className="absolute inset-0 -z-10 h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"></div>
-        ) : (
-          <>
-            <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]"></div>
-            <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#C9EBFF,transparent)]"></div>
-          </>
-        )}
+    <div className="min-h-screen relative bg-background text-foreground overflow-hidden">
+      {/* Background Decor */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[120px]" />
       </div>
 
-      {/* Main Content */}
-      <div className="relative min-h-screen text-gray-800 dark:text-white">
-        <div className="max-w-7xl mx-auto p-6 py-20">
-          {/* Show session expired banner if needed */}
-          {isSessionExpired && <SessionExpiredBanner onLogin={handleLogin} />}
+      {/* Offline Banner */}
+      <OfflineBanner isOnline={isOnline} onRetry={handleRetry} />
 
-          <motion.header
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-12 text-center"
-          >
-            <h1 className="text-5xl font-extrabold pb-4 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 animate-gradient">
-              {isSessionExpired
-                ? "Dashboard Preview"
-                : `Welcome, ${displayName} 👋`}
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              {isSessionExpired
-                ? "Your session has expired. Please log in again to access your full dashboard."
-                : "Ready to collaborate and achieve your goals? Let's make today productive and impactful!"}
-            </p>
-            <div className="mt-6 flex justify-center">
-              <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{
-                  duration: 0.5,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }}
-              >
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (isSessionExpired) {
-                      handleLogin();
-                    } else {
-                      // Original logic
-                      const confirmed = confirm(
-                        "Would you like to create a collaboration manually? Click 'OK' to proceed or 'Cancel' to use GitHub repository integration instead."
-                      );
-                      if (confirmed) {
-                        router.push("/collab/join-create");
-                      } else if (session?.provider === "github") {
-                        handleShowGithubRepos();
-                      }
-                    }
-                  }}
-                  className="px-8 py-3 cursor-pointer rounded-full text-white font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 dark:from-blue-500 dark:to-indigo-600 dark:hover:from-blue-600 dark:hover:to-indigo-700 shadow-lg transform transition-all duration-300 hover:scale-105"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        {/* Session Expired Banner */}
+        {isSessionExpired && <SessionExpiredBanner onLogin={handleLogin} />}
+
+        {/* Demo Mode Banner */}
+        {isDemo && !isSessionExpired && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 p-4 mb-8 rounded-r-lg">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
                 >
-                  {isSessionExpired ? "Log In Again" : "Get Started 🚀"}
-                </button>
-              </motion.div>
-            </div>
-          </motion.header>
-
-          {/* Profile Section */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="flex flex-col md:flex-row items-center justify-between mb-12"
-          >
-            <div className="flex items-center mb-6 md:mb-0">
-              <Image
-                src={session?.user?.image || "/default-pic.png"}
-                alt="Profile"
-                width={96}
-                height={96}
-                className="rounded-full mr-6 border-4 border-indigo-500 shadow-lg"
-                priority
-              />
-              <div>
-                <h2 className="text-2xl font-semibold text-indigo-700 dark:text-indigo-300">
-                  {session?.user?.name || displayName}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {session?.user?.email || "Demo Mode"}
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">
+                  Viewing demo data - Unable to load real data
                 </p>
               </div>
             </div>
-            <Link
-              href={ session ? "/collab/join-create" : "/auth" }
-              className="px-6 py-3 rounded-full text-white font-semibold transition-all transform hover:scale-105 bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700 shadow-lg"
-            >
-              { session ? 'Create or Join a new Collab' : 'Log In to Create a Collab' }
-            </Link>
-          </motion.div>
+          </div>
+        )}
 
-          {/* GitHub Integration Status - Only show if using GitHub */}
-          {session?.provider === "github" && !isSessionExpired && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="mb-8 rounded-2xl bg-gradient-to-br from-white/90 to-gray-50/95 dark:from-gray-800/90 dark:to-gray-900/80 shadow-xl dark:shadow-2xl border border-gray-100/80 dark:border-gray-700/40 overflow-hidden"
-            >
-              <div className="p-6 relative">
-                {/* Background decoration */}
-                <div className="absolute -top-12 -right-12 w-40 h-40 bg-gradient-to-br from-green-100/30 to-blue-100/20 dark:from-green-900/20 dark:to-blue-900/10 rounded-full blur-xl"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-32 bg-gradient-to-r from-transparent via-green-100/30 dark:via-green-900/20 to-transparent blur-xl -z-10 opacity-70"></div>
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                  <div className="flex items-center">
-                    <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-md mr-4">
-                      <svg
-                        viewBox="0 0 16 16"
-                        className="w-8 h-8 text-gray-800 dark:text-gray-200"
-                        fill="currentColor"
-                      >
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-                      </svg>
-                    </div>
-
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                        GitHub Integration
-                      </h4>
-                      <div className="flex items-center mt-1">
-                        <span className="inline-flex h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Connected as{" "}
-                          <span className="font-medium text-green-600 dark:text-green-400">
-                            @{session?.username || displayName || "user"}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <div className="px-4 py-2 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-100 dark:border-green-800/50">
-                      <span className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        Integration Active
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={handleShowGithubRepos}
-                      className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 dark:from-indigo-600 dark:to-blue-600 dark:hover:from-indigo-700 dark:hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:translate-y-[-2px]"
-                    >
-                      <span className="font-medium">Import Repositories</span>
-                      <ArrowBigDown className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Feature highlight */}
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-start px-4 py-3 bg-gray-50/70 dark:bg-gray-800/40 rounded-lg">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-md text-blue-700 dark:text-blue-300 mr-3">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 10V3L4 14h7v7l9-11h-7z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                        One-Click Import
-                      </h5>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        Convert any repo to a collaboration with a click
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start px-4 py-3 bg-gray-50/70 dark:bg-gray-800/40 rounded-lg">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-md text-purple-700 dark:text-purple-300 mr-3">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                        Team Collaboration
-                      </h5>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        Invite teammates with a simple code
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start px-4 py-3 bg-gray-50/70 dark:bg-gray-800/40 rounded-lg">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-md text-green-700 dark:text-green-300 mr-3">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                        Task Management
-                      </h5>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        Organize tasks for your GitHub projects
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Stats Section */}
-          <DashboardStats
-            stats={stats}
-            isStatsLoading={isStatsLoading}
-            taskStats={taskStats}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <CreateJoinCollabModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            initialTab={modalTab}
+            initialInviteCode={joinCode}
           />
+          {/* === Main Content Column (Left) === */}
+          <div className="lg:col-span-8 xl:col-span-9 space-y-8">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+            >
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight mb-2 aura-text-glow">
+                  {isSessionExpired
+                    ? "Dashboard Preview"
+                    : `Welcome back, ${displayName.split(" ")[0]}`}
+                </h1>
+                <p className="text-muted-foreground text-lg">
+                  {isSessionExpired
+                    ? "Log in to access your full workspace."
+                    : "Here's what's happening with your projects today."}
+                </p>
+              </div>
 
-          {/* Collaborations Section */}
-          { session && <DashboardCollabs
-            adminCollabs={adminCollabs}
-            memberCollabs={memberCollabs}
-            username={
-              session?.username || session?.user?.name || displayName || "User"
-            }
-          /> }
+              {/* Mobile Profile Toggle or similar could go here if needed, but we have sidebar */}
+            </motion.div>
 
-          {/* Repository Activity - Only show if using GitHub and explicitly requested */}
-          {session?.provider === "github" &&
-            (showGithubRepos || adminCollabs.length === 0) && (
-              <>
+            {/* Stats Overview */}
+            <DashboardStats
+              stats={stats}
+              isStatsLoading={isStatsLoading}
+              taskStats={taskStats}
+            />
+
+            {/* Projects / Collaborations */}
+            {session && (
+              <DashboardCollabs
+                adminCollabs={adminCollabs}
+                memberCollabs={memberCollabs}
+                username={displayName}
+              />
+            )}
+
+            {/* GitHub Repositories (Lazy Loaded) */}
+            {session?.connectedAccounts?.includes("github") &&
+              (showGithubRepos || adminCollabs.length === 0) && (
                 <motion.div
                   ref={githubRepoRef}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  className="mt-8 rounded-lg p-6 bg-[#fffff0] dark:bg-gray-800 shadow-md dark:shadow-lg"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="pt-4"
                 >
-                  <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-                    Repository Integration
-                  </h2>
-
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
-                    <p className="text-blue-800 dark:text-blue-200">
-                      Convert any of your GitHub repositories into
-                      collaborations! This will create a new collaboration space
-                      where you can:
-                    </p>
-                    <ul className="list-disc list-inside mt-2 text-blue-700 dark:text-blue-300">
-                      <li>
-                        Invite team members using your collaboration&apos;s
-                        invite code
-                      </li>
-                      <li>Manage project tasks and discussions</li>
-                      <li>Keep track of project progress</li>
-                      <li>Chat with your collaborators</li>
-                    </ul>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="flex p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                      <div className="mr-4 text-indigo-500 dark:text-indigo-400 text-3xl">
-                        🔗
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-indigo-700 dark:text-indigo-300">
-                          Link Repositories
-                        </h3>
-                        <p className="text-sm text-indigo-600 dark:text-indigo-400">
-                          Convert any GitHub repository into a collaboration
-                          with one click
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <div className="mr-4 text-green-500 dark:text-green-400 text-3xl">
-                        👥
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-green-700 dark:text-green-300">
-                          Team Collaboration
-                        </h3>
-                        <p className="text-sm text-green-600 dark:text-green-400">
-                          Invite teammates to collaborate using a simple invite
-                          code
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* GitHub Repositories Section - Lazy loaded */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="mt-12"
-                >
-                  <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-                    GitHub Repositories
+                  <h2 className="text-2xl font-bold mb-6 aura-text-glow">
+                    Repositories
                   </h2>
                   <Suspense
                     fallback={
-                      <div className="p-8 text-center">
-                        Loading GitHub repositories...
+                      <div className="h-40 flex items-center justify-center text-muted-foreground">
+                        Loading repositories...
                       </div>
                     }
                   >
                     <GitHubRepos onCreateCollab={createCollabFromRepo} />
                   </Suspense>
                 </motion.div>
-              </>
-            )}
+              )}
 
-          {/* Show GitHub repos button if not already showing */}
-          {session?.provider === "github" &&
-            !showGithubRepos &&
-            adminCollabs.length > 0 && (
-              <div className="mt-8 text-center">
-                <button
-                  onClick={handleShowGithubRepos}
-                  className="px-6 py-3 cursor-pointer rounded-full text-white font-medium bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-all"
-                >
-                  Show GitHub Repositories
-                </button>
-              </div>
+            {/* 4. Footer Info (Moved to Sidebar) */}
+            <div className="pt-6 text-center text-xs text-muted-foreground/40">
+              <p>© {new Date().getFullYear()} CollabHub</p>
+              <p className="mt-1">Crafted for the community</p>
+            </div>
+          </div>
+
+          {/* === Sidebar Column (Right) === */}
+          <div className="fixed right-4 lg:col-span-4 xl:col-span-3 space-y-6">
+            {/* 1. Profile Widget */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <SpotlightCard className="p-6 bg-card/60 backdrop-blur-md border-border/50">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="relative">
+                    <Image
+                      src={session?.user?.image || "/default-pic.png"}
+                      alt="Profile"
+                      width={64}
+                      height={64}
+                      className="rounded-full border-2 border-primary/20"
+                    />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></div>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg truncate max-w-[150px]">
+                      {displayName}
+                    </h3>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {session?.user?.email || "Pro Member"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Link
+                    href={session ? "/profile" : "/auth"}
+                    className="block w-full py-2 px-4 rounded-lg bg-muted/50 hover:bg-muted text-sm font-medium text-center transition-colors"
+                  >
+                    View Profile
+                  </Link>
+                  {isSessionExpired && (
+                    <button
+                      onClick={handleLogin}
+                      className="block w-full py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium text-center hover:opacity-90 transition-opacity"
+                    >
+                      Log In
+                    </button>
+                  )}
+                </div>
+              </SpotlightCard>
+            </motion.div>
+
+            {/* 2. Quick Actions */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <SpotlightCard className="p-6 bg-card/60 backdrop-blur-md border-border/50">
+                <h3 className="font-semibold text-muted-foreground uppercase text-xs tracking-wider mb-4">
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      setModalTab("create");
+                      setJoinCode("");
+                      setIsModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all group text-left"
+                  >
+                    <div className="p-2 bg-blue-500/10 text-blue-500 rounded-md group-hover:scale-110 transition-transform">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">New Project</div>
+                      <div className="text-xs text-muted-foreground">
+                        Start a fresh collaboration
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setModalTab("join");
+                      setJoinCode("");
+                      setIsModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all group text-left"
+                  >
+                    <div className="p-2 bg-purple-500/10 text-purple-500 rounded-md group-hover:scale-110 transition-transform">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">Join Team</div>
+                      <div className="text-xs text-muted-foreground">
+                        Enter an invite code
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </SpotlightCard>
+            </motion.div>
+
+            {/* 3. Integrations / GitHub */}
+            {!isSessionExpired && session && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <SpotlightCard className="p-6 bg-card/60 backdrop-blur-md border-border/50">
+                  <h3 className="font-semibold text-muted-foreground uppercase text-xs tracking-wider mb-4">
+                    Integrations
+                  </h3>
+
+                  {session.connectedAccounts?.includes("github") ? (
+                    // Connected State
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
+                            <svg
+                              height="20"
+                              viewBox="0 0 16 16"
+                              width="20"
+                              className="fill-current"
+                            >
+                              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                            </svg>
+                          </div>
+                          <span className="font-medium text-sm">GitHub</span>
+                        </div>
+                        <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                      </div>
+
+                      {!showGithubRepos && (
+                        <button
+                          onClick={handleShowGithubRepos}
+                          className="w-full py-2 px-3 text-xs font-medium border border-border rounded-md hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                        >
+                          Import Repositories{" "}
+                          <ArrowBigDown className="w-3 h-3" />
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    // Not Connected State
+                    <div className="text-center">
+                      <p className="text-sm max-w-[300px] text-wrap text-muted-foreground mb-4">
+                        Connect GitHub to import repositories and create
+                        collaborations instantly.
+                      </p>
+                      <button
+                        onClick={() =>
+                          import("next-auth/react").then(({ signIn }) =>
+                            signIn("github"),
+                          )
+                        }
+                        className="w-full py-2 px-3 bg-[#24292e] text-white hover:bg-[#2f363d] rounded-md transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                      >
+                        <svg
+                          height="16"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          className="fill-current"
+                        >
+                          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                        </svg>
+                        Connect GitHub
+                      </button>
+                    </div>
+                  )}
+                </SpotlightCard>
+              </motion.div>
             )}
+          </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="mb-16 px-4">
-        <p className="text-6xl font-extrabold mt-2  md:text-center">
-          <span className="text-gray-600 dark:text-gray-400 opacity-40">
-            Crafted with{" "}
-          </span>
-          <span>❤️ </span>
-          <span className="text-gray-600 dark:text-gray-400 opacity-40">
-            for the CollabHub Family
-          </span>
-        </p>
-        {/* <hr className="my-6 border-t dark:border-indigo-300 opacity-50" /> */}
-        <svg
-          id="wave"
-          // style="transform:rotate(180deg); transition: 0.3s"
-          className="my-6 md:px-20 opacity-50 rotate-180 transition-all duration-300 md:text-center"
-          viewBox="0 0 1440 100"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0">
-              <stop
-                stopColor="rgba(100.549, 100.549, 100.549, 1)"
-                offset="0%"
-              ></stop>
-              <stop
-                stopColor="rgba(237.156, 237.156, 237.156, 1)"
-                offset="100%"
-              ></stop>
-            </linearGradient>
-          </defs>
-          <path
-            // style="transform:translate(0, 0px); opacity:1"
-            className="translate opacity-100"
-            fill="url(#sw-gradient-0)"
-            d="M0,90L40,81.7C80,73,160,57,240,56.7C320,57,400,73,480,76.7C560,80,640,70,720,68.3C800,67,880,73,960,78.3C1040,83,1120,87,1200,75C1280,63,1360,37,1440,30C1520,23,1600,37,1680,38.3C1760,40,1840,30,1920,33.3C2000,37,2080,53,2160,55C2240,57,2320,43,2400,35C2480,27,2560,23,2640,18.3C2720,13,2800,7,2880,6.7C2960,7,3040,13,3120,16.7C3200,20,3280,20,3360,26.7C3440,33,3520,47,3600,50C3680,53,3760,47,3840,48.3C3920,50,4000,60,4080,58.3C4160,57,4240,43,4320,35C4400,27,4480,23,4560,30C4640,37,4720,53,4800,58.3C4880,63,4960,57,5040,56.7C5120,57,5200,63,5280,60C5360,57,5440,43,5520,38.3C5600,33,5680,37,5720,38.3L5760,40L5760,100L5720,100C5680,100,5600,100,5520,100C5440,100,5360,100,5280,100C5200,100,5120,100,5040,100C4960,100,4880,100,4800,100C4720,100,4640,100,4560,100C4480,100,4400,100,4320,100C4240,100,4160,100,4080,100C4000,100,3920,100,3840,100C3760,100,3680,100,3600,100C3520,100,3440,100,3360,100C3280,100,3200,100,3120,100C3040,100,2960,100,2880,100C2800,100,2720,100,2640,100C2560,100,2480,100,2400,100C2320,100,2240,100,2160,100C2080,100,2000,100,1920,100C1840,100,1760,100,1680,100C1600,100,1520,100,1440,100C1360,100,1280,100,1200,100C1120,100,1040,100,960,100C880,100,800,100,720,100C640,100,560,100,480,100C400,100,320,100,240,100C160,100,80,100,40,100L0,100Z"
-          ></path>
-        </svg>
-        <p className="text-xl font-bold text-gray-500 dark:text-gray-400 ml-32">
-          CollabHub
-        </p>
-      </footer>
     </div>
   );
 };

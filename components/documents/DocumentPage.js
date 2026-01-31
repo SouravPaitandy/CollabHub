@@ -6,21 +6,35 @@ import {
   FaArrowLeft,
   FaPlus,
   FaSearch,
-  FaFile,
-  FaTrash,
-  FaEdit,
+  FaFileAlt,
+  FaTrashAlt,
+  FaVideo,
+  FaTimes,
+  FaBars,
 } from "react-icons/fa";
+import { FiLayout, FiMaximize2 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "@/components/Loading";
 import DocumentEditor from "./DocumentEditor";
 import { toast } from "react-hot-toast";
-// import { content } from "html2canvas/dist/types/css/property-descriptors/content";
+import VideoCall from "@/components/VideoCall";
+import { CollabProvider } from "@/components/documents/CollabContext";
 
 export default function DocumentsPage({ collabId }) {
+  return (
+    <CollabProvider collabId={collabId}>
+      <DocumentsPageContent collabId={collabId} />
+    </CollabProvider>
+  );
+}
+
+export function DocumentsPageContent({ collabId, isEmbedded = false }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [collabInfo, setCollabInfo] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // ... (state defs remain same)
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
@@ -28,29 +42,25 @@ export default function DocumentsPage({ collabId }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreatingDoc, setIsCreatingDoc] = useState(false);
   const [newDocTitle, setNewDocTitle] = useState("");
-  const [isScrolledToMainContent, setIsScrolledToMainContent] = useState(false);
+  const [isVideoCallActive, setIsVideoCallActive] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Toggle for mobile/desktop
 
-  // Fetch collab info and documents
+  // Fetch Data logic... (remains same)
   useEffect(() => {
     const fetchData = async () => {
+      // ... (fetch logic same)
       if (session?.user?.email && collabId) {
         try {
           setLoading(true);
-
-          // Fetch collaboration info
           const collabResponse = await fetch(`/api/collab/${collabId}`);
-          if (!collabResponse.ok) {
+          if (!collabResponse.ok)
             throw new Error("Failed to fetch collaboration");
-          }
           const collabData = await collabResponse.json();
           setCollabInfo(collabData);
           setIsAdmin(collabData.userRole === "ADMIN");
 
-          // Fetch documents
           const docsResponse = await fetch(`/api/collab/${collabId}/documents`);
-          if (!docsResponse.ok) {
-            throw new Error("Failed to fetch documents");
-          }
+          if (!docsResponse.ok) throw new Error("Failed to fetch documents");
           const docsData = await docsResponse.json();
           setDocuments(docsData);
         } catch (err) {
@@ -61,486 +71,349 @@ export default function DocumentsPage({ collabId }) {
         }
       }
     };
-
     fetchData();
   }, [session, collabId]);
 
-  // Check if scroll position has reached main content
-  useEffect(() => {
-    const handleScroll = () => {
-      const mainContent = document.querySelector(".main-content");
-      if (!mainContent) return;
-      
-      const mainContentTop = mainContent.getBoundingClientRect().top;
-      const isReached = mainContentTop <= 120;
-      console.log("mainContentTop: ", mainContentTop)
-      if (isReached !== isScrolledToMainContent) {
-        setIsScrolledToMainContent(isReached);
-        console.log("Reached main content:", isReached);
-      }
-    };
+  // ... (rest of logic same)
+  // Define helper functions here if needed or keep existing
 
-    window.addEventListener("scroll", handleScroll);
-    
-    // Initial check
-    handleScroll();
-    
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isScrolledToMainContent]);
-
-  // Select document to view/edit
+  // Document Operations (same as before)
   const selectDocument = async (doc) => {
-    // First, set the basic document info to show something quickly
     setCurrentDocument(doc);
-
     try {
-      // Show loading state
-      const loadingToast = toast.loading("Loading document...");
-
-      // Then fetch the full document
+      // Optimistic set, but fetch full content
       const response = await fetch(
-        `/api/collab/${collabId}/documents/${doc._id}`
+        `/api/collab/${collabId}/documents/${doc._id}`,
       );
-
-      // Dismiss loading toast
-      toast.dismiss(loadingToast);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch document content");
-      }
-
+      if (!response.ok) throw new Error("Failed to fetch content");
       const fullDoc = await response.json();
-      console.log("Fetched document:", fullDoc); // Debug the returned data
-
-      // Update the current document with full content
       setCurrentDocument(fullDoc);
+      // On mobile, close sidebar after selection
+      if (window.innerWidth < 1024) setIsSidebarOpen(false);
     } catch (error) {
-      console.error("Error loading document:", error);
+      console.error(error);
       toast.error("Failed to load document content");
     }
   };
 
-  // Create new document
   const handleCreateDocument = async (e) => {
     e.preventDefault();
-
-    if (!newDocTitle.trim()) {
-      toast.error("Please enter a document title");
-      return;
-    }
+    if (!newDocTitle.trim()) return toast.error("Enter a title");
 
     try {
       setIsCreatingDoc(true);
-
       const response = await fetch(`/api/collab/${collabId}/documents`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: newDocTitle,
           content: "<p>Start typing here...</p>",
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create document");
-      }
-
+      if (!response.ok) throw new Error("Failed to create document");
       const newDocument = await response.json();
       setDocuments([...documents, newDocument]);
       setNewDocTitle("");
       setIsCreatingDoc(false);
-      toast.success("Document created successfully");
-
-      // Open the new document
-      setCurrentDocument(newDocument);
+      toast.success("Document created");
+      selectDocument(newDocument);
     } catch (error) {
-      console.error("Error creating document:", error);
       toast.error("Failed to create document");
+    } finally {
       setIsCreatingDoc(false);
     }
   };
 
-  // Delete document
   const handleDeleteDocument = async (docId) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this document? This action cannot be undone."
-    );
-
-    if (!confirmed) return;
-
+    if (!window.confirm("Irreversible action. Delete this document?")) return;
     try {
       const response = await fetch(
         `/api/collab/${collabId}/documents/${docId}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" },
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete document");
-      }
-
+      if (!response.ok) throw new Error("Failed to delete");
       setDocuments(documents.filter((doc) => doc._id !== docId));
-
-      if (currentDocument && currentDocument._id === docId) {
-        setCurrentDocument(null);
-      }
-
-      toast.success("Document deleted successfully");
+      if (currentDocument?._id === docId) setCurrentDocument(null);
+      toast.success("Document deleted");
     } catch (error) {
-      console.error("Error deleting document:", error);
       toast.error("Failed to delete document");
     }
   };
 
-  // Handle document update after save
   const handleDocumentSaved = (title, content) => {
-    // Update the documents list with the new title if it changed
     if (currentDocument && currentDocument.title !== title) {
-      setDocuments(
-        documents.map((doc) =>
-          doc._id === currentDocument._id ? { ...doc, title } : doc
-        )
+      setDocuments((docs) =>
+        docs.map((d) => (d._id === currentDocument._id ? { ...d, title } : d)),
       );
-      setCurrentDocument({ ...currentDocument, title });
+      setCurrentDocument((prev) => ({ ...prev, title }));
     }
   };
 
-  // Filter documents by search query
   const filteredDocuments = documents.filter((doc) =>
-    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+    doc.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // Loading state
-  if (status === "loading" || (loading && !collabInfo)) {
-    return <Loader />;
-  }
-
-  // Error state
-  if (error) {
+  if (status === "loading" || (loading && !collabInfo)) return <Loader />;
+  if (error) return <ErrorState error={error} onBack={() => router.back()} />;
+  if (!collabInfo)
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="min-h-screen flex items-center justify-center p-4"
-      >
-        <motion.div
-          initial={{ y: 20 }}
-          animate={{ y: 0 }}
-          className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 p-8 rounded-xl shadow-lg max-w-md w-full border border-red-200 dark:border-red-800"
-        >
-          <h2 className="text-2xl font-bold mb-4">Error Loading Documents</h2>
-          <p className="mb-6 text-red-500 dark:text-red-400">{error}</p>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => router.back()}
-            className="w-full px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center shadow-md hover:shadow-lg"
-          >
-            <FaArrowLeft className="mr-2" /> Return to Dashboard
-          </motion.button>
-        </motion.div>
-      </motion.div>
+      <div className="p-8 text-center text-muted-foreground">
+        Collaboration Not Found
+      </div>
     );
-  }
-
-  // Not found state
-  if (!collabInfo) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="min-h-screen flex items-center justify-center p-4"
-      >
-        <motion.div
-          initial={{ y: 20 }}
-          animate={{ y: 0 }}
-          className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-300 p-8 rounded-xl shadow-lg max-w-md w-full border border-yellow-200 dark:border-yellow-800"
-        >
-          <h2 className="text-2xl font-bold mb-4">Collaboration Not Found</h2>
-          <p className="mb-6">
-            The collaboration you&apos;re looking for doesn&apos;t exist or you
-            don&apos;t have access to it.
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => router.back()}
-            className="w-full px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center shadow-md hover:shadow-lg"
-          >
-            <FaArrowLeft className="mr-2" /> Return to Dashboard
-          </motion.button>
-        </motion.div>
-      </motion.div>
-    );
-  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-8xl mx-auto p-4 md:p-8 py-8 md:py-12"
+    <div
+      className={`h-[calc(100vh-64px)] flex flex-col md:flex-row bg-background text-foreground overflow-hidden ${
+        isEmbedded ? "h-full" : ""
+      }`}
     >
-    {/* Header with back link */}
-        <motion.div
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          {/* Breadcrumb navigation */}
-          <nav className="flex mt-8 mb-4 text-sm">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-          <li className="inline-flex items-center">
-            <button 
-              onClick={() => router.push(`/${session?.username}`)}
-              className="inline-flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
-            >
-              Dashboard
-            </button>
-          </li>
-          {isAdmin && <li>
-            <div className="flex items-center">
-              <span className="mx-2 text-gray-400">/</span>
-              <button 
-            onClick={() => router.push(`/collab/admin/${collabId}`)}
-            className="inline-flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
-              >
+      {/* Sidebar - Collapsible - HIDE IF EMBEDDED? No, we still need list of docs. 
+          Maybe style it to fit better? 
+          Actually, the outer shell has the global nav. The 'Documents' view DOES need a document list. 
+          So we keep it, but maybe adjust height or styling. 
+      */}
+      <motion.aside
+        initial={{ width: 280 }}
+        animate={{
+          width: isSidebarOpen ? 280 : 0,
+          opacity: isSidebarOpen ? 1 : 0,
+        }}
+        className={`flex-shrink-0 border-r border-white/5 bg-background/30 backdrop-blur-xl z-20 flex flex-col overflow-hidden transition-all duration-300 ${
+          isEmbedded ? "bg-transparent border-none" : ""
+        }`}
+      >
+        <div className="p-4 border-b border-border flex items-center justify-between min-w-[280px]">
+          <h2 className="font-semibold text-lg truncate pr-2">
             {collabInfo.name}
-              </button>
-            </div>
-          </li>}
-          <li>
-            <div className="flex items-center">
-              <span className="mx-2 text-gray-400">/</span>
-              <span className="text-indigo-600 dark:text-indigo-400 font-medium">Documents</span>
-            </div>
-          </li>
-            </ol>
-          </nav>
-
-          {/* <motion.button
-            whileHover={{ x: -5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.back()}
-            className="group inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors duration-200 mb-4 font-medium text-lg"
-            aria-label="Go back"
-          >
-            <FaArrowLeft className="mr-2 transform group-hover:translate-x-[-3px] transition-transform" />
-            Back to Collaboration
-          </motion.button> */}
-
-          <motion.div
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="border-b dark:border-gray-700 pb-5 mb-6"
-          >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Documents for {collabInfo.name}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl">
-              Create and collaborate on documents in real-time
-            </p>
+          </h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsCreatingDoc(true)}
+              className="p-2 rounded-md hover:bg-muted text-primary transition-colors"
+              title="New Document"
+            >
+              <FaPlus />
+            </button>
           </div>
-          {isAdmin && (
-            <div className="mt-4 md:mt-0">
-              <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-sm font-medium">
-            Admin Access
-              </span>
-            </div>
-          )}
-            </div>
-          </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Main content area */}
-      <div className={`main-content ${isScrolledToMainContent ? 'lg:relative' : ""} flex flex-col lg:flex-row gap-6 lg:gap-8 lg:justify-between`}>
-        {/* Sidebar with document list */}
-        <motion.div
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className={`lg:max-w-[280px] overflow-hidden ${isScrolledToMainContent ? 'lg:fixed top-28 z-30' : ''}`}
-        >
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-4">
-            <div className="flex mb-4 items-center justify-between">
-              <h2 className="text-xl font-semibold">Documents</h2>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsCreatingDoc(true)}
-                className="p-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full"
-              >
-                <FaPlus />
-              </motion.button>
-            </div>
-
-            {/* Search box */}
-            <div className="relative mb-4">
-              <input
-                type="text"
-                placeholder="Search documents..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-2 pl-9 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-              />
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
-            </div>
-
-            {/* Document list */}
-            <div className="space-y-2 max-h-[130px] lg:max-h-[60vh] overflow-y-auto">
-              {filteredDocuments.length > 0 ? (
-                filteredDocuments.map((doc) => (
-                  <motion.div
-                    key={doc._id}
-                    whileTap={{ scale: 0.98 }}
-                    className={`p-3 rounded-lg cursor-pointer flex items-center justify-between ${
-                      currentDocument && currentDocument._id === doc._id
-                        ? "bg-indigo-100 dark:bg-indigo-900/40"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
-                    onClick={() => selectDocument(doc)}
-                  >
-                    <div className="flex items-center">
-                      <FaFile className="text-indigo-500 dark:text-indigo-400 mr-2" />
-                      <div className="truncate">
-                        <p className="font-medium truncate">{doc.title}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(doc.updatedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {(isAdmin || doc.createdBy === session?.user?.email) && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteDocument(doc._id);
-                        }}
-                        className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1"
-                      >
-                        <FaTrash size={14} />
-                      </button>
-                    )}
-                  </motion.div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  {searchQuery
-                    ? "No documents match your search"
-                    : "No documents yet"}
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
-        {isScrolledToMainContent && <div className="lg:block hidden w-[258px] h-20"></div>}
-
-        {/* Document editor area */}
-        <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="lg:width-full flex-1"
-        >
-          {currentDocument ? (
-            <DocumentEditor
-              key={currentDocument._id}
-              documentId={currentDocument._id}
-              collabId={collabId}
-              initialContent={currentDocument.content}
-              title={currentDocument.title}
-              onSave={handleDocumentSaved}
+        {/* Search */}
+        <div className="p-4 min-w-[280px]">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-3 text-muted-foreground text-xs" />
+            <input
+              type="text"
+              placeholder="Search docs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-2 text-sm bg-muted/50 border border-transparent focus:border-primary rounded-lg outline-none transition-all"
             />
-          ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="w-32 h-32 mb-4 opacity-60 text-indigo-400">
-                <FaFile size={80} className="mx-auto" />
+          </div>
+        </div>
+
+        {/* Doc List */}
+        <div className="flex-1 overflow-y-auto min-w-[280px] px-3 pb-4">
+          <div className="space-y-1">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+              Documents
+            </h3>
+            {filteredDocuments.length === 0 && (
+              <p className="text-sm text-muted-foreground px-2 italic">
+                No documents found.
+              </p>
+            )}
+            {filteredDocuments.map((doc) => (
+              <div
+                key={doc._id}
+                onClick={() => selectDocument(doc)}
+                className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 border border-transparent ${
+                  currentDocument?._id === doc._id
+                    ? "bg-primary/15 text-primary font-medium border-primary/10 shadow-sm shadow-primary/5"
+                    : "hover:bg-primary/5 text-foreground/70 hover:text-foreground"
+                }`}
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div
+                    className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors ${
+                      currentDocument?._id === doc._id
+                        ? "bg-primary/20 text-primary"
+                        : "bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    }`}
+                  >
+                    <FaFileAlt className="text-xs" />
+                  </div>
+                  <span className="truncate text-sm">{doc.title}</span>
+                </div>
+                {(isAdmin || doc.createdBy === session?.user?.email) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteDocument(doc._id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+                  >
+                    <FaTrashAlt size={11} />
+                  </button>
+                )}
               </div>
-              <h3 className="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">
+            ))}
+          </div>
+        </div>
+      </motion.aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 relative bg-gradient-to-br from-background via-background to-primary/5">
+        {/* Toolbar / Breadcrumbs */}
+        <header className="h-[64px] border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-10 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 text-muted-foreground hover:text-foreground"
+            >
+              <FiLayout />
+            </button>
+            {currentDocument && (
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Editing</span>
+                <span className="text-sm font-semibold">
+                  {currentDocument.title}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsVideoCallActive(!isVideoCallActive)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                isVideoCallActive
+                  ? "bg-destructive/10 text-destructive border border-destructive/20"
+                  : "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+              }`}
+            >
+              <FaVideo /> {isVideoCallActive ? "End Call" : "Video Call"}
+            </button>
+          </div>
+        </header>
+
+        {/* Editor Container */}
+        <div className="flex-1 overflow-hidden relative w-full">
+          {currentDocument ? (
+            <div className="h-full w-full overflow-y-auto p-4 md:p-8 flex justify-center custom-scrollbar">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full max-w-[850px] glass-card rounded-2xl shadow-2xl min-h-[calc(100vh-180px)] relative overflow-hidden ring-1 ring-white/10"
+              >
+                {/* Decorative top gradient */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50" />
+
+                <DocumentEditor
+                  key={currentDocument._id}
+                  documentId={currentDocument._id}
+                  collabId={collabId}
+                  initialContent={currentDocument.content}
+                  title={currentDocument.title}
+                  onSave={handleDocumentSaved}
+                />
+              </motion.div>
+            </div>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-24 h-24 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-primary/20 shadow-lg shadow-primary/5"
+              >
+                <FaFileAlt className="text-3xl text-primary/60" />
+              </motion.div>
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
                 No document selected
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6 text-center max-w-md">
-                Select a document from the sidebar or create a new one to start
-                collaborating
+              <p className="text-sm opacity-60 max-w-xs text-center leading-relaxed">
+                Select a file from the sidebar to view or edit, or create a new
+                one to get started.
               </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsCreatingDoc(true)}
-                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg flex items-center"
-              >
-                <FaPlus className="mr-2" /> Create New Document
-              </motion.button>
             </div>
           )}
-        </motion.div>
-      </div>
+        </div>
+      </main>
 
-      {/* New document modal */}
+      {/* Video Call Overlay */}
+      <AnimatePresence>
+        {isVideoCallActive && (
+          <VideoCall
+            roomId={collabId}
+            userName={session?.user?.name}
+            onLeave={() => setIsVideoCallActive(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Create Document Modal */}
       <AnimatePresence>
         {isCreatingDoc && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-xl"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-card w-full max-w-md p-6 rounded-xl shadow-2xl border border-border"
             >
-              <h2 className="text-2xl font-bold mb-4">Create New Document</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold">New Document</h3>
+                <button
+                  onClick={() => setIsCreatingDoc(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <FaTimes />
+                </button>
+              </div>
               <form onSubmit={handleCreateDocument}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-2">
-                    Document Title
-                  </label>
-                  <input
-                    type="text"
-                    value={newDocTitle}
-                    onChange={(e) => setNewDocTitle(e.target.value)}
-                    placeholder="Enter document title"
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500"
-                    autoFocus
-                  />
-                </div>
-                <div className="flex justify-end gap-3">
-                  <motion.button
+                <input
+                  autoFocus
+                  className="w-full p-3 rounded-lg bg-input border border-border focus:ring-2 focus:ring-primary outline-none transition-all mb-4"
+                  placeholder="Document Title (e.g., Marketing Plan)"
+                  value={newDocTitle}
+                  onChange={(e) => setNewDocTitle(e.target.value)}
+                />
+                <div className="flex justify-end gap-2">
+                  <button
                     type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                     onClick={() => setIsCreatingDoc(false)}
-                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg"
+                    className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-muted transition-colors"
                   >
                     Cancel
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     type="submit"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg flex items-center"
-                    disabled={!newDocTitle.trim()}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
                   >
-                    <FaPlus className="mr-2" /> Create
-                  </motion.button>
+                    Create Document
+                  </button>
                 </div>
               </form>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
+
+const ErrorState = ({ error, onBack }) => (
+  <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+    <div className="bg-destructive/5 border border-destructive/20 text-destructive p-8 rounded-xl max-w-md text-center">
+      <p className="mb-4">{error}</p>
+      <button
+        onClick={onBack}
+        className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:opacity-90"
+      >
+        Go Back
+      </button>
+    </div>
+  </div>
+);

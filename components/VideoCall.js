@@ -155,6 +155,8 @@ export default function VideoCall({ roomId, onLeave }) {
 
         const newPeer = new Peer(undefined, peerConfig);
 
+        console.log("[VideoCall] Initializing PeerJS with config:", peerConfig);
+
         newPeer.on("open", (id) => {
           console.log("[VideoCall] My Peer ID:", id);
           console.log("[VideoCall] Peer Config:", peerConfig);
@@ -163,6 +165,23 @@ export default function VideoCall({ roomId, onLeave }) {
 
           // Join the video room via Server signaling using the existing socket
           socket.emit("join-video-room", roomId, id, userName);
+        });
+
+        // Add error handler
+        newPeer.on("error", (error) => {
+          console.error("[VideoCall] PeerJS Error:", error);
+          console.error("[VideoCall] Error type:", error.type);
+        });
+
+        // Add disconnected handler
+        newPeer.on("disconnected", () => {
+          console.log("[VideoCall] PeerJS Disconnected - attempting reconnect");
+          newPeer.reconnect();
+        });
+
+        // Add close handler
+        newPeer.on("close", () => {
+          console.log("[VideoCall] PeerJS Connection Closed");
         });
 
         // 3. Handle Incoming Calls

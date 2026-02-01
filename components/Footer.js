@@ -70,7 +70,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4 text-foreground">
-              About CollabHub
+              About Coordly
             </h3>
             <p className="text-muted-foreground">
               Empowering teams to collaborate seamlessly and efficiently.
@@ -165,7 +165,7 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground">
-            &copy; 2024-2025 CollabHub. All rights reserved.
+            &copy; 2024-2025 Coordly. All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <SocialIcon

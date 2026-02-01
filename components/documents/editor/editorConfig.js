@@ -13,6 +13,10 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
 import { getRandomColor, getRandomDarkColor } from "./colorUtils";
 
 export const createEditorConfig = ({
@@ -51,6 +55,12 @@ export const createEditorConfig = ({
     TableCell,
     TextStyle,
     Color,
+    Subscript,
+    Superscript,
+    TaskList,
+    TaskItem.configure({
+      nested: true,
+    }),
   ];
 
   const isDarkMode =
@@ -71,7 +81,7 @@ export const createEditorConfig = ({
           avatar: null,
         },
         render: (user) => createCursorElement(user),
-      })
+      }),
     );
   }
 
@@ -90,7 +100,7 @@ function createCursorElement(user) {
   cursor.classList.add("collaboration-cursor");
   cursor.setAttribute(
     "style",
-    `border-left: 2px solid ${user.color}; border-right: 2px solid ${user.color}; margin-left: -2px; margin-right: -2px; pointer-events: none; position: relative; word-break: normal;`
+    `border-left: 2px solid ${user.color}; border-right: 2px solid ${user.color}; margin-left: -2px; margin-right: -2px; pointer-events: none; position: relative; word-break: normal;`,
   );
 
   // Create the cursor label with user info
@@ -98,7 +108,7 @@ function createCursorElement(user) {
   label.classList.add("collaboration-cursor-label");
   label.setAttribute(
     "style",
-    `background-color: ${user.color}; color: black; font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 4px 4px 4px 0; position: absolute; top: -1.4em; left: -2px; white-space: nowrap; pointer-events: none; user-select: none;`
+    `background-color: ${user.color}; color: black; font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 4px 4px 4px 0; position: absolute; top: -1.4em; left: -2px; white-space: nowrap; pointer-events: none; user-select: none;`,
   );
 
   // Extract first name from full name

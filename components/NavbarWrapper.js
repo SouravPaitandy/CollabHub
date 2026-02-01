@@ -5,10 +5,18 @@ import Navbar from "./Navbar";
 
 export default function NavbarWrapper() {
   const pathname = usePathname();
-  const isChatPage =
-    pathname.startsWith("/chat") || pathname.startsWith("/collab/");
+  // Hide Navbar on chat, collab editor, and dashboard routes
+  // Dashboard routes are typically /[username] where username is not a standard page
+  const isExcludedPage =
+    pathname.startsWith("/chat") ||
+    pathname.startsWith("/collab/") ||
+    // Check if it's a dashboard route (single path segment that isn't a public page)
+    (pathname.split("/").length === 2 &&
+      !["/", "/auth", "/about", "/features", "/pricing", "/contact"].includes(
+        pathname,
+      ));
 
-  if (isChatPage) {
+  if (isExcludedPage) {
     return null;
   }
 

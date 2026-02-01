@@ -120,19 +120,44 @@ export default function VideoCall({ roomId, onLeave }) {
         if (myVideoRef.current) myVideoRef.current.srcObject = currentStream;
 
         // 2. Initialize PeerJS
-        // Parse peer URL from env or default
+        // For production (Render), use the WebSocket URL base
+        // For local, use localhost:3001
+        const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
         const peerUrl =
           process.env.NEXT_PUBLIC_PEER_URL || "ws://localhost:3001";
-        const peerUrlObj = new URL(peerUrl);
 
-        const newPeer = new Peer(undefined, {
-          host: peerUrlObj.hostname,
-          port: peerUrlObj.port ? parseInt(peerUrlObj.port) : 443,
-          path: peerUrlObj.pathname,
-        });
+        // Determine if we're using production URL (wss/https)
+        const isProduction =
+          wsUrl.startsWith("wss://") || wsUrl.startsWith("https://");
+
+        let peerConfig;
+        if (isProduction) {
+          // Production: Use same domain as WS_URL with /peerjs path
+          const wsUrlObj = new URL(
+            wsUrl.replace("wss://", "https://").replace("ws://", "http://"),
+          );
+          peerConfig = {
+            host: wsUrlObj.hostname,
+            port: 443,
+            path: "/peerjs",
+            secure: true,
+          };
+        } else {
+          // Local development: Use PEER_URL as before
+          const peerUrlObj = new URL(peerUrl);
+          peerConfig = {
+            host: peerUrlObj.hostname,
+            port: peerUrlObj.port ? parseInt(peerUrlObj.port) : 3001,
+            path: "/",
+            secure: false,
+          };
+        }
+
+        const newPeer = new Peer(undefined, peerConfig);
 
         newPeer.on("open", (id) => {
           console.log("[VideoCall] My Peer ID:", id);
+          console.log("[VideoCall] Peer Config:", peerConfig);
           setMyPeerId(id);
           peerInstanceRef.current = newPeer;
 

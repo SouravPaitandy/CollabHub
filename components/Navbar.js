@@ -61,7 +61,7 @@ const Navbar = () => {
               />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent group-hover:aura-text-glow transition-all">
-              CollabHub
+              Coordly
             </span>
           </Link>
 

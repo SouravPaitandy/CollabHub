@@ -173,8 +173,8 @@ export default function HomePage() {
                 Ready to boost productivity?
               </h2>
               <p className="text-xl text-muted-foreground max-w-xl mx-auto">
-                Join thousands of teams already using CollabHub to ship faster
-                and work better together.
+                Join thousands of teams already using Coordly to ship faster and
+                work better together.
               </p>
               <Link
                 href="/auth"

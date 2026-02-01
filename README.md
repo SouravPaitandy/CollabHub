@@ -1,6 +1,6 @@
-# 🚀 CollabHub
+# 🚀 Coordly
 
-CollabHub is a modern, responsive, and scalable web application built with the power of **Next.js**, **React**, and **Tailwind CSS**. Whether you're starting a new project or contributing to one, CollabHub is built to help you collaborate and scale seamlessly.
+Coordly is a modern, responsive, and scalable web application built with the power of **Next.js**, **React**, and **Tailwind CSS**. Whether you're starting a new project or contributing to one, Coordly is built to help you collaborate and scale seamlessly.
 
 ---
 
@@ -43,7 +43,7 @@ Once the server is running, open your browser and navigate to:
 
 ## 📚 Learn More
 
-Explore the technologies used in CollabHub:
+Explore the technologies used in Coordly:
 
 - [Next.js Documentation](https://nextjs.org/docs)  
 - [React Documentation](https://reactjs.org/docs/getting-started.html)  
@@ -53,7 +53,7 @@ Explore the technologies used in CollabHub:
 
 ## 🚀 Deployment
 
-CollabHub is optimized for deployment on [**Vercel**](https://vercel.com), the creators of Next.js.
+Coordly is optimized for deployment on [**Vercel**](https://vercel.com), the creators of Next.js.
 
 ### Steps to Deploy:
 1. Push your code to a **GitHub** repository.

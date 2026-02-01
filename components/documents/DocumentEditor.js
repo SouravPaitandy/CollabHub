@@ -19,6 +19,7 @@ import DocumentHeader from "./editor/DocumentHeader";
 import EditorToolbar from "./editor/EditorToolbar";
 import EditorStatusHub from "./editor/EditorStatusHub";
 import LoadingDisplay from "./editor/LoadingDisplay";
+import EditorBubbleMenu from "./editor/BubbleMenu";
 
 // Logic & Utils
 import { saveDocumentToAPI } from "./editor/apiUtils";
@@ -205,11 +206,14 @@ export default function DocumentEditor({
         className="flex-1 overflow-y-auto custom-scrollbar relative z-0 flex justify-center py-20 px-4"
         onClick={() => editor.chain().focus().run()}
       >
+        {/* Bubble Menu */}
+        <EditorBubbleMenu editor={editor} />
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-[900px] min-h-[1100px] bg-white dark:bg-[#121212] shadow-2xl shadow-black/5 dark:shadow-black/20 ring-1 ring-black/5 dark:ring-white/5 rounded-sm px-16 py-20 cursor-text"
+          className="w-full max-w-[900px] min-h-[1100px] bg-white dark:bg-[#121212] shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5 rounded-sm px-20 py-24 cursor-text"
         >
           <EditorContent
             editor={editor}

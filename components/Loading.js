@@ -74,7 +74,7 @@ const Loading = ({ message = "Syncing with the universe..." }) => {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-bold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-purple-500 aura-text-glow"
         >
-          CollabHub
+          Coordly
         </motion.h1>
 
         {/* Dynamic Loading Text */}

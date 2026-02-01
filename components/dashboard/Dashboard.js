@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, Suspense, lazy } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import Loader from "../Loading";
@@ -14,6 +14,7 @@ import CreateJoinCollabModal from "./CreateJoinCollabModal";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import ErrorState from "../common/ErrorState";
 import OfflineBanner from "../common/OfflineBanner";
+import DashboardHeader from "./DashboardHeader";
 import {
   DEMO_COLLABS_ADMIN,
   DEMO_COLLABS_MEMBER,
@@ -152,6 +153,12 @@ const Dashboard = ({
     if (typeof window !== "undefined") {
       const callbackUrl = encodeURIComponent(window.location.href);
       window.location.href = `/auth?callbackUrl=${callbackUrl}`;
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      signOut();
     }
   };
 
@@ -359,7 +366,10 @@ const Dashboard = ({
       {/* Offline Banner */}
       <OfflineBanner isOnline={isOnline} onRetry={handleRetry} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        {/* Dashboard Header */}
+        <DashboardHeader />
+
         {/* Session Expired Banner */}
         {isSessionExpired && <SessionExpiredBanner onLogin={handleLogin} />}
 
@@ -463,13 +473,13 @@ const Dashboard = ({
 
             {/* 4. Footer Info (Moved to Sidebar) */}
             <div className="pt-6 text-center text-xs text-muted-foreground/40">
-              <p>© {new Date().getFullYear()} CollabHub</p>
+              <p>© {new Date().getFullYear()} Coordly</p>
               <p className="mt-1">Crafted for the community</p>
             </div>
           </div>
 
           {/* === Sidebar Column (Right) === */}
-          <div className="fixed right-4 lg:col-span-4 xl:col-span-3 space-y-6">
+          <div className="fixed right-4 lg:col-span-4 xl:col-span-3 space-y-3">
             {/* 1. Profile Widget */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -505,12 +515,19 @@ const Dashboard = ({
                   >
                     View Profile
                   </Link>
-                  {isSessionExpired && (
+                  {isSessionExpired ? (
                     <button
                       onClick={handleLogin}
                       className="block w-full py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium text-center hover:opacity-90 transition-opacity"
                     >
                       Log In
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full py-2 px-4 cursor-pointer rounded-lg bg-red-600/10 text-red-900/80 hover:text-red-700 text-sm font-medium text-center hover:opacity-90 transition-opacity"
+                    >
+                      Log Out
                     </button>
                   )}
                 </div>

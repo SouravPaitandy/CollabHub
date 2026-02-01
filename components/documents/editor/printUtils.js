@@ -21,7 +21,9 @@
 export const printUtils = (documentTitle, setShowDropdown, userName = null) => {
   try {
     // Get the editor content
-    const editorContentContainer = document.querySelector(".editor-content-container");
+    const editorContentContainer = document.querySelector(
+      ".editor-content-container",
+    );
     const editorContent = document.querySelector(".editor-content");
 
     if (!editorContent || !editorContentContainer) {
@@ -31,9 +33,10 @@ export const printUtils = (documentTitle, setShowDropdown, userName = null) => {
     }
 
     // Create a new window for printing with a specific name to prevent browser blocking
-    const printWindowFeatures = "width=1000,height=800,menubar=yes,toolbar=yes,scrollbars=yes";
+    const printWindowFeatures =
+      "width=1000,height=800,menubar=yes,toolbar=yes,scrollbars=yes";
     const printWindow = window.open("", "print_window", printWindowFeatures);
-    
+
     if (!printWindow) {
       alert("Please allow popup windows to print your document.");
       return;
@@ -44,11 +47,16 @@ export const printUtils = (documentTitle, setShowDropdown, userName = null) => {
       try {
         // Get all stylesheet links from the current document for consistent styling
         const stylesheets = Array.from(
-          document.querySelectorAll('link[rel="stylesheet"]')
+          document.querySelectorAll('link[rel="stylesheet"]'),
         ).map((link) => link.outerHTML);
 
         // Generate the HTML document with enhanced styling
-        const html = generateDocumentHTML(documentTitle, stylesheets, editorContent, userName);
+        const html = generateDocumentHTML(
+          documentTitle,
+          stylesheets,
+          editorContent,
+          userName,
+        );
 
         // Write to the print window - check if the window is still open
         if (printWindow.document) {
@@ -57,7 +65,7 @@ export const printUtils = (documentTitle, setShowDropdown, userName = null) => {
           printWindow.document.close();
 
           // Add an onload handler to ensure content is fully loaded before printing
-          printWindow.onload = function() {
+          printWindow.onload = function () {
             try {
               // Additional delay to ensure styles are applied
               setTimeout(() => {
@@ -86,27 +94,35 @@ export const printUtils = (documentTitle, setShowDropdown, userName = null) => {
         }
       } catch (windowError) {
         console.error("Window manipulation error:", windowError);
-        alert("There was an error preparing your document for printing. Please check your popup blocker.");
+        alert(
+          "There was an error preparing your document for printing. Please check your popup blocker.",
+        );
       }
     }, 100);
-
   } catch (error) {
     console.error("Print error:", error);
-    alert("There was an error preparing your document for printing. Please try again.");
+    alert(
+      "There was an error preparing your document for printing. Please try again.",
+    );
   }
 };
 
 /**
  * Generate HTML for both printing and PDF export
  */
-function generateDocumentHTML(documentTitle, stylesheets, editorContent, userName = null) {
+function generateDocumentHTML(
+  documentTitle,
+  stylesheets,
+  editorContent,
+  userName = null,
+) {
   const date = new Date();
   const formattedDate = date.toLocaleDateString();
   const formattedDateTime = date.toLocaleString();
   const title = documentTitle || "Untitled Document";
   const userInfo = userName ? `Prepared by: ${userName}` : "";
-  
-return `
+
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -290,13 +306,13 @@ return `
                     <img src="/favicon.png">
                 </div>
                 <div class="company-text">
-                    <h2>CollabHub</h2>
+                    <h2>Coordly</h2>
                     <p>Sync · Create · Succeed</p>
                 </div>
             </div>
             <div class="document-info">
                 <h1>${title}</h1>
-                <p>${formattedDate}${userInfo ? ` · ${userInfo}` : ''}</p>
+                <p>${formattedDate}${userInfo ? ` · ${userInfo}` : ""}</p>
             </div>
         </div>
         
@@ -308,7 +324,7 @@ return `
         
         <div class="doc-footer">
             <div class="doc-footer-left">
-                <span class="footer-logo">CollabHub</span> · ${title}
+                <span class="footer-logo">Coordly</span> · ${title}
             </div>
             <div class="page-number">Page 1</div>
         </div>

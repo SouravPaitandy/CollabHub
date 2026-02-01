@@ -57,13 +57,13 @@ function AdminPanel({ id }) {
   };
 
   const shareInvite = async () => {
-    const shareText = `Join our collaboration "${collab.name}" on CollabHub! Use invite code: ${collab.inviteCode}`;
+    const shareText = `Join our collaboration "${collab.name}" on Coordly! Use invite code: ${collab.inviteCode}`;
     const shareUrl = `${window.location.origin}/dashboard?join=${collab.inviteCode}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Join ${collab.name} on CollabHub`,
+          title: `Join ${collab.name} on Coordly`,
           text: shareText,
           url: shareUrl,
         });
@@ -695,12 +695,12 @@ function AdminPanel({ id }) {
       <hr className="my-8 border-t dark:border-indigo-300 opacity-20" />
       <footer className="py-6 text-center">
         <p className="text-gray-600 dark:text-gray-400">
-          &copy; {new Date().getFullYear()} CollabHub. All rights reserved.
+          &copy; {new Date().getFullYear()} Coordly. All rights reserved.
         </p>
         <p className="text-5xl font-extrabold mt-2 opacity-40">
           <span className="text-indigo-600 dark:text-indigo-300">✨</span>
           <span className="text-gray-600 dark:text-gray-400">
-            Made with ❤️ by the CollabHub Team
+            Made with ❤️ by the Coordly Team
           </span>
         </p>
       </footer>

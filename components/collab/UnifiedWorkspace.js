@@ -45,7 +45,7 @@ function WorkspaceShell({ collabId }) {
     return view === "tasks" || view === "settings" ? view : "docs";
   });
   const [isChatOpen, setIsChatOpen] = useState(
-    searchParams.get("view") === "chat"
+    searchParams.get("view") === "chat",
   );
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -161,8 +161,20 @@ function WorkspaceShell({ collabId }) {
 
         {/* User / Bottom Actions */}
         <div className="p-4 border-t border-white/5 flex flex-col gap-2">
+          <NavButton
+            icon={<Settings size={20} />}
+            label="Settings"
+            isActive={activeView === "settings"}
+            isCollapsed={isSidebarCollapsed}
+            onClick={() => router.push(`/collab/admin/${collabId}`)}
+            variant="ghost"
+          />
           {session.user.image ? (
-            <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+            <button
+              title="Go to Dashboard"
+              className="cursor-pointer flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+              onClick={() => router.push("/dashboard")}
+            >
               <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border border-white/10">
                 <Image
                   src={session.user.image}
@@ -183,24 +195,8 @@ function WorkspaceShell({ collabId }) {
                   </p>
                 </motion.div>
               )}
-            </div>
+            </button>
           ) : null}
-
-          <NavButton
-            icon={<Settings size={20} />}
-            label="Settings"
-            isActive={activeView === "settings"}
-            isCollapsed={isSidebarCollapsed}
-            onClick={() => router.push(`/collab/admin/${collabId}`)}
-            variant="ghost"
-          />
-          <NavButton
-            icon={<LayoutGrid size={20} />}
-            label="Dashboard"
-            isCollapsed={isSidebarCollapsed}
-            onClick={() => router.push("/dashboard")}
-            variant="ghost"
-          />
         </div>
       </motion.nav>
 

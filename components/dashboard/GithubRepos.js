@@ -546,7 +546,7 @@ const GitHubRepos = ({ onCreateCollab }) => {
                   <span className="font-semibold text-primary">
                     {selectedRepo.name}
                   </span>{" "}
-                  to CollabHub?
+                  to Coordly?
                 </p>
                 <div className="flex justify-end gap-3">
                   <motion.button

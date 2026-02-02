@@ -34,20 +34,20 @@ export default function EditorStatusHub({
             initial={{ opacity: 0, x: 20, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 10, scale: 0.9 }}
-            className="pointer-events-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 px-3 py-2 rounded-full shadow-lg flex items-center gap-2"
+            className="pointer-events-auto bg-background/60 backdrop-blur-xl border border-white/10 px-3 py-2 rounded-full shadow-lg flex items-center gap-2 ring-1 ring-black/5"
           >
             <div className="flex gap-0.5">
-              <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-              <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-              <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
+              <span className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-1 h-1 bg-primary rounded-full animate-bounce" />
             </div>
-            <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
+            <span className="text-[10px] font-medium text-muted-foreground">
               {typingUsers.length === 1 ? (
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+                <span className="text-primary font-bold">
                   {typingUsers[0].name}
                 </span>
               ) : (
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+                <span className="text-primary font-bold">
                   {typingUsers.length} people
                 </span>
               )}{" "}
@@ -60,7 +60,7 @@ export default function EditorStatusHub({
       {/* 2. MAIN HUB (Mission Control) */}
       <motion.div
         layout
-        className="pointer-events-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 p-1.5 rounded-full shadow-2xl shadow-indigo-500/10 flex items-center gap-1 group/hub transition-all duration-300 hover:scale-105"
+        className="pointer-events-auto bg-background/60 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full shadow-2xl shadow-primary/5 flex items-center gap-1 group/hub transition-all duration-300 hover:scale-105 hover:bg-background/80 hover:border-white/20 ring-1 ring-black/5"
       >
         {/* Active Users Section */}
         <div className="flex items-center pl-1 pr-2 relative">

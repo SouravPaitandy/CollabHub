@@ -347,7 +347,7 @@ const GitHubRepos = ({ onCreateCollab }) => {
                 className="h-full"
               >
                 <SpotlightCard
-                  className={`h-full bg-card/50 backdrop-blur-sm border-border/50`}
+                  className={`h-full bg-white/80 dark:bg-black/40 backdrop-blur-2xl border-white/50 dark:border-white/10`}
                 >
                   <div className="p-6 h-full flex flex-col">
                     <div className="flex justify-between items-start mb-3">

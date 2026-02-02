@@ -132,14 +132,14 @@ export default function VideoCall({ roomId, onLeave }) {
 
         let peerConfig;
         if (isProduction) {
-          // Production: Use same domain as WS_URL with /peerjs path
+          // Production: Server has path: "/" so client specifies full /peerjs path
           const wsUrlObj = new URL(
             wsUrl.replace("wss://", "https://").replace("ws://", "http://"),
           );
           peerConfig = {
             host: wsUrlObj.hostname,
             port: 443,
-            path: "/peerjs",
+            path: "/peerjs", // Full path to PeerJS endpoint
             secure: true,
           };
         } else {

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -12,7 +13,7 @@ import {
   FaTimes,
   FaBars,
 } from "react-icons/fa";
-import { FiLayout, FiMaximize2 } from "react-icons/fi";
+import { FiLayout, FiMaximize2, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "@/components/Loading";
 import DocumentEditor from "./DocumentEditor";
@@ -165,7 +166,7 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
 
   return (
     <div
-      className={`h-[calc(100vh-64px)] flex flex-col md:flex-row bg-background text-foreground overflow-hidden ${
+      className={`h-[100dvh] md:h-[calc(100vh-64px)] flex flex-col md:flex-row bg-background text-foreground overflow-hidden ${
         isEmbedded ? "h-full" : ""
       }`}
     >
@@ -174,93 +175,77 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
           Actually, the outer shell has the global nav. The 'Documents' view DOES need a document list. 
           So we keep it, but maybe adjust height or styling. 
       */}
+      {/* Sidebar - Collapsible (Desktop) / Overlay (Mobile) */}
+      {/* NEW: Mobile Sidebar Portal Logic */}
+      {typeof window !== "undefined" &&
+        isSidebarOpen &&
+        window.innerWidth < 1024 &&
+        ReactDOM.createPortal(
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+            {/* Sidebar Drawer */}
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-0 left-0 bottom-0 w-[280px] bg-[#0A0A0A] border-r border-white/10 z-[10000] flex flex-col shadow-2xl"
+            >
+              {/* Close Button Mobile */}
+              <button
+                onClick={() => setIsSidebarOpen(false)}
+                className="absolute top-4 right-4 text-muted-foreground hover:text-white lg:hidden z-10 p-2"
+              >
+                <FiX size={20} />
+              </button>
+
+              <SidebarContent
+                isMobile={true}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                setIsCreatingDoc={setIsCreatingDoc}
+                filteredDocuments={filteredDocuments}
+                selectDocument={selectDocument}
+                currentDocument={currentDocument}
+                isAdmin={isAdmin}
+                session={session}
+                handleDeleteDocument={handleDeleteDocument}
+              />
+            </motion.aside>
+          </>,
+          document.body,
+        )}
+
+      {/* Desktop Sidebar (Relative) */}
       <motion.aside
-        initial={{ width: 280 }}
+        initial={{ width: 280, opacity: 1 }}
         animate={{
           width: isSidebarOpen ? 280 : 0,
           opacity: isSidebarOpen ? 1 : 0,
         }}
-        className={`flex-shrink-0 border-r border-white/5 bg-background/30 backdrop-blur-xl z-20 flex flex-col overflow-hidden transition-all duration-300 ${
-          isEmbedded ? "bg-transparent border-none" : ""
+        className={`hidden lg:flex flex-shrink-0 border-r border-white/5 bg-background/80 backdrop-blur-xl z-20 flex-col overflow-hidden transition-all duration-300 ${
+          isEmbedded ? "bg-background/90 border-r-0 lg:border-r" : ""
         }`}
       >
-        <div className="p-4 border-b border-border flex items-center justify-between min-w-[280px]">
-          <h2 className="font-semibold text-lg truncate pr-2">
-            {collabInfo.name}
-          </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsCreatingDoc(true)}
-              className="p-2 rounded-md hover:bg-muted text-primary transition-colors"
-              title="New Document"
-            >
-              <FaPlus />
-            </button>
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="p-4 min-w-[280px]">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-3 text-muted-foreground text-xs" />
-            <input
-              type="text"
-              placeholder="Search docs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 text-sm bg-muted/50 border border-transparent focus:border-primary rounded-lg outline-none transition-all"
-            />
-          </div>
-        </div>
-
-        {/* Doc List */}
-        <div className="flex-1 overflow-y-auto min-w-[280px] px-3 pb-4">
-          <div className="space-y-1">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 px-2">
-              Documents
-            </h3>
-            {filteredDocuments.length === 0 && (
-              <p className="text-sm text-muted-foreground px-2 italic">
-                No documents found.
-              </p>
-            )}
-            {filteredDocuments.map((doc) => (
-              <div
-                key={doc._id}
-                onClick={() => selectDocument(doc)}
-                className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 border border-transparent ${
-                  currentDocument?._id === doc._id
-                    ? "bg-primary/15 text-primary font-medium border-primary/10 shadow-sm shadow-primary/5"
-                    : "hover:bg-primary/5 text-foreground/70 hover:text-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div
-                    className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors ${
-                      currentDocument?._id === doc._id
-                        ? "bg-primary/20 text-primary"
-                        : "bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                    }`}
-                  >
-                    <FaFileAlt className="text-xs" />
-                  </div>
-                  <span className="truncate text-sm">{doc.title}</span>
-                </div>
-                {(isAdmin || doc.createdBy === session?.user?.email) && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteDocument(doc._id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
-                  >
-                    <FaTrashAlt size={11} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <SidebarContent
+          isMobile={false}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          setIsCreatingDoc={setIsCreatingDoc}
+          filteredDocuments={filteredDocuments}
+          selectDocument={selectDocument}
+          currentDocument={currentDocument}
+          isAdmin={isAdmin}
+          session={session}
+          handleDeleteDocument={handleDeleteDocument}
+        />
       </motion.aside>
 
       {/* Main Content Area */}
@@ -270,14 +255,16 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 text-muted-foreground hover:text-foreground"
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <FiLayout />
+              {isSidebarOpen ? <FiX /> : <FiLayout />}
             </button>
             {currentDocument && (
-              <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Editing</span>
-                <span className="text-sm font-semibold">
+              <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-300">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-hacker">
+                  Editing
+                </span>
+                <span className="text-sm font-semibold truncate max-w-[200px] md:max-w-md">
                   {currentDocument.title}
                 </span>
               </div>
@@ -287,13 +274,13 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsVideoCallActive(!isVideoCallActive)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all shadow-lg ${
                 isVideoCallActive
                   ? "bg-destructive/10 text-destructive border border-destructive/20"
                   : "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
               }`}
             >
-              <FaVideo /> {isVideoCallActive ? "End Call" : "Video Call"}
+              <FaVideo /> {isVideoCallActive ? "End Call" : "Connect"}
             </button>
           </div>
         </header>
@@ -301,12 +288,12 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
         {/* Editor Container */}
         <div className="flex-1 overflow-hidden relative w-full">
           {currentDocument ? (
-            <div className="h-full w-full overflow-y-auto p-4 md:p-8 flex justify-center custom-scrollbar">
+            <div className="h-full w-full overflow-y-auto p-4 flex justify-center custom-scrollbar">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full max-w-[850px] glass-card rounded-2xl shadow-2xl min-h-[calc(100vh-180px)] relative overflow-hidden ring-1 ring-white/10"
+                className="w-full glass-card rounded-2xl shadow-2xl relative overflow-hidden ring-1 ring-white/10"
               >
                 {/* Decorative top gradient */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50" />
@@ -330,13 +317,19 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
               >
                 <FaFileAlt className="text-3xl text-primary/60" />
               </motion.div>
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
+              <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
                 No document selected
               </h3>
-              <p className="text-sm opacity-60 max-w-xs text-center leading-relaxed">
+              <p className="text-sm opacity-60 max-w-xs text-center leading-relaxed font-mono">
                 Select a file from the sidebar to view or edit, or create a new
-                one to get started.
+                one using the button above.
               </p>
+              <button
+                onClick={() => setIsCreatingDoc(true)}
+                className="mt-6 px-6 py-2.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-semibold shadow-lg hover:shadow-primary/15 hover:scale-105 transition-all"
+              >
+                Create New Doc
+              </button>
             </div>
           )}
         </div>
@@ -353,49 +346,72 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
         )}
       </AnimatePresence>
 
-      {/* Create Document Modal */}
+      {/* Create Document Modal - Premium Spotlight Style */}
       <AnimatePresence>
         {isCreatingDoc && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-card w-full max-w-md p-6 rounded-xl shadow-2xl border border-border"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-[#0A0A0A] w-full max-w-lg p-1 rounded-2xl shadow-2xl ring-1 ring-white/10 relative overflow-hidden"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold">New Document</h3>
-                <button
-                  onClick={() => setIsCreatingDoc(false)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-              <form onSubmit={handleCreateDocument}>
-                <input
-                  autoFocus
-                  className="w-full p-3 rounded-lg bg-input border border-border focus:ring-2 focus:ring-primary outline-none transition-all mb-4"
-                  placeholder="Document Title (e.g., Marketing Plan)"
-                  value={newDocTitle}
-                  onChange={(e) => setNewDocTitle(e.target.value)}
-                />
-                <div className="flex justify-end gap-2">
+              {/* Animated Border Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/20 opacity-50" />
+
+              <div className="bg-card/90 backdrop-blur-xl relative rounded-xl p-8 overflow-hidden">
+                {/* Spotlight Effect helper */}
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-2xl font-bold font-hacker mb-1">
+                      New Document
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Give your ideas a home.
+                    </p>
+                  </div>
                   <button
-                    type="button"
                     onClick={() => setIsCreatingDoc(false)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+                    className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-white/5 rounded-full"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-                  >
-                    Create Document
+                    <FaTimes />
                   </button>
                 </div>
-              </form>
+
+                <form onSubmit={handleCreateDocument}>
+                  <div className="mb-8">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block ml-1">
+                      Title
+                    </label>
+                    <input
+                      autoFocus
+                      className="w-full p-4 font-geist-sans text-xl font-medium rounded-xl bg-muted/30 border border-white/5 focus:border-primary/50 focus:bg-muted/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/30"
+                      placeholder="e.g. Project Roadmap 2024"
+                      value={newDocTitle}
+                      onChange={(e) => setNewDocTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingDoc(false)}
+                      className="px-5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!newDocTitle.trim()}
+                      className="px-6 py-2.5 rounded-xl text-sm font-bold bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Create Document
+                    </button>
+                  </div>
+                </form>
+              </div>
             </motion.div>
           </div>
         )}
@@ -403,6 +419,116 @@ export function DocumentsPageContent({ collabId, isEmbedded = false }) {
     </div>
   );
 }
+
+const SidebarContent = ({
+  isMobile,
+  searchQuery,
+  setSearchQuery,
+  setIsCreatingDoc,
+  filteredDocuments,
+  selectDocument,
+  currentDocument,
+  isAdmin,
+  session,
+  handleDeleteDocument,
+}) => (
+  <>
+    {/* Sidebar Header */}
+    <div className={`p-4 pt-6 min-w-[280px] ${isMobile ? "mt-8" : ""}`}>
+      <h2 className="font-hacker text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 px-1">
+        Library
+      </h2>
+
+      {/* Search */}
+      <div className="relative group mb-4">
+        <FaSearch className="absolute left-3 top-3 text-muted-foreground group-focus-within:text-primary transition-colors text-xs" />
+        <input
+          type="text"
+          placeholder="Search documents..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-3 py-2.5 text-sm bg-muted/30 border border-white/5 focus:border-primary/30 focus:bg-muted/50 rounded-lg outline-none transition-all placeholder:text-muted-foreground/50"
+        />
+      </div>
+
+      {/* New Doc Button */}
+      <button
+        onClick={() => setIsCreatingDoc(true)}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-all group"
+      >
+        <div className="p-1 rounded bg-primary text-primary-foreground group-hover:scale-110 transition-transform">
+          <FaPlus size={10} />
+        </div>
+        <span className="text-sm font-semibold">New Document</span>
+      </button>
+    </div>
+
+    {/* Doc List */}
+    <div className="flex-1 overflow-y-auto min-w-[280px] px-3 pb-4 custom-scrollbar">
+      <div className="space-y-1">
+        {filteredDocuments.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-xs text-muted-foreground italic">
+              No documents found.
+            </p>
+          </div>
+        )}
+        <AnimatePresence>
+          {filteredDocuments.map((doc) => (
+            <motion.div
+              key={doc._id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              onClick={() => selectDocument(doc)}
+              className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 border border-transparent ${
+                currentDocument?._id === doc._id
+                  ? "bg-white/5 border-white/10 shadow-sm"
+                  : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div
+                  className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                    currentDocument?._id === doc._id
+                      ? "bg-gradient-to-br from-primary to-purple-600 text-white shadow-lg shadow-primary/20"
+                      : "bg-muted/50 text-muted-foreground group-hover:bg-white/10 group-hover:text-foreground"
+                  }`}
+                >
+                  <FaFileAlt className="text-xs" />
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span
+                    className={`truncate text-sm font-medium ${
+                      currentDocument?._id === doc._id ? "text-foreground" : ""
+                    }`}
+                    title={doc.title}
+                  >
+                    {doc.title}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground truncate opacity-60">
+                    {new Date(doc.updatedAt || Date.now()).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              {(isAdmin || doc.createdBy === session?.user?.email) && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteDocument(doc._id);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-2 rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+                >
+                  <FaTrashAlt size={12} />
+                </button>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  </>
+);
 
 const ErrorState = ({ error, onBack }) => (
   <div className="min-h-screen flex items-center justify-center p-4 bg-background">

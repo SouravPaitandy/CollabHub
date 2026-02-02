@@ -111,7 +111,9 @@ const Chat = ({ onClose, className = "" }) => {
 
     const handleReceiveReaction = ({ messageId, reactions }) => {
       setMessages((prev) =>
-        prev.map((msg) => (msg._id === messageId ? { ...msg, reactions } : msg))
+        prev.map((msg) =>
+          msg._id === messageId ? { ...msg, reactions } : msg,
+        ),
       );
     };
 
@@ -145,7 +147,7 @@ const Chat = ({ onClose, className = "" }) => {
           const data = await partRes.json();
           if (data?.participants) {
             setParticipants(
-              data.participants.map((p) => p.user).filter(Boolean)
+              data.participants.map((p) => p.user).filter(Boolean),
             );
           }
         }
@@ -266,14 +268,14 @@ const Chat = ({ onClose, className = "" }) => {
       animate={{ x: 0 }}
       exit={{ x: "100%" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`flex flex-col h-full bg-card border-l border-border shadow-2xl ${className}`}
+      className={`flex flex-col font-geist-sans h-full bg-card border-l border-border shadow-2xl ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-card/50 backdrop-blur-sm">
         <div>
-          <h2 className="font-semibold text-foreground">Chat</h2>
+          <h2 className="font-semibold font-hacker text-foreground">Chat</h2>
           <p className="text-xs text-muted-foreground">
-            {participants.length} online
+            {participants.length} Members
           </p>
         </div>
         <button
@@ -311,6 +313,7 @@ const Chat = ({ onClose, className = "" }) => {
                       alt={msg.sender.name}
                       width={28}
                       height={28}
+                      title={msg.sender.name}
                       className="rounded-full w-7 h-7 mt-1 border border-border"
                     />
                   )}
@@ -339,7 +342,7 @@ const Chat = ({ onClose, className = "" }) => {
                       {renderMessageContent(
                         msg.content,
                         session?.user?.email,
-                        session
+                        session,
                       )}
                     </p>
 
@@ -357,6 +360,7 @@ const Chat = ({ onClose, className = "" }) => {
                     )}
 
                     <span
+                      title={msg.sender.name}
                       className={`text-[10px] block mt-1 opacity-70 ${
                         isMe
                           ? "text-primary-foreground/80"
@@ -378,11 +382,11 @@ const Chat = ({ onClose, className = "" }) => {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-border bg-card relative">
+      <div className="p-4 border-t border-border bg-card relative pb-safe">
         {showMentions && (
           <MentionSuggestions
             users={participants.filter((p) =>
-              p.name.toLowerCase().startsWith(mentionQuery.toLowerCase())
+              p.name.toLowerCase().startsWith(mentionQuery.toLowerCase()),
             )}
             onSelect={(name) => {
               setNewMessage((prev) => prev.replace(/@([\w\s]*)$/, `@${name} `));

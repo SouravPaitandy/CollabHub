@@ -213,11 +213,11 @@ export default function DocumentEditor({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-[900px] min-h-[1100px] bg-white dark:bg-[#121212] shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5 rounded-sm px-20 py-24 cursor-text"
+          className="w-full max-w-[900px] min-h-[1100px] bg-white/50 dark:bg-black/40 backdrop-blur-xl shadow-2xl rounded-xl border border-white/20 dark:border-white/5 px-4 py-8 md:px-20 md:py-16 cursor-text ring-1 ring-black/5 dark:ring-white/5"
         >
           <EditorContent
             editor={editor}
-            className="prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[900px]"
+            className="prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[900px] font-geist-sans"
           />
         </motion.div>
       </div>

@@ -95,7 +95,7 @@ export default function DocumentHeader({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={saveDocument}
-          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-medium text-sm transition-colors"
+          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 font-medium text-sm transition-all"
         >
           {isSaving ? (
             <span className="animate-spin mr-1">↻</span>
@@ -109,7 +109,7 @@ export default function DocumentHeader({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={exportDocument}
-          className="p-2 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm transition-colors"
+          className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-muted-foreground hover:text-foreground backdrop-blur-md border border-white/10 shadow-sm transition-colors"
           title="Print / PDF"
         >
           <Printer className="w-4 h-4" />
@@ -118,7 +118,7 @@ export default function DocumentHeader({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="p-2 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm transition-colors"
+          className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-muted-foreground hover:text-foreground backdrop-blur-md border border-white/10 shadow-sm transition-colors"
         >
           <Share2 className="w-4 h-4" />
         </motion.button>
@@ -126,7 +126,7 @@ export default function DocumentHeader({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="sm:hidden p-2 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm transition-colors"
+          className="sm:hidden p-2 rounded-full bg-white/10 hover:bg-white/20 text-muted-foreground hover:text-foreground backdrop-blur-md border border-white/10 shadow-sm transition-colors"
         >
           <MoreVertical className="w-4 h-4" />
         </motion.button>

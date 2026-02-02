@@ -10,6 +10,12 @@ import {
   FaFilter,
   FaSearch,
   FaSortAmountDown,
+  FaListUl,
+  FaSyncAlt,
+  FaEye,
+  FaCheckSquare,
+  FaCog,
+  FaCheck,
 } from "react-icons/fa";
 import {
   MdOutlineLowPriority,
@@ -34,30 +40,30 @@ const COLUMNS_CONFIG = {
   [STATUS.TODO]: {
     title: "To Do",
     color: "lg:bg-blue-500/10 text-blue-400",
-    borderColor: "border-blue-500/30",
-    icon: "📋",
-    glow: "shadow-[0_0_15px_rgba(59,130,246,0.15)]",
+    borderColor: "border-blue-500/20",
+    icon: <FaListUl />,
+    glow: "shadow-[0_0_15px_rgba(59,130,246,0.1)]",
   },
   [STATUS.INPROGRESS]: {
     title: "In Progress",
     color: "lg:bg-amber-500/10 text-amber-400",
-    borderColor: "border-amber-500/30",
-    icon: "⚙️",
-    glow: "shadow-[0_0_15px_rgba(245,158,11,0.15)]",
+    borderColor: "border-amber-500/20",
+    icon: <FaSyncAlt />,
+    glow: "shadow-[0_0_15px_rgba(245,158,11,0.1)]",
   },
   [STATUS.REVIEW]: {
     title: "Review",
     color: "lg:bg-purple-500/10 text-purple-400",
-    borderColor: "border-purple-500/30",
-    icon: "🔍",
-    glow: "shadow-[0_0_15px_rgba(168,85,247,0.15)]",
+    borderColor: "border-purple-500/20",
+    icon: <FaEye />,
+    glow: "shadow-[0_0_15px_rgba(168,85,247,0.1)]",
   },
   [STATUS.DONE]: {
     title: "Done",
-    color: "lg:bg-green-500/10 text-green-400",
-    borderColor: "border-green-500/30",
-    icon: "✅",
-    glow: "shadow-[0_0_15px_rgba(34,197,94,0.15)]",
+    color: "lg:bg-emerald-500/10 text-emerald-400",
+    borderColor: "border-emerald-500/20",
+    icon: <FaCheckSquare />,
+    glow: "shadow-[0_0_15px_rgba(16,185,129,0.1)]",
   },
 };
 
@@ -66,20 +72,19 @@ const PRIORITY_BADGES = {
   high: {
     label: "High",
     icon: <MdPriorityHigh />,
-    class:
-      "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800",
+    class: "bg-red-500/10 text-red-500 border-red-500/20 backdrop-blur-sm",
   },
   medium: {
     label: "Medium",
     icon: <MdOutlineFlag />,
     class:
-      "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800",
+      "bg-amber-500/10 text-amber-500 border-amber-500/20 backdrop-blur-sm",
   },
   low: {
     label: "Low",
     icon: <MdOutlineLowPriority />,
     class:
-      "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-green-200 dark:border-green-800",
+      "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 backdrop-blur-sm",
   },
 };
 
@@ -163,7 +168,7 @@ const TaskModal = ({ isOpen, onClose, task, onSubmit, isEditing }) => {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex justify-center items-center p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -171,19 +176,19 @@ const TaskModal = ({ isOpen, onClose, task, onSubmit, isEditing }) => {
       >
         <motion.div
           ref={modalRef}
-          className="glass-card rounded-2xl shadow-2xl w-full max-w-md border border-white/10 ring-1 ring-white/5"
+          className="bg-background/80 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-md border border-white/10 ring-1 ring-white/5 overflow-hidden"
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
         >
-          <div className="flex justify-between items-center p-5 border-b border-white/5 bg-white/5 rounded-t-2xl">
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          <div className="flex justify-between items-center p-6 border-b border-white/5">
+            <h3 className="text-xl font-bold font-hacker text-foreground tracking-tight">
               {isEditing ? "Edit Task" : "Create New Task"}
             </h3>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-white/10"
               aria-label="Close modal"
             >
               <FaTimes />
@@ -192,33 +197,35 @@ const TaskModal = ({ isOpen, onClose, task, onSubmit, isEditing }) => {
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-muted-foreground">
                 Title *
               </label>
               <input
                 type="text"
                 placeholder="Task title"
-                className={`w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all ${
+                className={`w-full p-3 bg-white/5 border border-white/10 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all ${
                   validationError
-                    ? "border-red-500 dark:border-red-500"
-                    : "border-gray-300"
+                    ? "border-destructive ring-1 ring-destructive"
+                    : ""
                 }`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
               />
               {validationError && (
-                <p className="mt-1 text-sm text-red-500">{validationError}</p>
+                <p className="mt-1 text-sm text-destructive">
+                  {validationError}
+                </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-muted-foreground">
                 Description
               </label>
               <textarea
                 placeholder="Task description (optional)"
-                className="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
@@ -227,57 +234,68 @@ const TaskModal = ({ isOpen, onClose, task, onSubmit, isEditing }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">
                   Due Date
                 </label>
                 <input
                   type="date"
-                  className="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all [color-scheme:dark]"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">
                   Priority
                 </label>
-                <select
-                  className="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
+                <div className="relative">
+                  <select
+                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-foreground appearance-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                  >
+                    <option value="low" className="bg-gray-900">
+                      Low
+                    </option>
+                    <option value="medium" className="bg-gray-900">
+                      Medium
+                    </option>
+                    <option value="high" className="bg-gray-900">
+                      High
+                    </option>
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                    ▼
+                  </div>
+                </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-muted-foreground">
                 Assignee
               </label>
               <input
                 type="text"
                 placeholder="Assign to teammate (optional)"
-                className="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
                 value={assignee}
                 onChange={(e) => setAssignee(e.target.value)}
               />
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors font-medium"
+                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-foreground transition-colors font-medium border border-white/10"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-sm hover:shadow transition-all font-medium"
+                className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all font-medium border border-primary/20"
               >
                 {isEditing ? "Update Task" : "Create Task"}
               </button>
@@ -307,35 +325,45 @@ const TaskCard = ({ task, onEdit, onDelete, provided, snapshot, isAdmin }) => {
     : PRIORITY_BADGES.medium;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+    <div
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
-      className={`p-4 mb-3 rounded-xl backdrop-blur-xl border transition-all duration-300 group relative overflow-hidden ${
+      style={provided.draggableProps.style}
+      className={`p-4 mb-3 rounded-2xl backdrop-blur-md border group relative overflow-hidden cursor-grab active:cursor-grabbing select-none ${
         snapshot.isDragging
-          ? "shadow-2xl bg-indigo-500/20 border-indigo-500/40 ring-2 ring-indigo-500/30 scale-105 z-50"
-          : "bg-white/5 dark:bg-white/5 border-white/10 hover:border-indigo-500/30 hover:bg-white/10 dark:hover:bg-white/10 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1"
-      } transition-all duration-300 group`}
+          ? "shadow-[0_8px_40px_rgba(124,58,237,0.5)] bg-primary/25 border-primary/50 ring-2 ring-primary/40 scale-[1.02] opacity-90 z-50"
+          : "bg-white/5 dark:bg-black/40 border-white/10 hover:border-white/20 hover:bg-white/10 hover:shadow-xl transition-all duration-200"
+      }`}
     >
-      <div className="flex justify-between items-start">
+      {/* Drag Handle Visual Indicator (decorative only) */}
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-30 transition-opacity pointer-events-none">
+        <div className="flex flex-col gap-0.5">
+          <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
+          <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
+          <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
+          <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
+          <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
+          <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-start z-10 relative pl-2">
         <div className="flex-1">
-          <h4 className="font-medium text-gray-800 dark:text-gray-200 line-clamp-2">
+          <h4 className="font-semibold text-foreground line-clamp-2 font-geist-sans tracking-tight leading-snug">
             {task.title}
           </h4>
 
           {task.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 break-words line-clamp-3">
+            <p className="text-sm text-muted-foreground mt-2 break-words line-clamp-3 font-geist-sans">
               {task.description}
             </p>
           )}
 
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {/* Priority badge */}
             <span
-              className={`text-xs px-2 py-1 rounded-full border flex items-center gap-1 ${priorityInfo.class}`}
+              className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full border flex items-center gap-1.5 ${priorityInfo.class}`}
             >
               {priorityInfo.icon} {priorityInfo.label}
             </span>
@@ -343,55 +371,64 @@ const TaskCard = ({ task, onEdit, onDelete, provided, snapshot, isAdmin }) => {
             {/* Due date badge */}
             {formattedDate && (
               <span
-                className={`text-xs px-2 py-1 rounded-full border flex items-center gap-1
+                className={`text-[10px] font-medium px-2 py-1 rounded-full border flex items-center gap-1.5
                 ${
                   isOverdue
-                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800"
+                    ? "bg-destructive/10 text-destructive border-destructive/20"
                     : isToday
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800"
-                      : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600"
+                      ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                      : "bg-white/5 text-muted-foreground border-white/10"
                 }`}
               >
                 {isOverdue
-                  ? `Overdue: ${Math.abs(daysLeft)} days`
+                  ? `Overdue: ${Math.abs(daysLeft)}d`
                   : isToday
-                    ? "Due today"
+                    ? "Today"
                     : isTomorrow
-                      ? "Due tomorrow"
-                      : `Due: ${formattedDate}`}
+                      ? "Tomorrow"
+                      : formattedDate}
               </span>
             )}
             {/* Assignee badge */}
             {task.assignee && (
-              <p className="text-xs px-4 py-1 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                Assigned to: <span className="font-bold">{task.assignee}</span>
+              <p
+                className="text-sm font-geist-sans px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium truncate"
+                title={task.assignee}
+              >
+                @{task.assignee}
               </p>
             )}
           </div>
         </div>
 
         {isAdmin && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-2">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1 ml-2">
             <button
-              onClick={() => onEdit(task)}
-              className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(task);
+              }}
+              className="text-muted-foreground hover:text-primary transition-colors p-1.5 hover:bg-white/10 rounded-full"
               aria-label="Edit task"
               title="Edit task"
             >
-              <FaEdit size={14} />
+              <FaEdit size={12} />
             </button>
             <button
-              onClick={() => onDelete(task._id)}
-              className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(task._id);
+              }}
+              className="text-muted-foreground hover:text-destructive transition-colors p-1.5 hover:bg-white/10 rounded-full"
               aria-label="Delete task"
               title="Delete task"
             >
-              <FaTrash size={14} />
+              <FaTrash size={12} />
             </button>
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -413,20 +450,25 @@ const TaskColumn = ({
     key={columnId}
   >
     <div
-      className={`rounded-xl p-1 mb-3 backdrop-blur-md bg-opacity-30 border border-opacity-20 ${COLUMNS_CONFIG[columnId].color.replace("lg:bg-", "border-").replace("/10", "/20")} ${COLUMNS_CONFIG[columnId].borderColor}`}
+      className={`rounded-2xl p-1 mb-3 backdrop-blur-3xl bg-black/20 border ${COLUMNS_CONFIG[columnId].borderColor} shadow-lg relative overflow-hidden group/col`}
     >
+      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover/col:opacity-100 transition-opacity" />
       <h3
-        className={`font-medium py-3 px-4 flex justify-between items-center bg-transparent`}
+        className={`font-medium py-3 px-4 flex justify-between items-center relative z-10`}
       >
         <span className="flex items-center gap-2">
-          <span className="opacity-100 text-lg drop-shadow-sm">
+          <span
+            className={`opacity-100 text-base md:text-lg drop-shadow-md ${COLUMNS_CONFIG[columnId].color.split(" ")[1] || "text-foreground"}`}
+          >
             {COLUMNS_CONFIG[columnId].icon}
           </span>
-          <span className="font-bold tracking-wide">
+          <span
+            className={`font-bold tracking-wide font-hacker text-sm md:text-base ${COLUMNS_CONFIG[columnId].color.split(" ")[1] || "text-foreground"}`}
+          >
             {COLUMNS_CONFIG[columnId].title}
           </span>
         </span>
-        <span className="bg-white/10 text-xs font-bold px-3 py-1 rounded-full shadow-inner ring-1 ring-white/10">
+        <span className="bg-white/10 text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-inner ring-1 ring-white/10 text-muted-foreground">
           {tasks.length}
         </span>
       </h3>
@@ -437,11 +479,11 @@ const TaskColumn = ({
         <div
           {...provided.droppableProps}
           ref={provided.innerRef}
-          className={`flex-grow p-2 transition-all duration-300 rounded-2xl ${
+          className={`flex-grow p-2 rounded-3xl min-h-[400px] max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar transition-all duration-200 ${
             snapshot.isDraggingOver
-              ? "bg-indigo-500/5 ring-2 ring-inset ring-indigo-500/20"
-              : ""
-          } min-h-[400px] max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar`}
+              ? "bg-primary/5 ring-2 ring-primary/20 ring-inset"
+              : "bg-transparent"
+          }`}
         >
           <AnimatePresence>
             {tasks.map((task, index) => (
@@ -466,15 +508,17 @@ const TaskColumn = ({
           {provided.placeholder}
 
           {tasks.length === 0 && !isSearching && (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6">
-              <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-                {columnId === STATUS.TODO
-                  ? "📋"
-                  : columnId === STATUS.INPROGRESS
-                    ? "⚙️"
-                    : columnId === STATUS.REVIEW
-                      ? "🔍"
-                      : "✅"}
+            <div className="h-full select-none flex flex-col items-center justify-center text-center p-6">
+              <div className="text-gray-500 dark:text-gray-400 w-16 h-16 mb-4 flex items-center justify-center">
+                {columnId === STATUS.TODO ? (
+                  <FaClipboardList />
+                ) : columnId === STATUS.INPROGRESS ? (
+                  <FaCog />
+                ) : columnId === STATUS.REVIEW ? (
+                  <FaSearch />
+                ) : (
+                  <FaCheck />
+                )}
               </div>
               <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
                 {columnId === STATUS.TODO
@@ -513,15 +557,15 @@ const LoadingSpinner = () => (
         repeat: Infinity,
         repeatType: "reverse",
       }}
-      className="p-4 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600"
+      className="p-4 rounded-full bg-primary/20 backdrop-blur-md shadow-[0_0_30px_rgba(124,58,237,0.3)]"
     >
-      <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent"></div>
+      <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
     </motion.div>
     <motion.p
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.3 }}
-      className="text-gray-600 dark:text-gray-400 font-medium"
+      className="text-muted-foreground font-medium font-hacker animate-pulse"
     >
       Loading your tasks...
     </motion.p>
@@ -587,17 +631,17 @@ const ConfirmationDialog = ({ isOpen, message, onConfirm, onCancel }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex justify-center items-center p-4"
       >
         <motion.div
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-sm w-full border border-gray-200 dark:border-gray-700"
+          className="bg-background/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 max-w-sm w-full border border-white/10 ring-1 ring-white/5"
         >
           <div className="text-center mb-4">
-            <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-300">
+            <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center rounded-full bg-destructive/10 text-destructive border border-destructive/20">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8"
@@ -611,19 +655,17 @@ const ConfirmationDialog = ({ isOpen, message, onConfirm, onCancel }) => {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+            <h3 className="text-xl font-bold mb-2 font-hacker text-foreground">
               Delete Confirmation
             </h3>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
-            {message}
-          </p>
+          <p className="text-muted-foreground mb-6 text-center">{message}</p>
           <div className="flex justify-center space-x-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onCancel}
-              className="px-5 py-2.5 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="px-5 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-foreground transition-colors font-medium border border-white/10"
             >
               Cancel
             </motion.button>
@@ -631,7 +673,7 @@ const ConfirmationDialog = ({ isOpen, message, onConfirm, onCancel }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onConfirm}
-              className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-sm hover:shadow transition-all font-medium"
+              className="px-5 py-2.5 rounded-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/20 transition-all font-medium"
             >
               Delete
             </motion.button>
@@ -648,17 +690,17 @@ const EmptyTaskBoard = ({ onAddTask }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
-    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-200 dark:border-gray-700"
+    className="bg-white/5 backdrop-blur-lg rounded-3xl shadow-2xl p-12 text-center border border-white/10 ring-1 ring-white/5 max-w-2xl mx-auto"
   >
-    <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-300">
-      <FaClipboardList className="w-12 h-12" />
+    <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 shadow-[0_0_30px_rgba(124,58,237,0.2)]">
+      <FaClipboardList className="w-10 h-10" />
     </div>
-    <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-200">
+    <h3 className="text-3xl font-bold mb-4 font-hacker bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
       No tasks yet
     </h3>
-    <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-      Get started by creating your first task for this collaboration. Tasks help
-      you organize your work and track progress.
+    <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg font-geist-sans">
+      Get started by creating your first task. Tasks help you organize your work
+      and track progress efficiently.
     </p>
     <motion.button
       whileHover={{ scale: 1.05 }}
@@ -666,11 +708,10 @@ const EmptyTaskBoard = ({ onAddTask }) => (
       onClick={(e) => {
         e.preventDefault();
         onAddTask();
-        console.log("Add Task button clicked");
       }}
-      className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all font-medium inline-flex items-center"
+      className="px-8 py-4 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all font-bold text-lg inline-flex items-center gap-2"
     >
-      <FaPlus className="mr-2" /> Create Your First Task
+      <FaPlus /> Create Your First Task
     </motion.button>
   </motion.div>
 );
@@ -1060,19 +1101,20 @@ const TaskBoard = ({ collabId, isAdmin }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-3 sm:p-6 relative">
+    <div className="bg-transparent rounded-2xl relative">
       {/* Refresh Button - repositioned for better mobile experience */}
       <motion.button
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, rotate: 180 }}
         whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.4 }}
         onClick={fetchTasks}
-        className="absolute top-3 sm:top-7 right-3 sm:right-5 lg:right-7 z-10 p-2 sm:p-2.5 rounded-full bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:hover:bg-indigo-800/50 text-indigo-600 dark:text-indigo-300 transition-colors shadow-sm"
+        className="absolute top-0 right-0 z-10 p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-primary border border-white/10 backdrop-blur-md shadow-lg transition-all"
         title="Refresh tasks"
         aria-label="Refresh tasks"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 sm:h-5 sm:w-5"
+          className="h-5 w-5"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -1085,82 +1127,103 @@ const TaskBoard = ({ collabId, isAdmin }) => {
       </motion.button>
 
       {/* Header section with improved mobile layout */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 mt-2 sm:mt-0 pr-12 sm:pr-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3 mt-1 sm:mt-0 pr-12 sm:pr-0">
         <div className="flex items-center">
-          <FaClipboardList className="text-indigo-500 mr-2 sm:mr-3 text-xl sm:text-2xl" />
+          <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 mr-4 backdrop-blur-sm shadow-[0_0_15px_rgba(124,58,237,0.15)]">
+            <FaClipboardList className="text-primary text-base sm:text-xl" />
+          </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200">
+            <h2 className="text-base sm:text-xl font-bold font-hacker text-foreground tracking-tight">
               Task Board
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
-              {totalTasks} {totalTasks === 1 ? "task" : "tasks"} in total
+            <p className="text-muted-foreground text-xs sm:text-sm font-geist-sans font-medium">
+              <span className="text-primary font-bold">{totalTasks}</span>{" "}
+              {totalTasks === 1 ? "task" : "tasks"} in total
             </p>
           </div>
+          {isAdmin && (
+            <div className="ml-4">
+              <span className="bg-primary/10 text-primary px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border border-primary/20 backdrop-blur-sm">
+                Admin Access
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Controls toolbar - stacked on mobile, side by side on larger screens */}
-      <div className="flex flex-col w-full gap-3 mb-4 sm:mb-6">
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <FaSearch className="text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
-          </div>
+      <div className="flex flex-col w-full gap-4 mb-8">
+        <div className="relative w-full group">
           <input
             type="text"
             placeholder="Search tasks..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 pr-9 py-2 border border-gray-300 dark:border-gray-600 rounded-lg w-full dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            className="w-full pl-11 pr-10 py-2 bg-white/5 border border-white/10 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-geist-sans backdrop-blur-xs"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground p-2"
             >
               <FaTimes size={12} />
             </button>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-40">
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div className="md:col-span-5 relative group">
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className="appearance-none w-full pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+              className="appearance-none w-full pl-4 pr-10 py-2 bg-white/5 border border-white/10 rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-geist-sans backdrop-blur-sm"
             >
-              <option value="all">All Priorities</option>
-              <option value="high">High Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="low">Low Priority</option>
+              <option value="all" className="bg-gray-900">
+                All Priorities
+              </option>
+              <option value="high" className="bg-gray-900">
+                High Priority
+              </option>
+              <option value="medium" className="bg-gray-900">
+                Medium Priority
+              </option>
+              <option value="low" className="bg-gray-900">
+                Low Priority
+              </option>
             </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaFilter className="text-gray-400" size={12} />
+            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-muted-foreground group-hover:text-primary transition-colors">
+              <FaFilter size={14} />
             </div>
           </div>
 
-          <div className="flex justify-between items-center gap-2 sm:gap-0">
-            <div className="relative">
-              <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className="appearance-none w-full pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-              >
-                <option value="dueDate">Sort by Due Date</option>
-                <option value="priority">Sort by Priority</option>
-                <option value="title">Sort by Title</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <BiSortAlt2 className="text-gray-400" size={14} />
-              </div>
+          <div className="md:col-span-4 relative group">
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="appearance-none w-full pl-4 pr-10 py-2 bg-white/5 border border-white/10 rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-geist-sans backdrop-blur-sm"
+            >
+              <option value="dueDate" className="bg-gray-900">
+                Sort by Due Date
+              </option>
+              <option value="priority" className="bg-gray-900">
+                Sort by Priority
+              </option>
+              <option value="title" className="bg-gray-900">
+                Sort by Title
+              </option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-muted-foreground group-hover:text-primary transition-colors">
+              <BiSortAlt2 size={16} />
             </div>
+          </div>
 
+          <div className="md:col-span-3">
             {isAdmin && (
               <button
                 onClick={openAddTaskModal}
-                className="px-4 py-2 w-24 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-all shadow-sm hover:shadow flex items-center justify-center whitespace-nowrap text-sm"
+                className="w-full py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 flex items-center justify-center whitespace-nowrap font-bold font-hacker tracking-wide"
               >
-                <FaPlus className="mr-2 h-3 w-3" /> Add Task
+                <FaPlus className="mr-2" /> Add Task
               </button>
             )}
           </div>
@@ -1169,25 +1232,25 @@ const TaskBoard = ({ collabId, isAdmin }) => {
 
       {/* Filter status bar - responsive layout */}
       {isFiltering && (
-        <div className="mb-4 py-2 px-3 sm:px-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div className="text-xs sm:text-sm text-indigo-700 dark:text-indigo-300">
-            <span className="font-medium">Filtered: </span>
+        <div className="mb-6 py-3 px-4 bg-primary/10 rounded-xl border border-primary/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 backdrop-blur-sm">
+          <div className="text-sm text-primary font-medium font-geist-sans">
+            <span className="font-bold">Filtered View: </span>
             {filteredTasks.length}{" "}
             {filteredTasks.length === 1 ? "task" : "tasks"} found
             {searchTerm && (
               <span className="ml-1 sm:ml-2">
-                matching &quot;{searchTerm}&quot;
+                matches &quot;{searchTerm}&quot;
               </span>
             )}
             {filterPriority !== "all" && (
               <span className="ml-1 sm:ml-2 capitalize">
-                with {filterPriority} priority
+                • {filterPriority} priority
               </span>
             )}
           </div>
           <button
             onClick={clearFilters}
-            className="text-xs px-2 py-1 bg-white dark:bg-gray-700 rounded-md border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-800/30 w-full sm:w-auto text-center"
+            className="text-xs px-3 py-1.5 bg-white/10 rounded-lg border border-white/10 text-foreground hover:bg-white/20 transition-colors font-medium w-full sm:w-auto"
           >
             Clear Filters
           </button>

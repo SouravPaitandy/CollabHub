@@ -25,13 +25,13 @@ export const SpotlightCard = ({
 
   return (
     <div
-      className={`group relative border border-white/5 bg-gray-900/40 overflow-hidden rounded-2xl ${className}`}
+      className={`group relative border border-white/[0.08] bg-black/40 dark:bg-black/40 backdrop-blur-2xl overflow-hidden rounded-2xl ${className}`}
       onMouseMove={handleMouseMove}
     >
-      {/* Animated Gradient Border Layer */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-500/0 via-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:via-purple-500/5 group-hover:to-indigo-500/10 transition-all duration-700" />
+      {/* Animated Gradient Border Layer - Subtler liquid edge */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-      {/* Spotlight Effect */}
+      {/* Spotlight Effect with Liquid Blur */}
       <motion.div
         className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100 z-10"
         style={{
@@ -39,7 +39,7 @@ export const SpotlightCard = ({
         }}
       />
 
-      {/* Content */}
+      {/* Content - Ensure it sits above effects */}
       <div className="relative h-full z-20">{children}</div>
     </div>
   );

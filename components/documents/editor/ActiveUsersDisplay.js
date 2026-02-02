@@ -26,7 +26,7 @@ export default function ActiveUsersDisplay({ activeUsers }) {
                 damping: 25,
                 delay: index * 0.05,
               }}
-              className={`relative z-10 group`}
+              className={`relative z-10 group cursor-default`}
               style={{ zIndex: 50 - index }}
               title={`${user.name}${!user.active ? " (idle)" : ""}`}
             >
@@ -39,26 +39,26 @@ export default function ActiveUsersDisplay({ activeUsers }) {
                     alt={user.name}
                     width={32}
                     height={32}
-                    className="w-full h-full object-cover bg-gray-800"
+                    className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
                   <div
-                    className="w-full h-full flex items-center justify-center text-xs font-bold text-white shadow-inner"
+                    className="w-full h-full flex items-center justify-center text-xs font-bold text-white bg-primary/20 backdrop-blur-sm"
                     style={{
-                      backgroundColor: user.color,
+                      backgroundColor: user.color || undefined,
                       textShadow: "0 1px 2px rgba(0,0,0,0.3)",
                     }}
                   >
-                    {user.name.charAt(0).toUpperCase()}
+                    {user.name?.charAt(0).toUpperCase()}
                   </div>
                 )}
 
                 {/* Status Dot */}
                 <div
-                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-inherit ${
+                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background ${
                     user.active
                       ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"
-                      : "bg-gray-400"
+                      : "bg-muted"
                   }`}
                 />
               </div>

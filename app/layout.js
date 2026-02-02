@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Mono } from "next/font/google";
 import SessionWrapper from "@/components/SessionWrapper";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
@@ -19,6 +19,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 // const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -29,9 +35,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${spaceMono.variable}`}
+    >
       <body
-        className={`${geistSans.variable} ${geistMono.variable}  antialiased`}
+        className="antialiased select-none"
         // className={inter.className}
         suppressHydrationWarning
       >

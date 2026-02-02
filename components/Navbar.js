@@ -46,7 +46,7 @@ const Navbar = () => {
           className={`relative transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-between
           ${
             isScrolled
-              ? "w-[90%] max-w-5xl rounded-full glass-card py-2 px-6 border-white/20 dark:border-white/10"
+              ? "w-[90%] max-w-5xl rounded-full bg-black/60 backdrop-blur-2xl py-2 px-6 border border-white/[0.08]"
               : "w-full max-w-7xl px-6 py-4 bg-transparent border-transparent"
           }`}
         >
@@ -60,7 +60,7 @@ const Navbar = () => {
                 className="object-contain drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
               />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent group-hover:aura-text-glow transition-all">
+            <span className="text-xl font-hacker font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent group-hover:aura-text-glow transition-all">
               Coordly
             </span>
           </Link>

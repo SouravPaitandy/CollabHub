@@ -76,16 +76,16 @@ function WorkspaceShell({ collabId }) {
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden relative">
       {/* --- Cosmic Background --- */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px]" />
+      <div className="fixed inset-0 z-0 pointer-events-none bg-background">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/5 blur-[120px] animate-pulse-slow delay-1000" />
       </div>
 
-      {/* --- Global Navigation Rail --- */}
+      {/* --- Global Navigation Rail (Desktop) --- */}
       <motion.nav
         initial={{ width: 80 }}
         animate={{ width: isSidebarCollapsed ? 80 : 260 }}
-        className="z-50 h-full glass border-r border-white/5 flex flex-col justify-between shrink-0 transition-all duration-300 ease-in-out relative group"
+        className="hidden md:flex z-50 h-full bg-black/40 backdrop-blur-2xl border-r border-white/5 flex-col justify-between shrink-0 transition-all duration-300 ease-in-out relative group"
       >
         {/* Logo / Header */}
         <div className="p-4 flex items-center gap-3 h-20 border-b border-white/5">
@@ -114,7 +114,7 @@ function WorkspaceShell({ collabId }) {
 
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="absolute -right-3 top-8 bg-card border border-border rounded-full p-1 text-muted-foreground hover:text-primary transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+            className="absolute -right-3 top-8 bg-card border border-border rounded-full p-1 text-muted-foreground hover:text-primary transition-colors shadow-lg"
           >
             {isSidebarCollapsed ? (
               <ChevronRight size={14} />
@@ -198,25 +198,97 @@ function WorkspaceShell({ collabId }) {
             </button>
           ) : null}
         </div>
+        <div className="p-4 border-t border-white/5 text-sm text-muted-foreground flex items-center justify-center">
+          <span
+            className={`font-geist-sans ${isSidebarCollapsed ? "hidden" : "block"}`}
+          >
+            &copy;
+          </span>
+          <p>Coordly</p>
+        </div>
       </motion.nav>
 
+      {/* --- Mobile Bottom Navigation --- */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-t border-white/10 flex items-center justify-around px-2 z-50 pb-safe">
+        <MobileNavButton
+          icon={<FileText size={20} />}
+          label="Docs"
+          isActive={activeView === "docs"}
+          onClick={() => setActiveView("docs")}
+        />
+        <MobileNavButton
+          icon={<CheckSquare size={20} />}
+          label="Tasks"
+          isActive={activeView === "tasks"}
+          onClick={() => setActiveView("tasks")}
+        />
+        <MobileNavButton
+          icon={<MessageSquare size={20} />}
+          label="Chat"
+          isActive={activeView === "chat"}
+          onClick={() => setActiveView("chat")}
+        />
+        <MobileNavButton
+          icon={<Video size={20} />}
+          label="Video"
+          isActive={isVideoOpen}
+          onClick={() => setIsVideoOpen(!isVideoOpen)}
+          alertColor={isVideoOpen ? "bg-green-500 animate-pulse" : ""}
+        />
+        <MobileNavButton
+          icon={<Settings size={20} />}
+          label="Settings"
+          isActive={activeView === "settings"}
+          onClick={() => router.push(`/collab/admin/${collabId}`)}
+        />
+      </div>
+
       {/* --- Main Stage --- */}
-      <main className="flex-1 h-full relative overflow-hidden flex flex-col">
+      <main className="flex-1 h-full relative overflow-hidden flex flex-col pb-16 md:pb-0">
+        {/* Mobile Header (replaces sidebar header) */}
+        <div className="md:hidden h-14 border-b border-white/5 flex items-center justify-between px-4 bg-background/50 backdrop-blur-md shrink-0 z-20">
+          <div className="flex items-center gap-2">
+            <div className="relative w-8 h-8">
+              <Image
+                src="/favicon.png"
+                alt="Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <h1 className="font-bold text-sm truncate max-w-[150px]">
+              {collabName}
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* User Avatar -> Dashboard Link */}
+            {session?.user?.image && (
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="relative w-8 h-8 rounded-full overflow-hidden border border-white/20 shadow-sm"
+              >
+                <Image
+                  src={session.user.image}
+                  alt="Profile"
+                  fill
+                  className="object-cover"
+                />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Content Views */}
         <div className="flex-1 relative z-10 w-full h-full overflow-hidden">
           <AnimatePresence mode="wait">
             {activeView === "docs" && (
               <motion.div
                 key="docs"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="w-full h-full"
               >
-                {/* We pass a stripped interface to DocumentsPageContent to hide its internal sidebar if needed, 
-                       or we just let it render full width. 
-                       Currently DocumentPage has its own Sidebar. 
-                       In unified mode, we might want to keep the Document List sidebar as a "sub-sidebar". */}
                 <DocumentsPageContent collabId={collabId} isEmbedded={true} />
               </motion.div>
             )}
@@ -224,37 +296,45 @@ function WorkspaceShell({ collabId }) {
             {activeView === "tasks" && (
               <motion.div
                 key="tasks"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="w-full h-full overflow-y-auto"
               >
                 <TasksPageContent collabId={collabId} isEmbedded={true} />
+              </motion.div>
+            )}
+
+            {/* Mobile Chat View */}
+            {activeView === "chat" && (
+              <motion.div
+                key="chat"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="w-full h-full md:hidden bg-background"
+              >
+                <Chat
+                  collabId={collabId}
+                  onClose={() => setActiveView("docs")}
+                />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </main>
 
-      {/* --- Right Rail: Chat --- */}
-      {/* Persist Chat in DOM to prevent reload/disconnect on toggle */}
+      {/* --- Right Rail: Chat (Desktop Only) --- */}
       <motion.aside
         initial={false}
         animate={{
           width: isChatOpen ? 400 : 0,
           opacity: isChatOpen ? 1 : 0,
         }}
-        className="h-full border-l border-white/5 bg-background/50 backdrop-blur-xl z-40 shadow-2xl overflow-hidden relative"
-        style={{ pointerEvents: isChatOpen ? "auto" : "none" }} // Disable clicks when hidden
+        className="hidden md:block h-full border-l border-white/5 bg-background/50 backdrop-blur-xl z-40 shadow-2xl overflow-hidden relative"
+        style={{ pointerEvents: isChatOpen ? "auto" : "none" }}
       >
         <div className="h-full w-[400px] relative">
-          {" "}
-          {/* Fixed width container */}
-          {/* Close button removed here as Chat.js has one, or we can keep it external. 
-                User complained about "double close button". Chat.js has one internal (line 280).
-                UnifiedWorkspace had one external (line 250). 
-                I will remove the external one here. 
-            */}
           <Chat collabId={collabId} onClose={() => setIsChatOpen(false)} />
         </div>
       </motion.aside>
@@ -268,6 +348,26 @@ function WorkspaceShell({ collabId }) {
     </div>
   );
 }
+
+// Mobile Nav Button
+const MobileNavButton = ({ icon, label, isActive, onClick, alertColor }) => (
+  <button
+    onClick={onClick}
+    className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
+      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+    }`}
+  >
+    <div className="relative">
+      {icon}
+      {alertColor && (
+        <span
+          className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${alertColor}`}
+        />
+      )}
+    </div>
+    <span className="text-[10px] font-medium">{label}</span>
+  </button>
+);
 
 // Helper Nav Button
 const NavButton = ({
@@ -285,7 +385,7 @@ const NavButton = ({
       className={`relative flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group
         ${
           isActive
-            ? "bg-primary text-primary-foreground shadow-lg shadow-indigo-500/20"
+            ? "border border-primary-foreground text-primary shadow-lg shadow-indigo-500/20"
             : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
         }
         ${isCollapsed ? "justify-center" : ""}

@@ -26,6 +26,7 @@ import {
 } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SpotlightCard from "@/components/ui/SpotlightCard";
 
 function AdminPanel({ id }) {
   const router = useRouter();
@@ -301,9 +302,9 @@ function AdminPanel({ id }) {
       />
 
       <div className="fixed -z-10 h-full w-full top-0 left-0 bg-background overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 blur-[100px] animate-pulse" />
-        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] rounded-full bg-purple-500/20 blur-[120px] animate-float" />
-        <div className="absolute bottom-[-10%] right-[10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[140px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow" />
+        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] rounded-full bg-purple-500/10 blur-[120px] animate-pulse-slow delay-1000" />
+        <div className="absolute bottom-[-10%] right-[10%] w-[40%] h-[40%] rounded-full bg-blue-600/5 blur-[140px] animate-pulse-slow delay-700" />
       </div>
 
       <div className="container mx-auto px-4 py-8">
@@ -332,19 +333,69 @@ function AdminPanel({ id }) {
         </motion.button>
 
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
-          {/* Floating Sidebar */}
-          <motion.div
-            className="md:w-72 glass-card rounded-2xl h-fit sticky top-24 overflow-hidden"
+          {/* MOBILE ONLY: Top Navigation */}
+          <div className="md:hidden space-y-4 mb-2">
+            <h1 className="text-2xl font-bold text-foreground truncate aura-text-glow px-2">
+              {collab.name}
+            </h1>
+
+            {/* Scrollable Tab Bar */}
+            <div className="flex gap-2 overflow-x-auto pb-2 px-1 scrollbar-hide">
+              <button
+                onClick={() => setActiveTab("details")}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeTab === "details"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                    : "bg-muted/50 text-muted-foreground border border-border"
+                }`}
+              >
+                <FaCog className="inline mr-2" /> Details
+              </button>
+              <button
+                onClick={() => setActiveTab("participants")}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeTab === "participants"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                    : "bg-muted/50 text-muted-foreground border border-border"
+                }`}
+              >
+                <FaUsers className="inline mr-2" /> Participants
+              </button>
+              <button
+                onClick={() => setActiveTab("actions")}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeTab === "actions"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                    : "bg-muted/50 text-muted-foreground border border-border"
+                }`}
+              >
+                <FaChartBar className="inline mr-2" /> Actions
+              </button>
+            </div>
+
+            <Link
+              href={`/collab/${id}`}
+              className="w-full flex items-center justify-center bg-secondary/80 text-foreground py-3 px-4 rounded-xl transition duration-300 shadow-sm border border-white/10 font-medium"
+            >
+              <FaArrowRight className="mr-2" />
+              Enter Workspace
+            </Link>
+          </div>
+
+          {/* Desktop Floating Sidebar */}
+          <SpotlightCard
+            className="hidden md:block md:w-72 rounded-2xl h-fit sticky top-16 overflow-hidden border-black/10 bg-white/40 dark:border-white/10 dark:bg-black/40 backdrop-blur-2xl"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
             <div className="p-6">
               <motion.h1
-                className="text-2xl font-bold mb-6 text-foreground break-words aura-text-glow"
+                className="text-2xl font-bold mb-6 text-foreground truncate aura-text-glow"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
+                title={collab.name}
               >
                 {collab.name}
               </motion.h1>
@@ -392,7 +443,7 @@ function AdminPanel({ id }) {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </SpotlightCard>
 
           {/* Main Content Area */}
           <motion.div
@@ -401,7 +452,7 @@ function AdminPanel({ id }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className="p-6 md:p-8 h-full">
+            <div className="p-4 md:p-8 h-full">
               <AnimatePresence mode="wait">
                 {activeTab === "details" && (
                   <motion.section
@@ -411,19 +462,19 @@ function AdminPanel({ id }) {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+                    <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground flex items-center">
                       <FaCog className="mr-3 text-primary" /> Collaboration
                       Details
                     </h2>
 
                     <div className="grid gap-6">
                       {/* Invite Code Card */}
-                      <div className="bg-muted/30 p-6 rounded-xl border border-border hover:border-primary/20 transition-colors">
+                      <div className="bg-muted/30 p-4 md:p-6 rounded-xl border border-border hover:border-primary/20 transition-colors">
                         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
                           Invite Code
                         </h3>
                         <div className="flex flex-col sm:flex-row gap-3">
-                          <code className="flex-1 bg-background px-4 py-3 rounded-lg font-mono text-lg border border-input text-foreground flex items-center">
+                          <code className="flex-1 bg-background px-4 py-3 rounded-lg font-mono text-lg border border-input text-foreground flex items-center truncate">
                             {collab.inviteCode}
                           </code>
                           <div className="flex gap-2">
@@ -484,23 +535,23 @@ function AdminPanel({ id }) {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+                    <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground flex items-center">
                       <FaUsers className="mr-3 text-primary" /> Team Members
                     </h2>
 
                     {/* Invite Input */}
-                    <div className="mb-8 bg-muted/30 p-1 rounded-xl border border-border flex items-center">
+                    <div className="mb-6 md:mb-8 bg-muted/30 p-1 rounded-xl border border-border flex items-center flex-col sm:flex-row gap-2 sm:gap-0">
                       <input
                         type="email"
                         placeholder="Invite by email..."
-                        className="flex-1 bg-transparent border-none focus:ring-0 px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none"
+                        className="w-full sm:flex-1 bg-transparent border-none focus:ring-0 px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none"
                         value={inviteEmail}
                         onChange={(e) => setInviteEmail(e.target.value)}
                       />
                       <button
                         onClick={handleInviteUser}
                         disabled={isInviting}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-medium transition-all m-1 flex items-center disabled:opacity-50"
+                        className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-medium transition-all m-1 flex items-center justify-center disabled:opacity-50"
                       >
                         {isInviting ? "Sending..." : "Invite"}{" "}
                         <FaUserPlus className="ml-2" />
@@ -511,10 +562,10 @@ function AdminPanel({ id }) {
                       {participants.map((participant) => (
                         <div
                           key={participant._id}
-                          className="group flex items-center justify-between p-4 bg-background border border-border rounded-xl hover:border-primary/30 transition-all hover:shadow-sm"
+                          className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-background border border-border rounded-xl hover:border-primary/30 transition-all hover:shadow-sm gap-3"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+                          <div className="flex items-center gap-4 w-full sm:w-auto">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg flex-shrink-0">
                               {participant.user.image ? (
                                 <img
                                   src={participant.user.image}
@@ -525,16 +576,17 @@ function AdminPanel({ id }) {
                                 participant.user.name[0]
                               )}
                             </div>
-                            <div>
-                              <div className="font-semibold text-foreground">
+                            <div className="min-w-0">
+                              <div className="font-semibold text-foreground truncate">
                                 {participant.user.name}
                               </div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="text-sm text-muted-foreground truncate">
                                 {participant.user.email}
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+
+                          <div className="flex items-center justify-between w-full sm:w-auto gap-3 pl-14 sm:pl-0">
                             <span
                               className={`px-2 py-1 rounded-md text-xs font-medium ${
                                 participant.role === "ADMIN"
@@ -549,7 +601,7 @@ function AdminPanel({ id }) {
                                 onClick={() =>
                                   handleRemoveParticipant(participant._id)
                                 }
-                                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors sm:opacity-0 group-hover:opacity-100"
                                 title="Remove member"
                               >
                                 <FaUserMinus />
@@ -570,7 +622,7 @@ function AdminPanel({ id }) {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+                    <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground flex items-center">
                       <FaChartBar className="mr-3 text-primary" /> Admin Actions
                     </h2>
 
@@ -614,7 +666,7 @@ function AdminPanel({ id }) {
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
             >
               <h3 className="text-xl font-bold mb-4 text-destructive flex items-center">
-                <FaTrash className="mr-2" /> Confirm Deletion
+                <FaTrash className="mr-2 text-red-500" /> Confirm Deletion
               </h3>
               <p className="mb-6 text-muted-foreground">
                 Are you sure you want to delete this collaboration? This action
@@ -693,15 +745,9 @@ function AdminPanel({ id }) {
 
       {/* Footer */}
       <hr className="my-8 border-t dark:border-indigo-300 opacity-20" />
-      <footer className="py-6 text-center">
+      <footer className="py-6 text-center text-sm">
         <p className="text-gray-600 dark:text-gray-400">
           &copy; {new Date().getFullYear()} Coordly. All rights reserved.
-        </p>
-        <p className="text-5xl font-extrabold mt-2 opacity-40">
-          <span className="text-indigo-600 dark:text-indigo-300">✨</span>
-          <span className="text-gray-600 dark:text-gray-400">
-            Made with ❤️ by the Coordly Team
-          </span>
         </p>
       </footer>
     </div>

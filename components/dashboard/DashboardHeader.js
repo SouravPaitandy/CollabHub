@@ -52,21 +52,21 @@ export default function DashboardHeader() {
         </button>
 
         {/* User Menu */}
-        {/* <div className="relative">
+        <div className="relative md:hidden">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             onBlur={() => setTimeout(() => setIsMenuOpen(false), 200)}
-            className="flex items-center gap-3 pl-1 pr-2 py-1 rounded-full hover:bg-secondary/30 transition-all duration-300 border border-transparent hover:border-border/50"
+            className="flex items-center gap-3 pl-1 pr-2 py-1 rounded-full hover:bg-secondary/30 transition-all duration-300 border border-transparent hover:border-border/50 group"
           >
             <div className="relative">
               <Image
-                src={session?.user?.image || "/default-avatar.png"}
+                src={session?.user?.image || "/default-pic.png"}
                 alt="Profile"
                 width={36}
                 height={36}
-                className="rounded-full ring-2 ring-transparent group-hover:ring-primary/50 transition-all"
+                className="rounded-full ring-2 ring-transparent group-hover:ring-primary/50 transition-all border border-border"
               />
-              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background" />
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background shadow-sm" />
             </div>
 
             <div className="hidden md:flex flex-col items-start mr-1">
@@ -91,38 +91,39 @@ export default function DashboardHeader() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute right-0 mt-2 w-56 glass-card rounded-xl shadow-xl py-1 z-50 overflow-hidden border border-border/50"
+                transition={{ duration: 0.2 }}
+                className="absolute right-0 mt-2 w-64 glass-card rounded-xl shadow-2xl py-2 z-50 overflow-hidden border border-white/10 bg-black/80 backdrop-blur-xl ring-1 ring-black/5"
               >
-                <div className="px-4 py-3 border-b border-border/50 bg-secondary/20">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="px-5 py-4 border-b border-white/10 bg-white/5">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     Signed in as
                   </p>
-                  <p className="text-sm font-semibold text-foreground truncate mt-0.5">
+                  <p className="text-sm font-medium text-foreground truncate mt-1">
                     {session?.user?.email}
                   </p>
                 </div>
 
-                <div className="p-1">
-                  <button
-                    disabled
-                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground opacity-50 cursor-not-allowed rounded-lg"
+                <div className="p-2 space-y-1">
+                  <Link
+                    href="/profile"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:bg-white/10 rounded-lg transition-colors group"
                   >
-                    <UserCircleIcon className="w-5 h-5" />
+                    <UserCircleIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     Profile Settings
-                  </button>
+                  </Link>
 
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full flex items-center gap-3 text-left px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-lg transition-colors font-medium"
+                    className="w-full flex items-center gap-3 text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors font-medium group"
                   >
-                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                    <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     Sign Out
                   </button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div> */}
+        </div>
       </div>
     </header>
   );

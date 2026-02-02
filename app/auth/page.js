@@ -11,6 +11,8 @@ import { useSearchParams } from "next/navigation";
 
 import { Suspense } from "react";
 
+import SpotlightCard from "@/components/ui/SpotlightCard";
+
 const AuthContent = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -44,10 +46,10 @@ const AuthContent = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden relative">
-      {/* Background Decor */}
+      {/* Background Decor - Cosmic Liquid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[120px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[120px] animate-pulse-slow delay-700" />
       </div>
 
       <motion.div
@@ -63,7 +65,7 @@ const AuthContent = () => {
         >
           <div className="flex justify-center">
             <motion.div
-              className="p-3 bg-primary/10 rounded-2xl border border-primary/20"
+              className="p-3 bg-white/5 rounded-2xl border border-white/10"
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -71,7 +73,7 @@ const AuthContent = () => {
             </motion.div>
           </div>
           <motion.h2
-            className="mt-6 text-center text-3xl font-extrabold text-foreground"
+            className="mt-6 text-center text-3xl font-extrabold text-white"
             initial={{ y: 20 }}
             animate={{ y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -92,12 +94,12 @@ const AuthContent = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="space-y-4"
+          className="space-y-4 pt-6"
         >
           {/* Google Button */}
           <motion.button
             onClick={handleGoogleSignIn}
-            className="group relative cursor-pointer w-full flex justify-center py-3 px-4 border border-input text-sm font-medium rounded-xl text-foreground bg-card hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300"
+            className="group relative cursor-pointer w-full flex justify-center py-3 px-4 border border-white/10 text-sm font-medium rounded-xl text-foreground bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300"
             whileHover={{
               scale: 1.03,
               boxShadow: "0 0 15px rgba(234, 67, 53, 0.3)",
@@ -113,7 +115,7 @@ const AuthContent = () => {
           {/* GitHub Button */}
           <motion.button
             onClick={handleGitHubSignIn}
-            className="group relative cursor-pointer w-full flex justify-center py-3 px-4 border border-input text-sm font-medium rounded-xl text-white bg-[#24292e] hover:bg-[#2f363d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300"
+            className="group relative cursor-pointer w-full flex justify-center py-3 px-4 border border-white/10 text-sm font-medium rounded-xl text-white bg-[#24292e] hover:bg-[#2f363d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300"
             whileHover={{
               scale: 1.03,
               boxShadow: "0 0 15px rgba(36, 41, 46, 0.5)",

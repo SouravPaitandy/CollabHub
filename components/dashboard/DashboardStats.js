@@ -84,7 +84,7 @@ const DashboardStats = ({ stats, isStatsLoading, taskStats }) => {
         </div>
       ) : (
         /* Bento Grid Layout */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[minmax(180px,auto)]">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-[minmax(140px,auto)] md:auto-rows-[minmax(180px,auto)]">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -92,11 +92,11 @@ const DashboardStats = ({ stats, isStatsLoading, taskStats }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               className={`
-                ${index === 0 ? "md:col-span-2 md:row-span-2" : ""}
-                ${index === 1 ? "md:col-span-2" : ""} 
+                ${index === 0 ? "col-span-2 md:col-span-2 md:row-span-2" : "col-span-1"}
+                ${index === 1 ? "md:col-span-2" : index === 5 ? "col-span-2" : ""} 
                 `}
             >
-              <SpotlightCard className="h-full">
+              <SpotlightCard className="h-full bg-white/80 dark:bg-black/40 backdrop-blur-2xl border-white/50 dark:border-white/10">
                 <div className="p-6 h-full flex flex-col justify-between relative z-10">
                   {/* Header */}
                   <div className="flex items-center justify-between mb-4">
@@ -154,23 +154,23 @@ const DashboardStats = ({ stats, isStatsLoading, taskStats }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="md:col-span-2 lg:col-span-4"
+            className="col-span-2 lg:col-span-4"
           >
-            <SpotlightCard className="h-full">
+            <SpotlightCard className="h-full bg-white/80 dark:bg-black/40 backdrop-blur-2xl border-white/50 dark:border-white/10">
               <div className="p-8 relative overflow-hidden">
                 <div className="flex flex-col md:flex-row gap-8 items-center relative z-10">
                   <div className="flex-1 w-full">
                     <div className="flex justify-between items-end mb-4">
                       <div>
-                        <h3 className="text-2xl font-bold text-foreground">
+                        <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                           Project Velocity
                         </h3>
-                        <p className="text-muted-foreground mt-1">
+                        <p className="text-xs sm:text-base text-muted-foreground mt-1">
                           Overall completion rate across all active projects
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="text-4xl font-bold text-primary">
+                        <span className="text-3xl sm:text-4xl font-bold text-primary">
                           {taskStats.totalTasks > 0
                             ? Math.round(
                                 (taskStats.completedTasks /

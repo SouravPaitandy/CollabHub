@@ -16,6 +16,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMotionTemplate, useMotionValue } from "framer-motion";
 import SpotlightCard from "./ui/SpotlightCard";
+import MissionControl from "./landing/MissionControl";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -67,52 +68,98 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden selection:bg-primary/20">
-      {/* Background Decor */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[120px]" />
-      </div>
+      <main className="relative z-10">
+        {/* Animated Liquid Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+              x: [0, 50, 0],
+              y: [0, 30, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px]"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+              x: [0, -40, 0],
+              y: [0, -50, 0],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1,
+            }}
+            className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 blur-[120px]"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
+            className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] rounded-full bg-purple-500/20 blur-[100px]"
+          />
+        </div>
 
-      <main>
         {/* Hero Section */}
-        <motion.section
+        <section
           ref={heroRef}
-          onMouseMove={handleMouseMove}
-          className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 sm:px-6 pt-20 group"
+          className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-12"
           style={{ opacity, scale }}
         >
-          {/* Lantern Beam */}
-          <motion.div
-            className="pointer-events-none absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100"
-            style={{
-              background: lanternBackground,
-            }}
-          />
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-center max-w-4xl mx-auto space-y-8"
+            className="text-center max-w-5xl mx-auto space-y-8 z-10"
           >
-            <div className="space-y-4">
-              <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-primary/10 text-primary border border-primary/20">
-                v2.0 is here: Redesigned for focus
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="inline-flex items-center gap-2 px-2 py-1 sm:px-4 sm:py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4 hover:border-primary/30 transition-colors"
+            >
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground font-geist-sans tracking-wide">
+                v2.0 Now Available
               </span>
-              <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-foreground">
-                Collaborate <br className="hidden sm:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-500 to-purple-600">
-                  Without Limits
+            </motion.div>
+
+            <div className="space-y-2 relative">
+              <h1 className="text-4xl sm:text-8xl font-bold tracking-tighter text-foreground font-hacker leading-none relative z-10">
+                COLLABORATE
+                <br className="hidden sm:block" />
+                <span className="relative inline-block mt-2">
+                  <span className="absolute -inset-2 blur-2xl bg-primary/20 rounded-full"></span>
+                  <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-purple-500">
+                    WITHOUT&nbsp;LIMITS
+                  </span>
                 </span>
               </h1>
             </div>
 
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              The all-in-one workspace for your team. Real-time documents, video
-              calls, and seamless chat—all wrapped in a beautiful, focused
+            <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-geist-sans font-light">
+              The all-in-one workspace for your team. Real-time docs, video, and
+              chat - all wrapped in a{" "}
+              <span className="text-foreground font-medium">Cosmic Liquid</span>{" "}
               interface.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
               <Link
                 href={
                   !session
@@ -123,9 +170,13 @@ export default function HomePage() {
                         "dashboard"
                       }`
                 }
-                className="px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg shadow-lg hover:shadow-primary/25 hover:scale-105 transition-all"
+                className="group relative px-8 py-4 rounded-xl border border-primary/90 text-primary font-bold text-lg shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] hover:scale-105 transition-all overflow-hidden"
               >
-                {session ? "Go to Dashboard" : "Start Collaborating"}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+                <span className="relative flex items-center gap-2 font-hacker">
+                  {session ? "Launch Dashboard" : "Start Collaborating"}
+                  <FiArrowDown className="rotate-[-90deg] group-hover:rotate-0 transition-transform" />
+                </span>
               </Link>
               <Link
                 href="#features"
@@ -133,55 +184,61 @@ export default function HomePage() {
                   e.preventDefault();
                   featuresRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="px-8 py-4 rounded-xl bg-muted text-foreground font-medium text-lg hover:bg-muted/80 transition-all border border-border"
+                className="px-8 py-4 rounded-xl bg-white/5 text-foreground font-medium text-lg hover:bg-white/10 transition-all border border-white/10 backdrop-blur-sm font-geist-sans"
               >
-                See Features
+                Explore Features
               </Link>
             </div>
           </motion.div>
+        </section>
 
-          {/* Hero Image / Preview */}
+        <section className="mt-20">
+          {/* Hero Preview Card */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="mt-16 w-full max-w-6xl mx-auto"
+            initial={{ opacity: 0, y: 100, rotateX: 20 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ delay: 0.5, duration: 1, type: "spring" }}
+            className="mt-20 w-full max-w-6xl mx-auto perspective-1000"
           >
-            <SpotlightCard className="aspect-video shadow-2xl bg-card/50 backdrop-blur">
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 opacity-50" />
-              <div className="absolute inset-0 flex items-center justify-center font-bold text-4xl">
-                <span className="text-transparent bg-clip-text bg-gradient-to-br from-foreground to-muted-foreground aura-text-glow">
-                  App Preview UI
-                </span>
-              </div>
-              <div className="w-full h-full bg-grid-white/[0.02] dark:bg-grid-white/[0.05]" />
-            </SpotlightCard>
+            <div className="relative group rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden h-[600px] md:h-auto md:aspect-[21/9]">
+              <MissionControl />
+            </div>
           </motion.div>
-        </motion.section>
+        </section>
 
         {/* Features Section */}
-        <div ref={featuresRef} className="py-24 relative z-0">
+        <section ref={featuresRef} className="py-24 relative z-0">
           <KeyFeatures />
-        </div>
+        </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-4">
-          <div className="max-w-5xl mx-auto bg-card border border-border rounded-3xl p-8 sm:p-16 text-center shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
-            <div className="relative z-10 space-y-6">
-              <h2 className="text-3xl sm:text-4xl font-bold">
-                Ready to boost productivity?
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-xl mx-auto">
-                Join thousands of teams already using Coordly to ship faster and
-                work better together.
-              </p>
-              <Link
-                href="/auth"
-                className="inline-block px-8 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:shadow-lg hover:-translate-y-1 transition-all"
-              >
-                Get Started for Free
-              </Link>
+        <section className="py-32 px-4 relative z-10">
+          <div className="max-w-6xl mx-auto">
+            <div className="relative rounded-[2.5rem] bg-black/40 border border-white/10 backdrop-blur-2xl p-12 sm:p-24 text-center overflow-hidden shadow-2xl group">
+              {/* Background gradient animation */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
+
+              {/* Orb decorations */}
+              <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
+
+              <div className="relative z-10 space-y-8">
+                <h2 className="text-3xl sm:text-6xl font-bold font-hacker tracking-tight text-white mb-4">
+                  Ready to upgrade your workflow?
+                </h2>
+                <p className="text-lg sm:text-2xl text-muted-foreground max-w-2xl mx-auto font-geist-sans font-light">
+                  Join the future of collaboration. Fast, beautiful, and
+                  designed for focus.
+                </p>
+                <div className="pt-8">
+                  <Link
+                    href={session ? "/dashboard" : "/auth"}
+                    className="inline-flex items-center gap-3 px-6 py-3 sm:px-10 sm:py-5 rounded-2xl bg-white text-black font-bold text-sm sm:text-lg hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all duration-300"
+                  >
+                    Get Started for Free <FiArrowDown className="-rotate-90" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -197,9 +254,9 @@ export default function HomePage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all"
+            className="group cursor-pointer fixed bottom-8 right-8 z-50 p-3 rounded-full bg-transparent backdrop-blur-sm border-2 border-primary text-primary shadow-lg hover:shadow-xl transition-all"
           >
-            <FiArrowUp className="text-xl" />
+            <FiArrowUp className="text-xl group-hover:translate-y-[-4px] transition-all duration-300" />
           </motion.button>
         )}
       </AnimatePresence>

@@ -356,11 +356,12 @@ const Dashboard = ({
     : session?.username || username || "User";
 
   return (
-    <div className="min-h-screen relative bg-background text-foreground overflow-hidden">
+    <div className="min-h-screen relative bg-background text-foreground">
       {/* Background Decor */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[120px]" />
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse-slow" />
+        <div className="absolute top-[40%] left-[40%] w-[20%] h-[20%] rounded-full bg-purple-500/5 blur-[100px] animate-pulse-slow delay-1000" />
       </div>
 
       {/* Offline Banner */}
@@ -412,22 +413,122 @@ const Dashboard = ({
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="flex flex-col gap-6"
             >
-              <div>
-                <h1 className="text-4xl font-bold tracking-tight mb-2 aura-text-glow">
-                  {isSessionExpired
-                    ? "Dashboard Preview"
-                    : `Welcome back, ${displayName.split(" ")[0]}`}
-                </h1>
-                <p className="text-muted-foreground text-lg">
-                  {isSessionExpired
-                    ? "Log in to access your full workspace."
-                    : "Here's what's happening with your projects today."}
-                </p>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 aura-text-glow">
+                    {isSessionExpired
+                      ? "Dashboard Preview"
+                      : `Welcome back, ${displayName.split(" ")[0]}`}
+                  </h1>
+                  <p className="text-muted-foreground text-base md:text-lg">
+                    {isSessionExpired
+                      ? "Log in to access your full workspace."
+                      : "Here's what's happening today."}
+                  </p>
+                </div>
               </div>
 
-              {/* Mobile Profile Toggle or similar could go here if needed, but we have sidebar */}
+              {/* MOBILE ONLY: Quick Action Bar */}
+              <div className="grid grid-cols-2 gap-3 lg:hidden">
+                <button
+                  onClick={() => {
+                    setModalTab("create");
+                    setJoinCode("");
+                    setIsModalOpen(true);
+                  }}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold active:scale-95 transition-all shadow-lg hover:shadow-primary/20"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  New Project
+                </button>
+                <button
+                  onClick={() => {
+                    setModalTab("join");
+                    setJoinCode("");
+                    setIsModalOpen(true);
+                  }}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl bg-card border border-border text-foreground font-medium active:scale-95 transition-all hover:bg-muted"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                    />
+                  </svg>
+                  Join Team
+                </button>
+              </div>
+
+              {/* MOBILE ONLY: GitHub Integration */}
+              <div className="lg:hidden">
+                {!isSessionExpired && session && (
+                  <SpotlightCard className="p-4 bg-card/60 backdrop-blur-md border border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#24292e] text-white flex items-center justify-center">
+                          <svg
+                            height="20"
+                            viewBox="0 0 16 16"
+                            width="20"
+                            className="fill-current"
+                          >
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm">GitHub</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {session.connectedAccounts?.includes("github")
+                              ? "Connected"
+                              : "Not Connected"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {session.connectedAccounts?.includes("github") ? (
+                        <button
+                          onClick={handleShowGithubRepos}
+                          className="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary border border-primary/20 rounded-md hover:bg-primary/20 transition-colors"
+                        >
+                          Import
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            import("next-auth/react").then(({ signIn }) =>
+                              signIn("github"),
+                            )
+                          }
+                          className="px-3 py-1.5 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity"
+                        >
+                          Connect
+                        </button>
+                      )}
+                    </div>
+                  </SpotlightCard>
+                )}
+              </div>
             </motion.div>
 
             {/* Stats Overview */}
@@ -472,14 +573,17 @@ const Dashboard = ({
               )}
 
             {/* 4. Footer Info (Moved to Sidebar) */}
-            <div className="pt-6 text-center text-xs text-muted-foreground/40">
-              <p>© {new Date().getFullYear()} Coordly</p>
+            <div className="pt-6 text-center text-xs text-muted-foreground/40 uppercase lg:hidden">
+              <p>
+                <span className="font-geist-sans">©</span>{" "}
+                {new Date().getFullYear()} Coordly
+              </p>
               <p className="mt-1">Crafted for the community</p>
             </div>
           </div>
 
-          {/* === Sidebar Column (Right) === */}
-          <div className="fixed right-4 lg:col-span-4 xl:col-span-3 space-y-3">
+          {/* === Sidebar Column (Right - Desktop Only) === */}
+          <div className="hidden lg:block lg:col-span-4 xl:col-span-3 space-y-6 lg:sticky lg:top-8 h-fit">
             {/* 1. Profile Widget */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -498,11 +602,17 @@ const Dashboard = ({
                     />
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg truncate max-w-[150px]">
-                      {displayName}
+                  <div className="min-w-0">
+                    <h3
+                      className="font-bold font-geist-sans text-lg truncate"
+                      title={session?.user?.name}
+                    >
+                      {session?.user?.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p
+                      className="text-xs text-muted-foreground truncate"
+                      title={session?.user?.email || "Pro Member"}
+                    >
                       {session?.user?.email || "Pro Member"}
                     </p>
                   </div>

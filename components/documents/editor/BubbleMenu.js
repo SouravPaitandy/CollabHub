@@ -20,8 +20,8 @@ export default function EditorBubbleMenu({ editor }) {
       const { selection } = editor.state;
       const { from, to } = selection;
 
-      // Only show if there's a selection
-      if (from === to) {
+      // Only show if there's a selection and on desktop (touch handling is tricky with bubble menu)
+      if (from === to || window.innerWidth < 768) {
         setIsVisible(false);
         return;
       }
@@ -34,7 +34,7 @@ export default function EditorBubbleMenu({ editor }) {
 
       // Calculate center position above selection
       const left = (start.left + end.left) / 2 - editorRect.left;
-      const top = start.top - editorRect.top - 50; // 50px above selection
+      const top = start.top - editorRect.top + 120; // 120px above selection
 
       setPosition({ top, left });
       setIsVisible(true);
@@ -59,10 +59,10 @@ export default function EditorBubbleMenu({ editor }) {
         e.preventDefault();
         onClick();
       }}
-      className={`p-2 rounded-md transition-all ${
+      className={`p-2 rounded-full transition-all ${
         isActive
-          ? "bg-indigo-500 text-white"
-          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10"
+          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+          : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
       }`}
       title={title}
     >
@@ -84,7 +84,7 @@ export default function EditorBubbleMenu({ editor }) {
           transform: "translateX(-50%)",
           zIndex: 100,
         }}
-        className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-1 backdrop-blur-lg"
+        className="flex items-center gap-1 bg-white/90 dark:bg-black/80 rounded-full shadow-2xl border border-white/20 dark:border-white/10 p-1.5 backdrop-blur-xl ring-1 ring-black/5"
       >
         <BubbleButton
           onClick={() => editor.chain().focus().toggleBold().run()}

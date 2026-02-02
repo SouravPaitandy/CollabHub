@@ -58,7 +58,7 @@ const DashboardCollabs = ({ adminCollabs, memberCollabs, username }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3 aura-text-glow">
-            Dashboard
+            Collaborations
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Manage your projects and collaborations in one place.
@@ -135,7 +135,7 @@ const DashboardCollabs = ({ adminCollabs, memberCollabs, username }) => {
 const TabButton = ({ isActive, onClick, icon, label, count }) => (
   <button
     onClick={onClick}
-    className={`pb-4 text-sm font-medium flex items-center gap-2 transition-colors duration-300 relative ${
+    className={`pb-4 text-xs sm:text-sm font-medium flex items-center gap-2 transition-colors duration-300 relative ${
       isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
     }`}
   >
@@ -151,7 +151,7 @@ const TabButton = ({ isActive, onClick, icon, label, count }) => (
     {isActive && (
       <motion.div
         layoutId="activeTab"
-        className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-t-full"
+        className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full"
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
       />
     )}
@@ -192,7 +192,7 @@ const ProjectGrid = ({
             variants={itemVariants}
             className="h-full"
           >
-            <SpotlightCard className="h-full flex flex-col overflow-hidden bg-card/50 backdrop-blur-sm border-border/50">
+            <SpotlightCard className="h-full flex flex-col overflow-hidden bg-white/80 dark:bg-black/40 backdrop-blur-2xl border-white/50 dark:border-white/10">
               {/* Card Header image pattern (abstract) */}
               <div className="h-24 w-full bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 group-hover:from-indigo-50 group-hover:to-purple-50 dark:group-hover:from-indigo-950/30 dark:group-hover:to-purple-950/30 transition-colors duration-300 relative z-10" />
 
@@ -209,7 +209,10 @@ const ProjectGrid = ({
                 </div>
 
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                  <h3
+                    className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1"
+                    title={collab.collabName}
+                  >
                     {collab.collabName}
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">

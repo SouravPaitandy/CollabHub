@@ -17,6 +17,7 @@ import {
   DocumentIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
+import SpotlightCard from "./ui/SpotlightCard";
 
 // Import Swiper styles
 import "swiper/css";
@@ -26,74 +27,56 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 const Feature = ({ icon, title, description }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div
-      className="bg-card/50 backdrop-blur-md p-8 rounded-xl shadow-sm h-full 
-                transition-all duration-500 transform border border-border
-                relative overflow-hidden group hover:shadow-md hover:border-primary/20"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Background gradient that animates on hover */}
+    <SpotlightCard className="h-full bg-black/40 backdrop-blur-2xl border-white/10 relative overflow-hidden group rounded-3xl">
+      {/* Animated corner accents - Subtler for Cosmic Theme */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent 
-                    opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        className="absolute top-0 right-0 w-32 h-32 translate-x-12 -translate-y-12 
+                    bg-primary/20 rounded-full blur-[60px] group-hover:bg-primary/30
+                    transition-all duration-700 ease-out pointer-events-none"
+      ></div>
+      <div
+        className="absolute bottom-0 left-0 w-32 h-32 -translate-x-12 translate-y-12 
+                    bg-indigo-500/10 rounded-full blur-[60px] group-hover:bg-indigo-500/20
+                    transition-all duration-700 ease-out pointer-events-none"
       ></div>
 
-      {/* Animated corner accents */}
-      <div
-        className="absolute top-0 left-0 w-16 h-16 -translate-x-8 -translate-y-8 
-                    bg-primary/10 rounded-full group-hover:translate-x-0 group-hover:translate-y-0 
-                    transition-all duration-700 ease-out"
-      ></div>
-      <div
-        className="absolute bottom-0 right-0 w-16 h-16 translate-x-8 translate-y-8 
-                    bg-secondary/10 rounded-full group-hover:translate-x-0 group-hover:translate-y-0 
-                    transition-all duration-700 ease-out"
-      ></div>
-
-      <div className="relative z-10 flex flex-col justify-between h-full">
+      <div className="relative z-10 flex flex-col justify-between h-full p-8 sm:p-10">
         <div>
           <div
-            className="flex items-center justify-center w-16 h-16 mb-6 rounded-2xl 
-                        bg-primary/10 text-primary shadow-sm transform transition-transform duration-500
-                        group-hover:rotate-3 group-hover:scale-110 border border-primary/20"
+            className="flex items-center justify-center w-16 h-16 mb-8 rounded-2xl 
+                        bg-white/5 text-primary shadow-inner transform transition-transform duration-500
+                        group-hover:rotate-6 group-hover:scale-110 border border-white/10 backdrop-blur-md"
           >
             {icon}
           </div>
           <h4
-            className="text-xl font-bold text-foreground mb-3 
-                       group-hover:text-primary 
+            className="text-2xl font-bold font-hacker text-foreground mb-4 
+                       group-hover:text-primary tracking-wide
                        transition-colors duration-300"
           >
             {title}
           </h4>
-          <p className="text-muted-foreground mb-6 leading-relaxed">
+          <p className="text-muted-foreground mb-8 leading-relaxed text-base font-geist-sans font-light">
             {description}
           </p>
         </div>
         <Link
           href="/features"
           className="text-primary hover:text-primary/80 
-                   flex items-center w-fit font-medium
+                   flex items-center font-medium text-sm font-geist-sans
                    relative overflow-hidden group/link"
         >
-          <span className="relative z-10 flex items-center">
-            Learn More
+          <span className="relative z-10 flex items-center gap-2">
+            Explore
             <ArrowRightIcon
-              className="w-4 h-4 ml-2 transition-transform duration-500 
-                                     group-hover:translate-x-[2px]"
+              className="w-4 h-4 transition-transform duration-500 
+                                     group-hover:translate-x-1"
             />
           </span>
-          <span
-            className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary 
-                         group-hover/link:w-full transition-all duration-300 ease-out"
-          ></span>
         </Link>
       </div>
-    </div>
+    </SpotlightCard>
   );
 };
 
@@ -110,78 +93,44 @@ const KeyFeatures = () => {
     styleElement.innerHTML = `
       /* Pagination bullets */
       .swiper-pagination-bullet {
-        width: 10px;
-        height: 10px;
-        background: rgba(107, 70, 193, 0.3);
+        width: 8px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.2);
         opacity: 1;
         transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
       }
       .swiper-pagination-bullet-active {
-        width: 24px;
-        height: 10px;
-        border-radius: 5px;
-        background: linear-gradient(to right, rgb(99, 102, 241), rgb(168, 85, 247));
+        width: 32px;
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(to right, rgb(124, 58, 237), rgb(79, 70, 229));
+        box-shadow: 0 0 10px rgba(124, 58, 237, 0.4);
       }
       
       /* Slide transitions */
       .swiper-slide {
         transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        opacity: 0.4;
-        filter: blur(10px);
+        opacity: 0.3;
+        filter: blur(4px) grayscale(50%);
+        transform: scale(0.9);
       }
       .swiper-slide-active {
-        transform: scale(1.08);
-        opacity: 1;
-        filter: blur(0);
-        z-index: 2;
-      }
-      .swiper-slide-prev, .swiper-slide-next {
-        opacity: 0.25;
-        filter: blur(10px);
-        z-index: 1;
-      }
-      
-      /* Shadow effects */
-      .swiper-slide-shadow-left,
-      .swiper-slide-shadow-right {
-        border-radius: 12px;
-        background: radial-gradient(rgba(0, 0, 0, 0.1), transparent 70%);
-      }
-      
-      /* Navigation buttons */
-      .swiper-button-next, .swiper-button-prev {
-        color: rgb(99, 102, 241);
-        opacity: 0;
-        transform: scale(0.8);
-        transition: all 0.3s ease;
-      }
-      .swiper-container:hover .swiper-button-next,
-      .swiper-container:hover .swiper-button-prev {
-        opacity: 1;
         transform: scale(1);
+        opacity: 1;
+        filter: blur(0) grayscale(0%);
+        z-index: 2;
       }
       
       /* Mobile card effect */
       .card-effect .swiper-slide {
-        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
-        transform: translateY(0);
-        transition: all 0.4s ease;
-      }
-      .card-effect .swiper-slide-active {
-        transform: translateY(-10px);
-      }
-      
-      /* Progress bar */
-      .swiper-pagination-progressbar {
-        background: rgba(99, 102, 241, 0.2) !important;
-      }
-      .swiper-pagination-progressbar-fill {
-        background: linear-gradient(to right, rgb(99, 102, 241), rgb(168, 85, 247)) !important;
+        transition: all 0.4s ease-out;
+        opacity: 1;
+        filter: none;
+        transform: none;
       }
     `;
     document.head.appendChild(styleElement);
 
-    // Cleanup function to remove styles when component unmounts
     return () => {
       if (styleElement.parentNode) {
         document.head.removeChild(styleElement);
@@ -241,26 +190,32 @@ const KeyFeatures = () => {
   };
 
   return (
-    <section className="py-24 overflow-hidden bg-background">
+    <section className="py-32 relative z-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-block mb-4">
-            <div className="h-1.5 w-16 bg-gradient-to-r from-primary to-indigo-500 rounded-full mb-1"></div>
-            <div className="h-1.5 w-10 bg-gradient-to-r from-primary to-indigo-500 rounded-full ml-6"></div>
+        <div className="text-center mb-20 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -z-10"></div>
+
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary mb-0.5"></span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest font-geist-sans">
+              Power Tools
+            </span>
           </div>
-          <h2
-            className="text-4xl pb-4 font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-primary to-foreground mb-4 
-                         animate-text-shimmer bg-[length:200%_100%]"
-          >
-            Key Features
+
+          <h2 className="text-4xl sm:text-5xl font-bold font-hacker text-foreground mb-6">
+            Everything you need <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-purple-500">
+              in one void.
+            </span>
           </h2>
-          <p className="mt-4 text-xl text-muted-foreground max-w-3xl mx-auto">
-            Powerful tools to enhance your collaboration
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-geist-sans font-light">
+            Powerful tools to enhance your collaboration, seamlessly integrated
+            into your workflow.
           </p>
         </div>
 
         {/* Mobile View */}
-        <div className="md:hidden card-effect">
+        <div className="md:hidden card-effect relative z-10">
           <Swiper
             ref={swiperRef}
             effect={"cards"}
@@ -279,12 +234,9 @@ const KeyFeatures = () => {
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
-            // pagination={{
-            //   type: "progressbar",
-            // }}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             modules={[EffectCards, Pagination, Autoplay]}
-            className="pb-12 h-[480px] mx-auto max-w-[340px] sm:max-w-[400px]" // Adjusted height and added max-width
+            className="pb-12 h-[480px] mx-auto max-w-[340px] sm:max-w-[400px]"
           >
             {features.map((feature, index) => (
               <SwiperSlide key={index} className="px-1">
@@ -293,17 +245,13 @@ const KeyFeatures = () => {
             ))}
           </Swiper>
 
-          {/* Feature dots indicator for mobile - improved spacing */}
+          {/* Feature dots indicator for mobile */}
           <div className="flex justify-center gap-3 mt-4 mb-2 px-4">
             {features.map((_, index) => (
               <button
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 
-                  ${
-                    activeIndex === index
-                      ? "bg-primary w-6"
-                      : "bg-muted-foreground/30"
-                  }`}
+                  ${activeIndex === index ? "bg-primary w-6" : "bg-white/20"}`}
                 onClick={() => {
                   if (swiperRef.current && swiperRef.current.swiper) {
                     swiperRef.current.swiper.slideToLoop(index);
@@ -322,14 +270,14 @@ const KeyFeatures = () => {
             effect={"coverflow"}
             grabCursor={true}
             centeredSlides={true}
-            slidesPerView={2.5}
+            slidesPerView={3}
             initialSlide={2}
             coverflowEffect={{
-              rotate: 10,
+              rotate: 0,
               stretch: 0,
-              depth: 200,
-              modifier: 2,
-              slideShadows: true,
+              depth: 300,
+              modifier: 1,
+              slideShadows: false,
             }}
             loop={true}
             autoplay={{
@@ -341,121 +289,42 @@ const KeyFeatures = () => {
               clickable: true,
               dynamicBullets: true,
             }}
-            navigation={{
-              nextEl: ".swiper-button-next-custom",
-              prevEl: ".swiper-button-prev-custom",
-            }}
             breakpoints={{
               768: { slidesPerView: 1.8 },
-              1024: { slidesPerView: 2.3 },
-              1280: { slidesPerView: 2.5 },
+              1024: { slidesPerView: 2.5 },
+              1280: { slidesPerView: 3 },
             }}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            modules={[EffectCoverflow, Pagination, Autoplay, Navigation]}
-            className="pb-16 pt-8"
+            modules={[EffectCoverflow, Pagination, Autoplay]}
+            className="pb-20 pt-10 px-10"
           >
             {features.map((feature, index) => (
-              <SwiperSlide key={index} className="w-[400px] h-[400px]">
+              <SwiperSlide key={index} className="h-[450px]">
                 <Feature {...feature} />
               </SwiperSlide>
             ))}
-
-            {/* Custom navigation elements that appear on hover */}
-            <div
-              className="swiper-button-prev-custom absolute top-1/2 left-4 z-10 -translate-y-1/2 opacity-0 
-                         group-hover:opacity-100 transition-opacity duration-300"
-            ></div>
-            <div
-              className="swiper-button-next-custom absolute top-1/2 right-4 z-10 -translate-y-1/2 opacity-0 
-                         group-hover:opacity-100 transition-opacity duration-300"
-            ></div>
           </Swiper>
         </div>
       </div>
 
-      {/* Enhanced Navigation Buttons */}
-      <div className="hidden md:flex justify-center gap-6 mt-6">
+      {/* Enhanced Navigation Buttons (Desktop) */}
+      <div className="hidden md:flex justify-center gap-6 mt-8">
         <button
           onClick={handlePrev}
-          className="p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110
-                   bg-card border border-border text-foreground hover:bg-muted group"
+          className="p-4 rounded-full transition-all duration-300 hover:scale-110
+                   bg-white/5 border border-white/10 text-foreground hover:bg-white/10 hover:border-primary/50 group backdrop-blur-md"
           aria-label="Previous slide"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-5 h-5 text-muted-foreground
-                                               group-hover:text-primary
-                                               transition-transform duration-300 group-hover:-translate-x-0.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
-          </svg>
+          <ArrowRightIcon className="w-5 h-5 rotate-180 group-hover:text-primary transition-colors" />
         </button>
         <button
           onClick={handleNext}
-          className="p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110
-                   bg-card border border-border text-foreground hover:bg-muted group"
+          className="p-4 rounded-full transition-all duration-300 hover:scale-110
+                   bg-white/5 border border-white/10 text-foreground hover:bg-white/10 hover:border-primary/50 group backdrop-blur-md"
           aria-label="Next slide"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-5 h-5 text-muted-foreground
-                                               group-hover:text-primary
-                                               transition-transform duration-300 group-hover:translate-x-0.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
+          <ArrowRightIcon className="w-5 h-5 group-hover:text-primary transition-colors" />
         </button>
-      </div>
-
-      {/* Feature dots indicator for desktop */}
-      <div className="hidden md:flex justify-center gap-3 mt-6">
-        {features.map((feature, index) => (
-          <button
-            key={index}
-            className="flex flex-col items-center group"
-            onClick={() => {
-              if (swiperRef.current && swiperRef.current.swiper) {
-                swiperRef.current.swiper.slideToLoop(index);
-              }
-            }}
-            aria-label={`Go to ${feature.title}`}
-          >
-            <span
-              className={`w-3 h-3 rounded-full mb-2 transition-all duration-500
-                          ${
-                            activeIndex === index
-                              ? "bg-gradient-to-r from-primary to-indigo-500 scale-125"
-                              : "bg-muted-foreground/30 group-hover:bg-primary/50"
-                          }`}
-            />
-            <span
-              className={`text-xs font-medium transition-all duration-300
-                          ${
-                            activeIndex === index
-                              ? "text-primary"
-                              : "text-muted-foreground group-hover:text-foreground"
-                          }`}
-            >
-              {feature.title.split(" ")[0]}
-            </span>
-          </button>
-        ))}
       </div>
     </section>
   );

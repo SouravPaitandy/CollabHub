@@ -1,28 +1,35 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: var(--font-space-mono), ui-sans-serif, system-ui, sans-serif;
+  --font-geist-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-hacker:
+    var(--font-space-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
 /* Define a custom variant for dark mode */
@@ -64,37 +71,37 @@
 }
 
 .dark {
-  /* Cosmic Midnight Mode */
-  --background: 230 35% 7%; /* Deep space blue-black */
-  --foreground: 210 20% 98%;
+  /* Cosmic Void Mode (Vercel-like Depth) */
+  --background: 0 0% 0%; /* Pure Void Black */
+  --foreground: 0 0% 98%; /* Stark White */
 
-  /* Glass Card - Semi-transparent deep blue */
-  --card: 230 40% 12%;
-  --card-foreground: 210 20% 98%;
+  /* Liquid Glass Base */
+  --card: 0 0% 3%; /* Almost black card base */
+  --card-foreground: 0 0% 98%;
 
-  --popover: 230 40% 12%;
-  --popover-foreground: 210 20% 98%;
+  --popover: 0 0% 3%;
+  --popover-foreground: 0 0% 98%;
 
-  /* Neon Indigo */
-  --primary: 245 90% 65%;
-  --primary-foreground: 210 20% 98%;
+  /* Electric Aurora */
+  --primary: 250 100% 65%; /* Vivid Purple */
+  --primary-foreground: 0 0% 100%;
 
-  /* Deep Violet Base */
-  --secondary: 250 30% 15%;
-  --secondary-foreground: 210 20% 98%;
+  /* Subtle Depth - Slightly Cool Void */
+  --secondary: 240 4% 10%; /* Cool dark gray */
+  --secondary-foreground: 0 0% 98%;
 
-  --muted: 250 30% 15%;
-  --muted-foreground: 230 20% 65%;
+  --muted: 240 4% 10%;
+  --muted-foreground: 240 0% 65%; /* Crisp muted text */
 
-  --accent: 250 30% 15%;
-  --accent-foreground: 210 20% 98%;
+  --accent: 240 4% 12%; /* Slightly lighter for hover states */
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 210 20% 98%;
+  --destructive: 0 90% 65%; /* Vibrant Red */
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 240 30% 20%; /* Subtle purple border */
-  --input: 240 30% 20%;
-  --ring: 245 90% 65%;
+  --border: 240 4% 16%; /* Visible but subtle cool border */
+  --input: 240 4% 16%;
+  --ring: 250 100% 65%;
 }
 
 * {
@@ -104,7 +111,9 @@
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -126,20 +135,20 @@ body {
   background: hsl(var(--primary) / 0.8);
 }
 
-/* Premium Glassmorphism */
+/* Premium Liquid Glass */
 .glass {
-  @apply bg-white/70 dark:bg-[#0B1020]/70 border border-white/40 dark:border-white/5 backdrop-blur-xl shadow-lg;
+  @apply bg-white/70 dark:bg-black/40 border border-white/40 dark:border-white/10 backdrop-blur-2xl shadow-lg;
 }
 .glass-card {
-  @apply bg-white/80 dark:bg-[#121629]/60 border border-white/50 dark:border-white/10 backdrop-blur-2xl shadow-xl transition-all duration-300;
+  @apply bg-white/80 dark:bg-black/40 border border-white/50 dark:border-white/10 backdrop-blur-2xl shadow-xl transition-all duration-300;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 .dark .glass-card {
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); /* Deeper shadow for void */
 }
 .glass-card:hover {
-  @apply border-indigo-500/30 dark:border-indigo-400/30;
-  box-shadow: 0 12px 40px -10px rgba(99, 102, 241, 0.2);
+  @apply border-indigo-500/30 dark:border-white/20;
+  box-shadow: 0 12px 40px -10px rgba(99, 102, 241, 0.1);
 }
 
 /* Aura / Glow Effects */

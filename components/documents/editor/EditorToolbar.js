@@ -36,11 +36,11 @@ const ToolbarButton = ({ onClick, isActive, disabled, icon: Icon, title }) => (
     onClick={onClick}
     disabled={disabled}
     className={`
-      p-2 rounded-lg transition-all duration-200 relative group
+      p-2 rounded-full transition-all duration-200 relative group
       ${
         isActive
-          ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-          : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100"
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
       }
       ${disabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}
     `}
@@ -64,9 +64,9 @@ export default function EditorToolbar({ editor }) {
     <motion.div
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-20 z-40 mx-auto max-w-fit"
+      className="sticky top-20 z-40 mx-auto max-w-[95vw] md:max-w-fit"
     >
-      <div className="glass-panel px-2 py-1.5 rounded-2xl flex flex-wrap items-center gap-1 shadow-xl shadow-indigo-500/5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/20 dark:border-white/10 ring-1 ring-black/5">
+      <div className="px-3 py-2 rounded-full flex flex-nowrap overflow-x-auto items-center gap-1 shadow-2xl shadow-indigo-500/10 bg-white/80 dark:bg-black/60 backdrop-blur-2xl border border-white/20 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 scrollbar-hide">
         {/* History Group */}
         <div className="flex items-center gap-0.5">
           <ToolbarButton

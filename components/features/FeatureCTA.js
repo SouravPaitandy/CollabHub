@@ -1,36 +1,37 @@
-import { Button } from "@/components/common/Button";
+import Link from "next/link";
+import { FiArrowDown } from "react-icons/fi";
 
 export default function FeatureCTA() {
   return (
-    <section className="pt-20 bg-indigo-600 dark:bg-indigo-800">
-      <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-white mb-4">
-          Ready to Transform Your Team&apos;s Collaboration?
-        </h2>
-        <p className="text-xl text-indigo-100 mb-8">
-          Join thousands of teams already using Coordly to boost their
-          productivity.
-        </p>
-        <Button
-          href="/auth"
-          className="bg-white text-indigo-600 hover:bg-indigo-50"
-        >
-          Get Started for Free
-        </Button>
-      </div>
-      <hr className="my-8 border-t border-indigo-300 opacity-20" />
+    <section className="px-4 relative z-10">
+      <div className="max-w-6xl mx-auto">
+        <div className="relative rounded-[2.5rem] bg-zinc-100/80 dark:bg-black/40 border border-black/5 dark:border-white/10 backdrop-blur-2xl p-12 sm:p-20 text-center overflow-hidden shadow-2xl group">
+          {/* Background gradient animation */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
 
-      {/* Footer */}
-      <footer className="py-6 text-center">
-        <p className="text-gray-600 dark:text-gray-400">
-          &copy; {new Date().getFullYear()} Coordly. All rights reserved.
-        </p>
-        <p className="text-5xl font-extrabold mt-2 opacity-40">
-          <span className="text-gray-600 dark:text-gray-400">
-            Made with ❤️ by the Coordly Team
-          </span>
-        </p>
-      </footer>
+          {/* Orb decorations */}
+          <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
+
+          <div className="relative z-10 space-y-8">
+            <h2 className="text-3xl sm:text-5xl font-bold font-hacker tracking-tight text-foreground mb-4">
+              Ready to Transform Your Team&apos;s Collaboration?
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-geist-sans font-light">
+              Join thousands of teams already using Coordly to boost their
+              productivity.
+            </p>
+            <div className="pt-4">
+              <Link
+                href="/auth"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-foreground text-background font-bold text-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
+              >
+                Get Started for Free <FiArrowDown className="-rotate-90" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

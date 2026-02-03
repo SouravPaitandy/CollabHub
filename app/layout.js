@@ -30,7 +30,7 @@ const spaceMono = Space_Mono({
 export const metadata = {
   title: "Coordly: Sync, Create, Succeed",
   description:
-    "Coordly - The unified workspace for developers to coordinate code, video, and tasks in real-time.",
+    "Coordly (formerly CollabHub) - The unified workspace for developers to coordinate code, video, and tasks in real-time.",
 };
 
 export default function RootLayout({ children }) {

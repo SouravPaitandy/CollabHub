@@ -1,5 +1,5 @@
 /**
- * Print and PDF export utilities for CollabHub documents
+ * Print and PDF export utilities for Coordly documents
  * Provides functions to print documents with headers/footers and export as PDF
  */
 
@@ -15,7 +15,7 @@
 // }
 
 /**
- * Print utility for CollabHub documents
+ * Print utility for Coordly documents
  * Extracts document content and creates a print-friendly version with header and footer
  */
 export const printUtils = (documentTitle, setShowDropdown, userName = null) => {

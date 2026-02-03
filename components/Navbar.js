@@ -46,7 +46,7 @@ const Navbar = () => {
           className={`relative transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-between
           ${
             isScrolled
-              ? "w-[90%] max-w-5xl rounded-full bg-black/60 backdrop-blur-2xl py-2 px-6 border border-white/[0.08]"
+              ? "w-[90%] max-w-5xl rounded-full bg-white/80 dark:bg-black/60 backdrop-blur-2xl py-2 px-6 border border-black/10 dark:border-white/[0.08] shadow-lg dark:shadow-none"
               : "w-full max-w-7xl px-6 py-4 bg-transparent border-transparent"
           }`}
         >
@@ -130,7 +130,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed inset-x-4 top-24 z-40 md:hidden rounded-2xl glass-card border border-white/20 overflow-hidden shadow-2xl"
+            className="fixed inset-x-4 top-24 z-40 md:hidden rounded-2xl glass-card bg-white/90 dark:bg-black/90 border border-black/10 dark:border-white/20 overflow-hidden shadow-2xl backdrop-blur-xl"
           >
             <div className="p-6 space-y-4 flex flex-col">
               <MobileNavLink

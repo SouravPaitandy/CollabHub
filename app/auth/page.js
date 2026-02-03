@@ -78,7 +78,7 @@ const AuthContent = () => {
             animate={{ y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            Join CollabHub
+            Join Coordly
           </motion.h2>
           <motion.p
             className="mt-2 text-center text-sm text-muted-foreground"

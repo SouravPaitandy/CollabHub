@@ -1,120 +1,183 @@
-import Image from 'next/image';
+"use client";
 import { Button } from "@/components/common/Button";
-import TeamMember from '@/components/about/TeamMember';
-import Timeline from '@/components/about/TimeLine';
+import TeamMember from "@/components/about/TeamMember";
+import Timeline from "@/components/about/TimeLine";
+import { motion } from "framer-motion";
+import SpotlightCard from "@/components/ui/SpotlightCard";
+import Footer from "@/components/Footer";
+import Link from "next/link";
 
 export default function AboutPage() {
-    return (
-        <div className="min-h-screen bg-gradient-to-b from-white via-white to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-            {/* Hero Section */}
-            <section className="py-24 md:py-32 text-center px-4">
-                <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl md:text-6xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
-                        Our Story
-                    </h1>
-                    <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed">
-                        CollabHub was born from a vision to revolutionize the way teams work together. 
-                        We believe in the power of seamless collaboration to drive innovation and success.
-                    </p>
-                    <div className="flex justify-center">
-                        <Button href="/contact" className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                            Get in Touch
-                        </Button>
-                    </div>
-                </div>
-            </section>
+  return (
+    <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30 overflow-hidden">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+      </div>
 
-            {/* Mission Section */}
-            <section className="py-20 md:py-28 bg-gray-50 dark:bg-gray-800/50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-gray-900 dark:text-white">
-                        Our Mission
-                    </h2>
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-12">
-                        <div className="md:w-1/2 relative">
-                            <div className="absolute -top-3 -left-3 w-full h-full bg-indigo-200 dark:bg-indigo-900 rounded-lg transform -rotate-2"></div>
-                            <img 
-                                src="https://th.bing.com/th/id/OIP.gstLb1jnX5Hnpfpy10DJvgHaEK?rs=1&pid=ImgDetMain" 
-                                alt="Our Mission" 
-                                className="rounded-lg shadow-lg relative z-10 w-full h-auto object-cover" 
-                            />
-                        </div>
-                        <div className="md:w-1/2 md:pl-8 mt-10 md:mt-0">
-                            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-                                At CollabHub, our mission is to empower teams of all sizes to achieve their full potential through intuitive, 
-                                powerful collaboration tools. We&apos;re committed to breaking down communication barriers and fostering a culture 
-                                of innovation and productivity in every organization we serve.
-                            </p>
-                            <div className="mt-8 flex flex-wrap gap-4">
-                                <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm flex-1 min-w-[200px]">
-                                    <h3 className="font-semibold text-lg mb-2 text-indigo-600 dark:text-indigo-400">Innovation</h3>
-                                    <p className="text-gray-600 dark:text-gray-300">Pushing boundaries to create better solutions</p>
-                                </div>
-                                <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm flex-1 min-w-[200px]">
-                                    <h3 className="font-semibold text-lg mb-2 text-indigo-600 dark:text-indigo-400">Excellence</h3>
-                                    <p className="text-gray-600 dark:text-gray-300">Committed to delivering quality in everything we do</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Timeline Section */}
-            <Timeline />
-
-            {/* Team Section */}
-            <section className="py-20 md:py-28">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900 dark:text-white">Meet Our Team</h2>
-                    <p className="text-center text-lg text-gray-600 dark:text-gray-300 mb-16 max-w-3xl mx-auto">
-                        The passionate individuals behind CollabHub who are dedicated to transforming how teams collaborate
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-                        <TeamMember name="Sourav Paitandy" role="CEO & Founder" image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg" />
-                        <TeamMember name="Sourav Paitandy" role="CTO" image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg" />
-                        <TeamMember name="Sourav Paitandy" role="Head of Design" image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg" />
-                    </div>
-                </div>
-            </section>
-
-            {/* Join Us Section */}
-            <section className="py-20 md:py-28 bg-gradient-to-br from-indigo-600 to-purple-700 dark:from-indigo-800 dark:to-purple-900 text-white text-center px-4">
-                <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-8">Join Us in Shaping the Future of Collaboration</h2>
-                    <p className="text-xl mb-10 leading-relaxed">
-                        We&apos;re always looking for passionate individuals to join our team. If you&apos;re excited about creating 
-                        innovative solutions that help teams work better together, we&apos;d love to hear from you.
-                    </p>
-                    <Button href="/careers" className="bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg transform transition-transform hover:scale-105">
-                        View Open Positions
-                    </Button>
-                </div>
-
-                <footer className="pt-20 mt-10 text-center border-t border-indigo-500/30">
-                    <div className="flex justify-center space-x-6 mb-8">
-                        <a href="#" className="text-white hover:text-indigo-200 transition-colors">
-                            <span className="sr-only">Twitter</span>
-                            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                            </svg>
-                        </a>
-                        <a href="#" className="text-white hover:text-indigo-200 transition-colors">
-                            <span className="sr-only">LinkedIn</span>
-                            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" />
-                            </svg>
-                        </a>
-                        <a href="#" className="text-white hover:text-indigo-200 transition-colors">
-                            <span className="sr-only">GitHub</span>
-                            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                            </svg>
-                        </a>
-                    </div>
-                    <p className="text-indigo-100">&copy; 2025 CollabHub. All rights reserved.</p>
-                </footer>
-            </section>
+      {/* Hero Section */}
+      <section className="relative pt-40 pb-20 px-4 text-center z-10">
+        <div className="max-w-5xl mx-auto">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-5xl md:text-8xl font-black font-hacker mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40"
+          >
+            OUR STORY
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto"
+          >
+            <span className="text-indigo-400 font-semibold">Coordly</span>{" "}
+            (formerly CollabHub) was born from a vision to revolutionize the way
+            teams work together. We believe in the power of seamless
+            collaboration to drive innovation and success.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex justify-center"
+          >
+            <Button
+              href="/contact"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 text-lg rounded-full shadow-[0_0_20px_rgba(79,70,229,0.5)] hover:shadow-[0_0_30px_rgba(79,70,229,0.7)] transition-all duration-300"
+            >
+              Get in Touch
+            </Button>
+          </motion.div>
         </div>
-    );
+      </section>
+
+      {/* Mission Section */}
+      <section className="py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SpotlightCard className="p-8 md:p-16 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-xl">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-16">
+              <div className="md:w-1/2 relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl md:rounded-[2rem] blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+                <img
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+                  alt="Our Mission"
+                  className="relative z-10 w-full h-auto object-cover rounded-2xl md:rounded-[2rem] border border-white/10 shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-[1.02]"
+                />
+              </div>
+              <div className="md:w-1/2">
+                <h2 className="text-3xl md:text-5xl font-bold font-hacker text-white mb-8">
+                  Mission & Vision
+                </h2>
+                <p className="text-lg text-gray-400 leading-relaxed mb-10">
+                  At Coordly, our mission is to empower teams of all sizes to
+                  achieve their full potential through intuitive, powerful
+                  collaboration tools. We&apos;re committed to breaking down
+                  communication barriers and fostering a culture of innovation
+                  and productivity in every organization we serve.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                    <h3 className="font-bold text-xl mb-2 text-indigo-400">
+                      Innovation
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      Pushing boundaries to create better solutions
+                    </p>
+                  </div>
+                  <div className="bg-white/5 p-6 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                    <h3 className="font-bold text-xl mb-2 text-purple-400">
+                      Excellence
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      Committed to delivering quality in everything we do
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SpotlightCard>
+        </div>
+      </section>
+
+      {/* Timeline Section */}
+      <div className="relative z-10 py-10">
+        <div className="text-center mt-12">
+          <Link
+            href="/updates"
+            className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors inline-flex items-center gap-2"
+          >
+            View our full timeline & updates
+            <span className="text-xl">→</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Team Section */}
+      <section className="py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl md:text-6xl font-bold font-hacker text-white mb-6">
+              Meet The Minds
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              The passionate individuals behind Coordly who are dedicated to
+              transforming how teams collaborate
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+            <TeamMember
+              name="Sourav Paitandy"
+              role="CEO & Founder"
+              image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
+            />
+            <TeamMember
+              name="Sourav Paitandy"
+              role="CTO"
+              image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
+            />
+            <TeamMember
+              name="Sourav Paitandy"
+              role="Head of Design"
+              image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Join Us Section */}
+      <section className="py-32 relative z-10 overflow-hidden">
+        {/* Abstract shapes */}
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/40 to-purple-900/40" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-3xl animate-pulse" />
+
+        <div className="max-w-4xl mx-auto text-center relative z-20 px-4">
+          <h2 className="text-4xl md:text-6xl font-bold font-hacker text-white mb-8">
+            Ready to Shape the Future?
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 leading-relaxed">
+            We&apos;re always looking for passionate individuals to join our
+            team. If you&apos;re excited about creating innovative solutions
+            that help teams work better together, we&apos;d love to hear from
+            you.
+          </p>
+          <Button
+            href="/careers"
+            className="bg-white text-black hover:bg-gray-100 px-10 py-4 rounded-full text-lg font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transform transition-all hover:scale-105"
+          >
+            View Open Positions
+          </Button>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
 }

@@ -73,12 +73,12 @@ export default function MissionControl() {
   }, []);
 
   return (
-    <div className="w-full h-full relative overflow-hidden flex flex-col md:flex-row bg-[#030014]/80 backdrop-blur-2xl">
+    <div className="w-full h-full relative overflow-hidden flex flex-col md:flex-row bg-white/80 dark:bg-[#030014]/80 backdrop-blur-2xl">
       {/* Background Decor */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
       {/* Left Panel: System Status */}
-      <div className="flex-1 p-4 md:p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col gap-4 md:gap-6 min-h-0">
+      <div className="flex-1 p-4 md:p-6 border-b md:border-b-0 md:border-r border-black/5 dark:border-white/10 flex flex-col gap-4 md:gap-6 min-h-0">
         <div className="flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -92,7 +92,7 @@ export default function MissionControl() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 md:gap-4 shrink-0">
-          <div className="p-3 md:p-4 rounded-xl bg-white/5 border border-white/5 relative overflow-hidden group">
+          <div className="p-3 md:p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex items-start justify-between mb-2">
               <FaGlobeAmericas className="text-blue-400 text-lg" />
@@ -103,7 +103,7 @@ export default function MissionControl() {
             <div className="text-xl md:text-2xl font-bold font-hacker text-foreground">
               {activeUsers.toLocaleString()}
             </div>
-            <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+            <div className="w-full h-1 bg-black/10 dark:bg-white/10 rounded-full mt-2 overflow-hidden">
               <motion.div
                 initial={{ width: "50%" }}
                 animate={{ width: "65%" }}
@@ -117,7 +117,7 @@ export default function MissionControl() {
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl bg-white/5 border border-white/5 relative overflow-hidden group">
+          <div className="p-3 md:p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex items-start justify-between mb-2">
               <FaBolt className="text-yellow-400 text-lg" />
@@ -131,7 +131,7 @@ export default function MissionControl() {
                 %
               </span>
             </div>
-            <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+            <div className="w-full h-1 bg-black/10 dark:bg-white/10 rounded-full mt-2 overflow-hidden">
               <motion.div
                 animate={{ width: `${systemLoad}%` }}
                 className="h-full bg-yellow-400 rounded-full"
@@ -141,7 +141,7 @@ export default function MissionControl() {
         </div>
 
         {/* Central Visualizer (Mini-Map / Radar) */}
-        <div className="flex-1 bg-black/20 rounded-xl border border-white/5 relative flex items-center justify-center overflow-hidden min-h-[150px] md:min-h-0">
+        <div className="flex-1 bg-black/5 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5 relative flex items-center justify-center overflow-hidden min-h-[150px] md:min-h-0">
           {/* Radar Rings */}
           {[1, 2, 3].map((i) => (
             <motion.div
@@ -164,7 +164,7 @@ export default function MissionControl() {
 
       {/* Right Panel: Activity Stream */}
       <div className="flex-1 p-4 md:p-6 flex flex-col min-h-0">
-        <h3 className="text-sm font-hacker text-muted-foreground uppercase tracking-wider mb-4 border-b border-white/10 pb-2">
+        <h3 className="text-sm font-hacker text-muted-foreground uppercase tracking-wider mb-4 border-b border-black/10 dark:border-white/10 pb-2">
           Global Activity Stream
         </h3>
         <div className="flex-1 overflow-hidden relative min-h-[200px] md:min-h-0">
@@ -177,7 +177,7 @@ export default function MissionControl() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, delay: i * 0.1 }}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                 >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${

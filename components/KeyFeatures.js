@@ -28,7 +28,7 @@ import "swiper/css/navigation";
 
 const Feature = ({ icon, title, description }) => {
   return (
-    <SpotlightCard className="h-full bg-black/40 backdrop-blur-2xl border-white/10 relative overflow-hidden group rounded-3xl">
+    <SpotlightCard className="h-full bg-white/40 dark:bg-black/40 backdrop-blur-2xl border-black/5 dark:border-white/10 relative overflow-hidden group rounded-3xl">
       {/* Animated corner accents - Subtler for Cosmic Theme */}
       <div
         className="absolute top-0 right-0 w-32 h-32 translate-x-12 -translate-y-12 
@@ -45,8 +45,8 @@ const Feature = ({ icon, title, description }) => {
         <div>
           <div
             className="flex items-center justify-center w-16 h-16 mb-8 rounded-2xl 
-                        bg-white/5 text-primary shadow-inner transform transition-transform duration-500
-                        group-hover:rotate-6 group-hover:scale-110 border border-white/10 backdrop-blur-md"
+                        bg-black/5 dark:bg-white/5 text-primary shadow-inner transform transition-transform duration-500
+                        group-hover:rotate-6 group-hover:scale-110 border border-black/5 dark:border-white/10 backdrop-blur-md"
           >
             {icon}
           </div>

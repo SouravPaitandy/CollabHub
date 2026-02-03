@@ -131,7 +131,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="inline-flex items-center gap-2 px-2 py-1 sm:px-4 sm:py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4 hover:border-primary/30 transition-colors"
+              className="inline-flex items-center gap-2 px-2 py-1 sm:px-4 sm:py-2 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md mb-4 hover:border-primary/30 transition-colors"
             >
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
               <span className="text-xs sm:text-sm font-medium text-muted-foreground font-geist-sans tracking-wide">
@@ -172,7 +172,7 @@ export default function HomePage() {
                 }
                 className="group relative px-8 py-4 rounded-xl border border-primary/90 text-primary font-bold text-lg shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] hover:scale-105 transition-all overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 dark:via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
                 <span className="relative flex items-center gap-2 font-hacker">
                   {session ? "Launch Dashboard" : "Start Collaborating"}
                   <FiArrowDown className="rotate-[-90deg] group-hover:rotate-0 transition-transform" />
@@ -184,7 +184,7 @@ export default function HomePage() {
                   e.preventDefault();
                   featuresRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="px-8 py-4 rounded-xl bg-white/5 text-foreground font-medium text-lg hover:bg-white/10 transition-all border border-white/10 backdrop-blur-sm font-geist-sans"
+                className="px-8 py-4 rounded-xl bg-black/5 dark:bg-white/5 text-foreground font-medium text-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all border border-black/10 dark:border-white/10 backdrop-blur-sm font-geist-sans"
               >
                 Explore Features
               </Link>
@@ -200,7 +200,7 @@ export default function HomePage() {
             transition={{ delay: 0.5, duration: 1, type: "spring" }}
             className="mt-20 w-full max-w-6xl mx-auto perspective-1000"
           >
-            <div className="relative group rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden h-[600px] md:h-auto md:aspect-[21/9]">
+            <div className="relative group rounded-2xl border border-black/10 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden h-[600px] md:h-auto md:aspect-[21/9]">
               <MissionControl />
             </div>
           </motion.div>
@@ -214,16 +214,16 @@ export default function HomePage() {
         {/* CTA Section */}
         <section className="py-32 px-4 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="relative rounded-[2.5rem] bg-black/40 border border-white/10 backdrop-blur-2xl p-12 sm:p-24 text-center overflow-hidden shadow-2xl group">
+            <div className="relative rounded-[2.5rem] bg-zinc-100/80 dark:bg-black/40 border border-black/5 dark:border-white/10 backdrop-blur-2xl p-12 sm:p-24 text-center overflow-hidden shadow-2xl">
               {/* Background gradient animation */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 opacity-80 transition-opacity duration-700"></div>
 
               {/* Orb decorations */}
               <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
 
               <div className="relative z-10 space-y-8">
-                <h2 className="text-3xl sm:text-6xl font-bold font-hacker tracking-tight text-white mb-4">
+                <h2 className="text-3xl sm:text-6xl font-bold font-hacker tracking-tight text-foreground mb-4">
                   Ready to upgrade your workflow?
                 </h2>
                 <p className="text-lg sm:text-2xl text-muted-foreground max-w-2xl mx-auto font-geist-sans font-light">
@@ -233,9 +233,10 @@ export default function HomePage() {
                 <div className="pt-8">
                   <Link
                     href={session ? "/dashboard" : "/auth"}
-                    className="inline-flex items-center gap-3 px-6 py-3 sm:px-10 sm:py-5 rounded-2xl bg-white text-black font-bold text-sm sm:text-lg hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all duration-300"
+                    className="group inline-flex font-geist-sans items-center gap-3 px-6 py-3 sm:px-10 sm:py-5 rounded-2xl bg-foreground text-background font-bold text-sm sm:text-lg hover:shadow-2xl transition-all duration-300"
                   >
-                    Get Started for Free <FiArrowDown className="-rotate-90" />
+                    Get Started for Free{" "}
+                    <FiArrowDown className="-rotate-90 group-hover:translate-x-1 transition-all duration-300" />
                   </Link>
                 </div>
               </div>

@@ -6,7 +6,7 @@
 export const DEMO_COLLABS_ADMIN = [
   {
     id: "demo-admin-1",
-    name: "CollabHub Sample Project",
+    name: "Coordly Sample Project",
     description:
       "A sample collaboration workspace (Demo Data - Viewing Offline)",
     role: "ADMIN",

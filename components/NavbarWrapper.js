@@ -12,9 +12,18 @@ export default function NavbarWrapper() {
     pathname.startsWith("/collab/") ||
     // Check if it's a dashboard route (single path segment that isn't a public page)
     (pathname.split("/").length === 2 &&
-      !["/", "/auth", "/about", "/features", "/pricing", "/contact"].includes(
-        pathname,
-      ));
+      ![
+        "/",
+        "/auth",
+        "/about",
+        "/features",
+        "/pricing",
+        "/contact",
+        "/updates",
+        "/terms",
+        "/privacy",
+        "/support",
+      ].includes(pathname));
 
   if (isExcludedPage) {
     return null;

@@ -66,11 +66,11 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-background border-t border-white/[0.08] text-foreground">
+    <footer className="bg-background border-t border-black/5 dark:border-white/[0.08] text-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           <div className="space-y-4">
-            <h3 className="text-xl font-hacker font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
+            <h3 className="text-xl font-hacker font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-900/60 dark:from-white dark:to-white/60">
               Coordly
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
@@ -91,6 +91,19 @@ export default function Footer() {
               </li>
               <li>
                 <FooterLink href="/updates">Changelog</FooterLink>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold mb-6 text-foreground tracking-wider uppercase font-hacker">
+              Company
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <FooterLink href="/about">About Us</FooterLink>
+              </li>
+              <li>
+                <FooterLink href="/contact">Contact</FooterLink>
               </li>
             </ul>
           </div>
@@ -117,13 +130,13 @@ export default function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground/50 transition-all font-light"
+                className="w-full px-4 py-3 bg-black/5 dark:bg-white/[0.03] border border-black/5 dark:border-white/[0.08] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground/50 transition-all font-light"
                 required
                 disabled={isSubmitting}
               />
               <button
                 type="submit"
-                className="w-full px-4 py-3 bg-white text-black font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 disabled:opacity-50"
+                className="w-full px-4 py-3 bg-foreground text-background font-semibold rounded-xl hover:opacity-90 transition-all duration-300 disabled:opacity-50"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Subscribing..." : "Subscribe"}
@@ -131,7 +144,7 @@ export default function Footer() {
             </form>
           </div>
         </div>
-        <div className="mt-16 pt-8 border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-16 pt-8 border-t border-black/5 dark:border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-xs font-mono">
             &copy; {new Date().getFullYear()} Coordly. All rights reserved.
           </p>

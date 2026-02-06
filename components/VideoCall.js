@@ -15,6 +15,9 @@ import {
 } from "react-icons/fa";
 import { useCollab } from "@/components/documents/CollabContext"; // Import Context
 
+// Module-level map to track initialized rooms (persists across React StrictMode remounts)
+const initializedRooms = new Map();
+
 // --- Remote Video Component ---
 const RemoteVideo = ({ stream, userName, isMuted, isVideoOff }) => {
   const videoRef = useRef(null);
@@ -24,6 +27,14 @@ const RemoteVideo = ({ stream, userName, isMuted, isVideoOff }) => {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
+
+  // Debug: Log prop changes
+  useEffect(() => {
+    console.log(`[RemoteVideo] ${userName} props updated:`, {
+      isMuted,
+      isVideoOff,
+    });
+  }, [isMuted, isVideoOff, userName]);
 
   return (
     <motion.div
@@ -80,6 +91,7 @@ export default function VideoCall({ roomId, onLeave }) {
   const [stream, setStream] = useState(null);
   const [peers, setPeers] = useState({}); // remoteStream by peerId
   const [peerNames, setPeerNames] = useState({}); // peerId -> userName
+  const [peerMediaStatus, setPeerMediaStatus] = useState({}); // peerId -> {isMuted, isVideoOff}
 
   // Local Media State
   const [isMuted, setIsMuted] = useState(false);
@@ -93,6 +105,7 @@ export default function VideoCall({ roomId, onLeave }) {
   const peerInstanceRef = useRef(null);
   const streamRef = useRef(null);
   const userNameRef = useRef(userName);
+  const hasInitialized = useRef(false); // Prevent double initialization in StrictMode
 
   // Sync refs safely
   useEffect(() => {
@@ -105,9 +118,32 @@ export default function VideoCall({ roomId, onLeave }) {
     streamRef.current = stream;
   }, [stream]);
 
+  // Debug: Log peerMediaStatus changes
+  useEffect(() => {
+    console.log("[VideoCall] peerMediaStatus updated:", peerMediaStatus);
+    console.log(
+      "[VideoCall] Current peers (PeerJS connections):",
+      Object.keys(peers),
+    );
+    console.log(
+      "[VideoCall] Media status for peers:",
+      Object.keys(peerMediaStatus),
+    );
+  }, [peerMediaStatus, peers]);
+
   // Initialize Media and Peer
   useEffect(() => {
     if (!socket) return; // Wait for socket connection
+    if (initializedRooms.has(roomId)) {
+      console.log(
+        `[VideoCall] Room ${roomId} already initialized, skipping duplicate`,
+      );
+      return; // Prevent double initialization in StrictMode
+    }
+
+    // Mark as initialized IMMEDIATELY to prevent race condition in StrictMode
+    initializedRooms.set(roomId, true);
+    console.log("[VideoCall] Initializing video call for room:", roomId);
 
     const init = async () => {
       try {
@@ -187,6 +223,17 @@ export default function VideoCall({ roomId, onLeave }) {
         // 3. Handle Incoming Calls
         newPeer.on("call", (call) => {
           console.log("[VideoCall] Incoming Call from:", call.peer);
+
+          // Prevent duplicate incoming connections
+          if (callsRef.current[call.peer]) {
+            console.log(
+              "[VideoCall] Already have connection with peer:",
+              call.peer,
+              "- ignoring duplicate",
+            );
+            return;
+          }
+
           // Store caller name if available in metadata
           if (call.metadata && call.metadata.userName) {
             setPeerNames((prev) => ({
@@ -235,32 +282,82 @@ export default function VideoCall({ roomId, onLeave }) {
         delete newPeers[peerId];
         return newPeers;
       });
+
+      setPeerMediaStatus((prev) => {
+        const newStatus = { ...prev };
+        delete newStatus[peerId];
+        return newStatus;
+      });
+    };
+
+    const handlePeerMediaStatusChanged = ({ peerId, isMuted, isVideoOff }) => {
+      console.log("[VideoCall] Peer media status changed:", peerId, {
+        isMuted,
+        isVideoOff,
+      });
+      setPeerMediaStatus((prev) => ({
+        ...prev,
+        [peerId]: { isMuted, isVideoOff },
+      }));
     };
 
     socket.on("user-connected", handleUserConnected);
     socket.on("user-disconnected", handleUserDisconnected);
+    socket.on("peer-media-status-changed", handlePeerMediaStatusChanged);
 
     // Cleanup
     return () => {
       socket.off("user-connected", handleUserConnected);
       socket.off("user-disconnected", handleUserDisconnected);
+      socket.off("peer-media-status-changed", handlePeerMediaStatusChanged);
 
       if (peerInstanceRef.current) peerInstanceRef.current.destroy();
       if (streamRef.current)
         streamRef.current.getTracks().forEach((track) => track.stop());
+      // Don't delete from Map - let it persist across StrictMode unmount/remount
+      // initializedRooms.delete(roomId);
     };
   }, [socket, roomId]);
 
-  // Check Local Media Toggle
+  // Check Local Media Toggle and broadcast to peers
   useEffect(() => {
     if (stream) {
       stream.getAudioTracks().forEach((track) => (track.enabled = !isMuted));
       stream.getVideoTracks().forEach((track) => (track.enabled = !isVideoOff));
+
+      // Broadcast media status to other peers in the room
+      if (socket && myPeerId && roomId) {
+        console.log("[VideoCall] Broadcasting media status:", {
+          myPeerId,
+          isMuted,
+          isVideoOff,
+        });
+        console.log("[VideoCall] Socket connected?", socket.connected);
+        console.log("[VideoCall] Socket ID:", socket.id);
+        socket.emit("update-media-status", {
+          roomId,
+          peerId: myPeerId,
+          isMuted,
+          isVideoOff,
+        });
+      } else {
+        console.warn("[VideoCall] Cannot broadcast - missing:", {
+          hasSocket: !!socket,
+          hasMyPeerId: !!myPeerId,
+          hasRoomId: !!roomId,
+        });
+      }
     }
-  }, [isMuted, isVideoOff, stream]);
+  }, [isMuted, isVideoOff, stream, socket, myPeerId, roomId]);
 
   const connectToNewUser = (userId, currentStream, peerInstance) => {
     if (!currentStream || !peerInstance) return;
+
+    // Prevent duplicate connections - check if we already have this peer
+    if (callsRef.current[userId]) {
+      console.log("[VideoCall] Already connected to peer:", userId);
+      return;
+    }
 
     console.log("[VideoCall] Calling peer:", userId);
     const call = peerInstance.call(userId, currentStream, {
@@ -410,15 +507,28 @@ export default function VideoCall({ roomId, onLeave }) {
 
         {/* Remote Videos */}
         <AnimatePresence>
-          {Object.entries(peers).map(([peerId, peerStream]) => (
-            <RemoteVideo
-              key={peerId}
-              stream={peerStream}
-              userName={peerNames[peerId]}
-              isMuted={false}
-              isVideoOff={!peerStream.getVideoTracks()[0]?.enabled}
-            />
-          ))}
+          {Object.entries(peers)
+            .filter(([peerId]) => peers[peerId]) // Only render if we have a stream
+            .map(([peerId, peerStream]) => {
+              const mediaStatus = peerMediaStatus[peerId] || {
+                isMuted: false,
+                isVideoOff: false,
+              };
+              console.log(`[VideoCall] Rendering RemoteVideo for ${peerId}:`, {
+                userName: peerNames[peerId],
+                isMuted: mediaStatus.isMuted,
+                isVideoOff: mediaStatus.isVideoOff,
+              });
+              return (
+                <RemoteVideo
+                  key={peerId}
+                  stream={peerStream}
+                  userName={peerNames[peerId]}
+                  isMuted={mediaStatus.isMuted}
+                  isVideoOff={mediaStatus.isVideoOff}
+                />
+              );
+            })}
         </AnimatePresence>
       </div>
 

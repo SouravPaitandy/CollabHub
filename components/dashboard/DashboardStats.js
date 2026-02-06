@@ -55,7 +55,7 @@ const DashboardStats = ({ stats, isStatsLoading, taskStats }) => {
       transition={{ duration: 0.8 }}
       className="mb-12"
     >
-      <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+      <h2 className="text-2xl font-black mb-6 text-foreground flex items-center font-hacker uppercase tracking-wide">
         <span className="mr-3 text-primary">✨</span>
         Dashboard Analytics
       </h2>
@@ -200,7 +200,7 @@ const DashboardStats = ({ stats, isStatsLoading, taskStats }) => {
                         transition={{ duration: 1, ease: "easeOut" }}
                         className="h-full bg-gradient-to-r from-primary to-indigo-400 rounded-full shadow-[0_0_20px_rgba(var(--primary),0.5)] relative"
                       >
-                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50"></div>
+                        {/* <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50"></div> */}
                       </motion.div>
                     </div>
 

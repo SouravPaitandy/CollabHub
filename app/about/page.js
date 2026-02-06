@@ -4,12 +4,12 @@ import TeamMember from "@/components/about/TeamMember";
 import Timeline from "@/components/about/TimeLine";
 import { motion } from "framer-motion";
 import SpotlightCard from "@/components/ui/SpotlightCard";
-import Footer from "@/components/Footer";
+
 import Link from "next/link";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30 overflow-hidden">
+    <div className="min-h-screen  selection:bg-indigo-500/30 overflow-hidden">
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
@@ -31,7 +31,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto"
+            className="text-xl md:text-2xl text-gray-400 font-geist-sans mb-12 leading-relaxed max-w-3xl mx-auto"
           >
             <span className="text-indigo-400 font-semibold">Coordly</span>{" "}
             (formerly CollabHub) was born from a vision to revolutionize the way
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl md:text-5xl font-bold font-hacker text-white mb-8">
                   Mission & Vision
                 </h2>
-                <p className="text-lg text-gray-400 leading-relaxed mb-10">
+                <p className="text-lg font-geist-sans text-gray-400 leading-relaxed mb-10">
                   At Coordly, our mission is to empower teams of all sizes to
                   achieve their full potential through intuitive, powerful
                   collaboration tools. We&apos;re committed to breaking down
@@ -83,7 +83,7 @@ export default function AboutPage() {
                     <h3 className="font-bold text-xl mb-2 text-indigo-400">
                       Innovation
                     </h3>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 text-sm font-geist-sans">
                       Pushing boundaries to create better solutions
                     </p>
                   </div>
@@ -91,7 +91,7 @@ export default function AboutPage() {
                     <h3 className="font-bold text-xl mb-2 text-purple-400">
                       Excellence
                     </h3>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 text-sm font-geist-sans">
                       Committed to delivering quality in everything we do
                     </p>
                   </div>
@@ -127,19 +127,19 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-6xl font-bold font-hacker text-white mb-6">
               Meet The Minds
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-xl font-geist-sans text-gray-400 max-w-3xl mx-auto">
               The passionate individuals behind Coordly who are dedicated to
               transforming how teams collaborate
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+          <div className="flex justify-center items-center">
             <TeamMember
               name="Sourav Paitandy"
-              role="CEO & Founder"
+              role="CEO & Founder, CTO, Head of Design"
               image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
             />
-            <TeamMember
+            {/* <TeamMember
               name="Sourav Paitandy"
               role="CTO"
               image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
@@ -148,13 +148,13 @@ export default function AboutPage() {
               name="Sourav Paitandy"
               role="Head of Design"
               image="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
-            />
+            /> */}
           </div>
         </div>
       </section>
 
       {/* Join Us Section */}
-      <section className="py-32 relative z-10 overflow-hidden">
+      <section className="py-32 rounded-4xl relative z-10 overflow-hidden">
         {/* Abstract shapes */}
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/40 to-purple-900/40" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-3xl animate-pulse" />
@@ -163,7 +163,7 @@ export default function AboutPage() {
           <h2 className="text-4xl md:text-6xl font-bold font-hacker text-white mb-8">
             Ready to Shape the Future?
           </h2>
-          <p className="text-xl text-gray-300 mb-12 leading-relaxed">
+          <p className="text-xl font-geist-sans text-gray-300 mb-12 leading-relaxed">
             We&apos;re always looking for passionate individuals to join our
             team. If you&apos;re excited about creating innovative solutions
             that help teams work better together, we&apos;d love to hear from
@@ -177,7 +177,6 @@ export default function AboutPage() {
           </Button>
         </div>
       </section>
-      <Footer />
     </div>
   );
 }

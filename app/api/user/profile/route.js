@@ -28,6 +28,7 @@ export async function GET(req) {
       website: user.website,
       socials: user.socials,
       accounts: user.accounts,
+      joinedDate: user.createdAt,
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

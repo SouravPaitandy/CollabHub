@@ -12,15 +12,16 @@ import {
   Shield,
   Briefcase,
   CheckCircle2,
-  clock,
+  Clock,
   ArrowLeft,
-  Github,
   MapPin,
-  Globe,
   Edit2,
-  Twitter,
-  Linkedin,
+  Zap,
+  Activity,
+  Cpu,
+  Terminal,
 } from "lucide-react";
+import { FaGithub, FaGlobe, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { format } from "date-fns";
 import SpotlightCard from "@/components/ui/SpotlightCard";
 import Loader from "@/components/Loading";
@@ -63,19 +64,17 @@ export default function ProfilePage() {
     if (session?.user) {
       const fetchData = async () => {
         try {
-          // Fetch Tasks Stats
           const statsRes = await fetch("/api/user/task-stats");
           const statsData = await statsRes.json();
 
-          // Fetch Collabs count
           const collabsRes = await fetch("/api/user/collabs");
           const collabsData = await collabsRes.json();
 
-          // Fetch Rich Profile Data
           const profileRes = await fetch("/api/user/profile");
           if (profileRes.ok) {
             const profile = await profileRes.json();
             setProfileData(profile);
+            console.log("profileData: ", profile);
           }
 
           setStats({
@@ -103,8 +102,6 @@ export default function ProfilePage() {
 
     const resData = await res.json();
     toast.success("Profile updated!");
-
-    // Refresh local state
     setProfileData((prev) => ({ ...prev, ...updatedData }));
   };
 
@@ -114,24 +111,8 @@ export default function ProfilePage() {
 
   if (!session) return null;
 
-  // Stagger animation variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
-
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-black relative overflow-hidden selection:bg-indigo-500/30">
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -139,276 +120,334 @@ export default function ProfilePage() {
         onSave={handleUpdateProfile}
       />
 
-      {/* Background Decor */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[100px]" />
+      {/* Deep Space Background */}
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-indigo-900/20 rounded-full blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] animate-pulse-slow delay-1000" />
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
-        {/* Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        {/* Navigation Head */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="mb-8 flex items-center justify-between"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between mb-8"
         >
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+            className="group flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Dashboard
+            <span className="font-hacker text-xs uppercase tracking-widest">
+              Return to Base
+            </span>
           </button>
 
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/50 rounded-lg transition-all group"
           >
-            <Edit2 className="w-4 h-4" /> Edit Profile
+            <Edit2 className="w-3.5 h-3.5 text-zinc-400 group-hover:text-indigo-400 transition-colors" />
+            <span className="font-hacker text-xs uppercase tracking-widest text-zinc-300 group-hover:text-white">
+              Edit Profile
+            </span>
           </button>
         </motion.div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 lg:grid-cols-12 gap-8"
-        >
-          {/* --- Left Column: Identity --- */}
-          <motion.div variants={item} className="lg:col-span-4 space-y-6">
-            <SpotlightCard className="p-8 text-center bg-card/50 backdrop-blur-xl border-border/50">
-              <div className="relative w-32 h-32 mx-auto mb-6">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 blur-lg opacity-50 animate-pulse"></div>
+        {/* Hero Identity Section */}
+        <div className="relative mb-8 group">
+          {/* Ambient Glow */}
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-cyan-500/20 rounded-[2rem] blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-1000" />
+
+          <SpotlightCard className="relative p-10 md:p-14 rounded-[2rem] bg-black/60 border border-white/10 backdrop-blur-3xl flex flex-col md:flex-row items-center gap-10 md:gap-16 overflow-hidden">
+            {/* Holographic Scanner Effect */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] mix-blend-overlay" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent blur-sm animate-scan" />
+
+            {/* Avatar HUD */}
+            <div className="relative shrink-0 group/avatar">
+              {/* Rotating Rings */}
+              <div className="absolute inset-[-20%] border border-indigo-500/20 rounded-full animate-spin-slow w-[140%] h-[140%] -top-[20%] -left-[20%] border-dashed" />
+              <div className="absolute inset-[-10%] border border-purple-500/30 rounded-full animate-reverse-spin w-[120%] h-[120%] -top-[10%] -left-[10%]" />
+
+              <div className="relative w-32 h-32 md:w-48 md:h-48 rounded-full p-1.5 bg-black ring-1 ring-white/10 shadow-2xl shadow-indigo-500/20">
                 <Image
                   src={session.user.image || "/default-pic.png"}
                   alt={session.user.name}
-                  width={128}
-                  height={128}
-                  className="rounded-full border-4 border-background relative z-10 w-full h-full object-cover"
+                  fill
+                  className="object-cover rounded-full grayscale group-hover/avatar:grayscale-0 transition-all duration-500"
                 />
-                <div
-                  className="absolute bottom-1 right-1 z-20 w-6 h-6 bg-green-500 border-4 border-background rounded-full"
-                  title="Online"
-                ></div>
               </div>
 
-              <h1 className="text-2xl font-bold aura-text-glow mb-2">
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-black/90 border border-emerald-500/50 rounded-full flex items-center gap-2 backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] font-hacker">
+                  SESSIONS ONLINE
+                </span>
+              </div>
+            </div>
+
+            {/* Identity Data */}
+            <div className="flex-1 text-center md:text-left relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold font-hacker uppercase tracking-widest mb-4">
+                <User className="w-3 h-3" />
+                <span>Commandant • Level 1</span>
+              </div>
+
+              <h1 className="text-5xl md:text-7xl font-black font-hacker text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-500 tracking-tight uppercase mb-2 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
                 {session.user.name}
               </h1>
-              <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm mb-4">
-                <Mail className="w-4 h-4" />
-                {session.user.email}
-              </div>
 
-              {/* Optional Fields Display */}
-              <div className="space-y-3 mb-6">
-                {profileData.location && (
-                  <div className="flex items-center justify-center gap-2 text-sm text-foreground/80">
-                    <MapPin className="w-3.5 h-3.5 text-indigo-500" />
-                    {profileData.location}
-                  </div>
-                )}
-                {profileData.website && (
-                  <a
-                    href={profileData.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 text-sm text-indigo-500 hover:underline"
-                  >
-                    <Globe className="w-3.5 h-3.5" />
-                    {new URL(profileData.website).hostname}
-                  </a>
-                )}
-
-                {/* Social Icons */}
-                <div className="flex justify-center gap-3 mt-4">
-                  {profileData.socials?.github && (
-                    <a
-                      href={`https://github.com/${profileData.socials.github}`}
-                      target="_blank"
-                      className="p-2 bg-muted rounded-full hover:bg-foreground hover:text-background transition-colors"
-                    >
-                      <Github className="w-4 h-4" />
-                    </a>
-                  )}
-                  {profileData.socials?.twitter && (
-                    <a
-                      href={`https://twitter.com/${profileData.socials.twitter}`}
-                      target="_blank"
-                      className="p-2 bg-muted rounded-full hover:bg-blue-400 hover:text-white transition-colors"
-                    >
-                      <Twitter className="w-4 h-4" />
-                    </a>
-                  )}
-                  {profileData.socials?.linkedin && (
-                    <a
-                      href={
-                        profileData.socials.linkedin.startsWith("http")
-                          ? profileData.socials.linkedin
-                          : `https://linkedin.com/in/${profileData.socials.linkedin}`
-                      }
-                      target="_blank"
-                      className="p-2 bg-muted rounded-full hover:bg-blue-700 hover:text-white transition-colors"
-                    >
-                      <Linkedin className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap justify-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-500 text-xs font-medium border border-indigo-500/20">
-                  Pro Member
-                </span>
-                {profileData.accounts && profileData.accounts.length > 0 && (
-                  <span
-                    className="px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-xs font-medium border border-orange-500/20"
-                    title="Linked Accounts"
-                  >
-                    {profileData.accounts.length} Linked
+              <div className="flex flex-col md:flex-row items-center gap-6 mt-6">
+                {/* Metadata Pills */}
+                <div className="flex items-center gap-3 text-sm font-mono text-zinc-400">
+                  <span className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-zinc-500" />
+                    {session.user.email}
                   </span>
-                )}
-              </div>
-            </SpotlightCard>
-
-            <SpotlightCard className="p-6 bg-card/30 backdrop-blur-md border-border/30">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                Account Details
-              </h3>
-
-              <div className="space-y-4">
-                {/* Linked Providers */}
-                <div className="flex flex-col gap-2 py-2 border-b border-border/50">
-                  <span className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Shield className="w-3.5 h-3.5" />
-                    Auth Providers
-                  </span>
-                  <div className="flex gap-2 mt-1">
-                    {/* Always show current session provider */}
-                    <div className="px-2 py-1 bg-muted rounded text-xs uppercase font-bold flex items-center gap-1">
-                      {session.provider === "google" ? "Google" : "GitHub"}
-                      <CheckCircle2 className="w-3 h-3 text-green-500" />
+                  <span className="w-1 h-1 bg-zinc-700 rounded-full" />
+                  {profileData.location && (
+                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                      <MapPin className="w-3.5 h-3.5 text-purple-400" />
+                      {profileData.location}
                     </div>
-                    {/* Show other linked accounts */}
-                    {profileData.accounts?.map(
-                      (acc) =>
-                        acc.provider !== session.provider && (
-                          <div
-                            key={acc.provider}
-                            className="px-2 py-1 bg-muted rounded text-xs uppercase font-bold text-muted-foreground"
-                          >
-                            {acc.provider} (Linked)
-                          </div>
-                        ),
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between py-2 border-b border-border/50">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-purple-500" />
-                    <span className="text-sm">Joined</span>
-                  </div>
-                  <span className="text-sm font-medium">
-                    {format(new Date(), "MMM yyyy")}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between py-2">
-                  <div className="flex items-center gap-3">
-                    <Briefcase className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm">Role</span>
-                  </div>
-                  <span className="text-sm font-medium">
-                    Full Stack Developer
-                  </span>
+                  )}
+                  {profileData.joinedDate && (
+                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                      <Calendar className="w-3.5 h-3.5 text-cyan-400" />
+                      Joined{" "}
+                      {format(new Date(profileData.joinedDate), "MMM yyyy")}
+                    </div>
+                  )}
                 </div>
               </div>
-            </SpotlightCard>
-          </motion.div>
 
-          {/* --- Right Column: Stats & Achievements --- */}
-          <motion.div variants={item} className="lg:col-span-8 space-y-6">
-            {/* Bio Section */}
-            {profileData.bio && (
-              <SpotlightCard className="p-6 bg-card/40 backdrop-blur-sm border-border/40">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  About Me
-                </h3>
-                <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                  {profileData.bio}
-                </p>
-              </SpotlightCard>
-            )}
+              {/* Social Frequency Array */}
+              <div className="h-8 w-px bg-white/10 hidden md:block" />
 
-            {/* Skills Section */}
-            {profileData.skills?.length > 0 && (
-              <SpotlightCard className="p-6 bg-card/40 backdrop-blur-sm border-border/40">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                  Skills & Technologies
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {profileData.skills.map((skill, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="px-3 py-1.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition-colors cursor-default"
-                    >
-                      {skill}
-                    </motion.div>
-                  ))}
-                </div>
-              </SpotlightCard>
-            )}
+              <div className="flex items-center gap-2">
+                {Object.entries(profileData.socials || {}).map(
+                  ([platform, handle]) => {
+                    if (!handle) return null;
+                    const Icon =
+                      platform === "github"
+                        ? FaGithub
+                        : platform === "twitter"
+                          ? FaTwitter
+                          : platform === "linkedin"
+                            ? FaLinkedin
+                            : Globe;
+                    const url =
+                      platform === "linkedin" && !handle.startsWith("http")
+                        ? `https://linkedin.com/in/${handle}`
+                        : platform === "github"
+                          ? `https://github.com/${handle}`
+                          : platform === "twitter"
+                            ? `https://twitter.com/${handle}`
+                            : handle;
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <StatsCard
-                icon={<Briefcase className="w-5 h-5 text-indigo-500" />}
-                label="Active Projects"
-                value={stats.collaborations}
-                trend="+2 this month"
-              />
-              <StatsCard
-                icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                label="Completed Tasks"
-                value={stats.completedTasks}
-                trend="Top 10%"
-              />
-              <StatsCard
-                icon={<Calendar className="w-5 h-5 text-orange-500" />}
-                label="Pending Tasks"
-                value={stats.totalTasks}
-                trend="Due soon: 2"
-              />
+                    return (
+                      <a
+                        key={platform}
+                        href={url}
+                        target="_blank"
+                        className="p-2.5 bg-white/5 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors border border-transparent hover:border-white/10"
+                      >
+                        <Icon className="w-4 h-4" />
+                      </a>
+                    );
+                  },
+                )}
+              </div>
             </div>
-          </motion.div>
-        </motion.div>
+            {/* </div> */}
+
+            {/* Decorative Tech Elements */}
+            <div className="absolute top-6 right-6 flex flex-col items-end gap-1 opacity-20">
+              <div className="w-24 h-1 bg-white" />
+              <div className="w-16 h-1 bg-white" />
+              <div className="text-[10px] font-hacker text-white mt-1">
+                ID: {session.user.email.split("@")[0].toUpperCase()}
+              </div>
+            </div>
+          </SpotlightCard>
+        </div>
+
+        {/* Mission Control Grid (Bento) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 1. Bio / Personnel File */}
+          <div className="md:col-span-2">
+            <SpotlightCard className="h-full p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                <Terminal className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-sm font-bold font-hacker text-white uppercase tracking-widest">
+                  Personnel File
+                </h3>
+              </div>
+              <div className="flex-1 bg-black/20 rounded-xl p-6 border border-white/5 font-mono text-sm text-zinc-300 leading-relaxed overflow-y-auto max-h-[200px] scrollbar-hide">
+                {profileData.bio ? (
+                  profileData.bio
+                ) : (
+                  <span className="text-zinc-600 italic">
+                    \// No bio data initialized...
+                  </span>
+                )}
+              </div>
+            </SpotlightCard>
+          </div>
+
+          {/* 2. Primary Stats */}
+          <div className="md:col-span-1 space-y-6">
+            <StatModule
+              icon={Briefcase}
+              label="Active Missions"
+              value={stats.collaborations}
+              color="text-cyan-400"
+              bg="bg-cyan-500/10"
+              border="border-cyan-500/20"
+            />
+            <StatModule
+              icon={CheckCircle2}
+              label="Tasks Executed"
+              value={stats.completedTasks}
+              color="text-emerald-400"
+              bg="bg-emerald-500/10"
+              border="border-emerald-500/20"
+            />
+            <StatModule
+              icon={Activity}
+              label="Pending Ops"
+              value={stats.totalTasks}
+              color="text-orange-400"
+              bg="bg-orange-500/10"
+              border="border-orange-500/20"
+            />
+          </div>
+
+          {/* 3. Skill Matrices */}
+          <div className="md:col-span-2">
+            <SpotlightCard className="h-full p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+              <div className="flex items-center gap-3 mb-6">
+                <Cpu className="w-5 h-5 text-purple-400" />
+                <h3 className="text-sm font-bold font-hacker text-white uppercase tracking-widest">
+                  Capability Matrix
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {profileData.skills?.length > 0 ? (
+                  profileData.skills.map((skill, i) => (
+                    <div
+                      key={i}
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 rounded-lg text-xs font-mono text-zinc-300 transition-all cursor-default flex items-center gap-2 group"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500 group-hover:animate-pulse" />
+                      {skill}
+                    </div>
+                  ))
+                ) : (
+                  <span className="text-zinc-600 font-mono text-xs">
+                    \// No capabilities modules loaded
+                  </span>
+                )}
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 border-dashed rounded-lg text-xs font-mono text-indigo-400 transition-all flex items-center gap-2"
+                >
+                  + Add Module
+                </button>
+              </div>
+            </SpotlightCard>
+          </div>
+
+          {/* 4. Credentials / Accounts */}
+          <div className="md:col-span-1">
+            <SpotlightCard className="h-full p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+              <div className="flex items-center gap-3 mb-6">
+                <Shield className="w-5 h-5 text-zinc-400" />
+                <h3 className="text-sm font-bold font-hacker text-white uppercase tracking-widest">
+                  Security Clearance
+                </h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-black/20 rounded-xl border border-white/5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/5 rounded-lg">
+                      {session.provider === "github" ? (
+                        <FaGithub className="w-4 h-4 text-white" />
+                      ) : (
+                        <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-green-500 rounded-full" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white uppercase">
+                        {session.provider}
+                      </div>
+                      <div className="text-[10px] text-zinc-500 font-mono">
+                        Primary Uplink
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                </div>
+                {profileData.accounts?.map(
+                  (acc) =>
+                    acc.provider !== session.provider && (
+                      <div
+                        key={acc.provider}
+                        className="flex items-center justify-between p-3 bg-black/20 rounded-xl border border-white/5"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-white/5 rounded-lg">
+                            <Shield className="w-4 h-4 text-zinc-400" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-300 uppercase">
+                              {acc.provider}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 font-mono">
+                              Secondary Link
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-[10px] text-zinc-500 font-mono">
+                          LINKED
+                        </div>
+                      </div>
+                    ),
+                )}
+              </div>
+            </SpotlightCard>
+          </div>
+        </div>
+      </div>
+      {/* 4. Footer Info */}
+      <div className="py-4 text-center text-xs text-muted-foreground/40 uppercase">
+        <p>
+          <span className="font-geist-sans">©</span> {new Date().getFullYear()}{" "}
+          Coordly
+        </p>
+        <p className="mt-1">Crafted for the community</p>
       </div>
     </div>
   );
 }
 
-function StatsCard({ icon, label, value, trend }) {
+function StatModule({ icon: Icon, label, value, color, bg, border }) {
   return (
-    <SpotlightCard className="p-6 bg-card/40 backdrop-blur-sm border-border/40 hover:border-primary/20 transition-colors">
-      <div className="flex items-start justify-between mb-4">
-        <div className="p-2 rounded-lg bg-background/50 ring-1 ring-border">
-          {icon}
-        </div>
+    <SpotlightCard
+      className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${bg} ${border} backdrop-blur-md flex items-center gap-4 group hover:scale-[1.02] transition-transform`}
+    >
+      <div className={`p-3 rounded-xl bg-black/20 ${color}`}>
+        <Icon className="w-6 h-6" />
       </div>
-      <div className="text-2xl font-bold mb-1">{value}</div>
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+      <div>
+        <div className="text-2xl font-black font-hacker text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/50 transition-all">
+          {value}
+        </div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-hacker">
           {label}
         </div>
-        {trend && (
-          <div className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
-            {trend}
-          </div>
-        )}
       </div>
     </SpotlightCard>
   );

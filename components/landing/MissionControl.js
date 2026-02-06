@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
   FaGlobeAmericas,
   FaBolt,
@@ -47,9 +47,19 @@ export default function MissionControl() {
   const [logs, setLogs] = useState(ACTIVITY_LOGS);
   const [activeUsers, setActiveUsers] = useState(1240);
   const [systemLoad, setSystemLoad] = useState(42);
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, { once: false, amount: 0.3 });
 
-  // Simulate live data updates
+  // Detect Mobile
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  // Simulate live data updates - ONLY when visible AND not mobile
+  useEffect(() => {
+    if (!isInView || isMobile) return;
+
     const interval = setInterval(() => {
       // Rotate logs
       setLogs((prev) => {
@@ -67,13 +77,16 @@ export default function MissionControl() {
       setSystemLoad((prev) =>
         Math.min(Math.max(prev + Math.floor(Math.random() * 10) - 5, 20), 80),
       );
-    }, 3000);
+    }, 4000); // Slower updates (4s) to reduce main thread load
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isInView, isMobile]);
 
   return (
-    <div className="w-full h-full relative overflow-hidden flex flex-col md:flex-row bg-white/80 dark:bg-[#030014]/80 backdrop-blur-2xl">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative overflow-hidden flex flex-col md:flex-row bg-white/70 dark:bg-[#030014]/70 backdrop-blur-md"
+    >
       {/* Background Decor */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
@@ -106,7 +119,7 @@ export default function MissionControl() {
             <div className="w-full h-1 bg-black/10 dark:bg-white/10 rounded-full mt-2 overflow-hidden">
               <motion.div
                 initial={{ width: "50%" }}
-                animate={{ width: "65%" }}
+                animate={isMobile ? { width: "50%" } : { width: "65%" }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
@@ -126,14 +139,16 @@ export default function MissionControl() {
               </span>
             </div>
             <div className="text-xl md:text-2xl font-bold font-hacker text-foreground">
-              98
+              {isMobile ? "98" : "98"}
               <span className="text-sm text-muted-foreground font-normal">
                 %
               </span>
             </div>
             <div className="w-full h-1 bg-black/10 dark:bg-white/10 rounded-full mt-2 overflow-hidden">
               <motion.div
-                animate={{ width: `${systemLoad}%` }}
+                animate={
+                  isMobile ? { width: "80%" } : { width: `${systemLoad}%` }
+                }
                 className="h-full bg-yellow-400 rounded-full"
               ></motion.div>
             </div>
@@ -141,23 +156,73 @@ export default function MissionControl() {
         </div>
 
         {/* Central Visualizer (Mini-Map / Radar) */}
-        <div className="flex-1 bg-black/5 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5 relative flex items-center justify-center overflow-hidden min-h-[150px] md:min-h-0">
+        <div className="flex-1 bg-black/5 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5 relative flex items-center justify-center overflow-hidden min-h-[150px] md:min-h-0 group">
+          {/* HUD Scanning Line */}
+          <motion.div
+            animate={{ top: ["0%", "100%", "0%"] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            className="absolute left-0 right-0 h-[2px] bg-primary/50 shadow-[0_0_10px_rgba(99,102,241,0.5)] z-20 pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(99,102,241,0.05)_50%)] bg-[length:100%_4px] pointer-events-none z-10" />
+
           {/* Radar Rings */}
           {[1, 2, 3].map((i) => (
             <motion.div
               key={i}
-              animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
-              transition={{ duration: 3, repeat: Infinity, delay: i * 0.8 }}
-              className="absolute border border-primary/20 rounded-full w-20 h-20"
-            ></motion.div>
+              animate={{
+                scale: [1, 2],
+                opacity: [0.8, 0],
+                border: [
+                  "1px solid rgba(99,102,241,0.5)",
+                  "1px solid rgba(99,102,241,0)",
+                ],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: i * 0.8,
+                ease: "easeOut",
+              }}
+              className="absolute rounded-full w-16 h-16 flex items-center justify-center"
+            >
+              <div className="w-1 h-1 bg-primary rounded-full absolute top-0" />
+            </motion.div>
           ))}
+
           <div className="relative z-10 text-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center border border-primary/40 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center border border-primary/40 shadow-[0_0_30px_rgba(124,58,237,0.3)] relative">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 border-t border-r border-primary rounded-full"
+              />
               <FiActivity className="text-xl md:text-2xl text-white" />
             </div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary mt-3 font-hacker">
-              Monitoring
-            </p>
+
+            {/* Glitch Text Element */}
+            <div className="relative mt-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-hacker relative z-10">
+                Monitoring
+              </p>
+              <motion.p
+                animate={{ x: [-2, 2, -1, 0], opacity: [0.5, 0.8, 0] }}
+                transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 3 }}
+                className="absolute inset-0 text-[10px] uppercase tracking-[0.2em] text-red-500 font-hacker opacity-50 z-0"
+              >
+                Monitoring
+              </motion.p>
+              <motion.p
+                animate={{ x: [2, -2, 1, 0], opacity: [0.5, 0.8, 0] }}
+                transition={{
+                  duration: 0.2,
+                  repeat: Infinity,
+                  repeatDelay: 2.5,
+                }}
+                className="absolute inset-0 text-[10px] uppercase tracking-[0.2em] text-blue-500 font-hacker opacity-50 z-0"
+              >
+                Monitoring
+              </motion.p>
+            </div>
           </div>
         </div>
       </div>

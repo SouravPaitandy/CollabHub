@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Footer from "@/components/Footer";
 
 export default function TermsOfServicePage() {
   return (
@@ -126,8 +125,6 @@ export default function TermsOfServicePage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

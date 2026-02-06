@@ -2,11 +2,10 @@ import FeatureHero from "@/components/features/FeatureHero";
 import FeatureList from "@/components/features/FeatureList";
 import FeatureComparison from "@/components/features/FeatureComparison";
 import FeatureCTA from "@/components/features/FeatureCTA";
-import Footer from "@/components/Footer";
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 font-geist-sans">
+    <div className="min-h-screen text-foreground overflow-x-hidden selection:bg-primary/20 font-geist-sans">
       {/* Cosmic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px] animate-pulse-slow" />
@@ -19,8 +18,6 @@ export default function FeaturesPage() {
         <FeatureComparison />
         <FeatureCTA />
       </main>
-
-      <Footer />
     </div>
   );
 }

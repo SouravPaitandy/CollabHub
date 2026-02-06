@@ -2,12 +2,15 @@ import { Geist, Geist_Mono, Space_Mono } from "next/font/google";
 import SessionWrapper from "@/components/SessionWrapper";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
-// import FooterWrapper from "@/components/FooterWrapper";
+import FooterWrapper from "@/components/FooterWrapper";
 import ClientSessionProvider from "@/app/SessionProvider";
 // import { ThemeProvider } from "next-themes";
 import ThemeProviderWrapper from "./ThemeProvider";
 import { Toaster } from "react-hot-toast";
 import "@/Styles/scrollbars.css";
+import SplashWrapper from "@/components/SplashWrapper";
+import SmoothScroll from "@/components/SmoothScroll";
+import CustomCursor from "@/components/ui/CustomCursor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,16 +42,17 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${spaceMono.variable}`}
     >
-      <body
-        className="antialiased select-none"
-        // className={inter.className}
-        suppressHydrationWarning
-      >
+      <body className="antialiased select-none" suppressHydrationWarning>
         <SessionWrapper>
           <ClientSessionProvider>
             <ThemeProviderWrapper>
-              <NavbarWrapper />
-              {children}
+              <SplashWrapper>
+                <SmoothScroll />
+                <CustomCursor />
+                <NavbarWrapper />
+                {children}
+                <FooterWrapper />
+              </SplashWrapper>
               <Toaster position="top-right" />
             </ThemeProviderWrapper>
           </ClientSessionProvider>

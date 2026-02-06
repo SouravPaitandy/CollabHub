@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Footer from "@/components/Footer";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -136,8 +135,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

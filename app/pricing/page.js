@@ -1,5 +1,5 @@
 "use client";
-import Footer from "@/components/Footer";
+
 import { FiCheck, FiX, FiZap } from "react-icons/fi";
 import { motion } from "framer-motion";
 import SpotlightCard from "@/components/ui/SpotlightCard";
@@ -183,8 +183,6 @@ export default function PricingPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

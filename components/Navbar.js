@@ -37,7 +37,7 @@ const Navbar = () => {
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} // Elegant easing
         className={`fixed z-50 transition-all duration-300 left-0 right-0 flex justify-center ${
           isScrolled ? "top-4" : "top-0"
         }`}
@@ -46,37 +46,83 @@ const Navbar = () => {
           className={`relative transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-between
           ${
             isScrolled
-              ? "w-[90%] max-w-5xl rounded-full bg-white/80 dark:bg-black/60 backdrop-blur-2xl py-2 px-6 border border-black/10 dark:border-white/[0.08] shadow-lg dark:shadow-none"
-              : "w-full max-w-7xl px-6 py-4 bg-transparent border-transparent"
+              ? "w-[90%] max-w-5xl rounded-full bg-white/70 dark:bg-[#030014]/60 backdrop-blur-3xl py-3 px-6 border border-black/5 dark:border-white/10 shadow-2xl dark:shadow-[0_0_40px_-20px_rgba(99,102,241,0.3)]"
+              : "w-full max-w-7xl px-6 py-6 bg-transparent border-transparent"
           }`}
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-9 h-9 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+          <Link
+            href="/"
+            className="flex items-center gap-3 group relative z-10"
+          >
+            <div className="relative w-10 h-10 transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
               <Image
                 src="/favicon.png"
                 alt="Logo"
                 fill
-                className="object-contain drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                className="object-contain drop-shadow-[0_0_15px_rgba(99,102,241,0.6)]"
               />
+              <div className="absolute inset-0 bg-primary/40 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
-            <span className="text-xl font-hacker font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent group-hover:aura-text-glow transition-all">
+            <span className="text-xl font-hacker font-bold text-foreground group-hover:tracking-widest transition-all duration-300">
               Coordly
             </span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            <div className="flex items-center gap-1 mr-4 bg-secondary/30 rounded-full px-2 py-1 backdrop-blur-sm border border-white/5">
+            <div className="flex items-center gap-2 mr-6 bg-black/5 dark:bg-white/5 rounded-full px-2 py-1.5 backdrop-blur-md border border-black/5 dark:border-white/5">
               <NavLink href="/features">Features</NavLink>
               <NavLink href="/pricing">Pricing</NavLink>
             </div>
 
-            <div className="h-6 w-px bg-border/50 mx-2" />
+            <div className="h-6 w-px bg-foreground/10 mx-2" />
 
             <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2.5 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:rotate-12"
+              onClick={(e) => {
+                const isDark = theme === "dark";
+                const nextTheme = isDark ? "light" : "dark";
+
+                // Fallback for browsers regarding View Transitions
+                if (!document.startViewTransition) {
+                  setTheme(nextTheme);
+                  return;
+                }
+
+                // Capture button position before transition starts
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+
+                const transition = document.startViewTransition(() => {
+                  setTheme(nextTheme);
+                });
+
+                // Circular Reveal Effect
+                transition.ready.then(() => {
+                  const right = window.innerWidth - x;
+                  const bottom = window.innerHeight - y;
+                  const maxRadius = Math.hypot(
+                    Math.max(x, right),
+                    Math.max(y, bottom),
+                  );
+
+                  document.documentElement.animate(
+                    {
+                      clipPath: [
+                        `circle(0px at ${x}px ${y}px)`,
+                        `circle(${maxRadius}px at ${x}px ${y}px)`,
+                      ],
+                    },
+                    {
+                      duration: 800,
+                      easing: "ease-in-out",
+                      pseudoElement: "::view-transition-new(root)",
+                    },
+                  );
+                });
+              }}
+              className="p-2.5 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:rotate-90 active:scale-95"
             >
               {theme === "dark" ? (
                 <SunIcon className="w-5 h-5" />
@@ -90,9 +136,13 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/auth"
-                className="ml-3 px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-medium hover:opacity-90 transition-all text-sm shadow-[0_0_20px_-5px_rgba(99,102,241,0.6)] hover:shadow-[0_0_25px_-5px_rgba(99,102,241,0.8)] hover:scale-105 active:scale-95"
+                className="ml-4 overflow-hidden relative group px-6 py-2.5 rounded-full font-medium text-sm transition-all"
               >
-                Sign In
+                <div className="absolute inset-0 bg-primary group-hover:opacity-0 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative z-10 text-primary-foreground group-hover:tracking-wide transition-all duration-300">
+                  Sign In
+                </span>
               </Link>
             )}
           </div>
@@ -111,7 +161,7 @@ const Navbar = () => {
             </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-foreground active:scale-90 transition-transform"
+              className="p-2 text-foreground active:scale-90 transition-transform z-50 relative"
             >
               {isMenuOpen ? (
                 <XMarkIcon className="w-7 h-7" />

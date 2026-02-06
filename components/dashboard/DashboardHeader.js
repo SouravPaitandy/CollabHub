@@ -31,16 +31,56 @@ export default function DashboardHeader() {
             className="object-contain drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
           />
         </div>
-        <span className="text-xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent group-hover:aura-text-glow transition-all">
-          Coordly
-        </span>
+        <span className="text-xl font-bold text-foreground">Coordly</span>
       </Link>
 
       {/* Right Side Actions */}
       <div className="flex items-center gap-4">
         {/* Theme Toggle */}
         <button
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={(e) => {
+            const isDark = theme === "dark";
+            const nextTheme = isDark ? "light" : "dark";
+
+            // Fallback for browsers regarding View Transitions
+            if (!document.startViewTransition) {
+              setTheme(nextTheme);
+              return;
+            }
+
+            // Capture button position before transition starts
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            const transition = document.startViewTransition(() => {
+              setTheme(nextTheme);
+            });
+
+            // Circular Reveal Effect
+            transition.ready.then(() => {
+              const right = window.innerWidth - x;
+              const bottom = window.innerHeight - y;
+              const maxRadius = Math.hypot(
+                Math.max(x, right),
+                Math.max(y, bottom),
+              );
+
+              document.documentElement.animate(
+                {
+                  clipPath: [
+                    `circle(0px at ${x}px ${y}px)`,
+                    `circle(${maxRadius}px at ${x}px ${y}px)`,
+                  ],
+                },
+                {
+                  duration: 800,
+                  easing: "ease-in-out",
+                  pseudoElement: "::view-transition-new(root)",
+                },
+              );
+            });
+          }}
           className="p-2 cursor-pointer rounded-full text-muted-foreground hover:text-primary hover:bg-secondary/50 transition-all duration-300 hover:rotate-12"
           aria-label="Toggle Theme"
         >

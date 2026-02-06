@@ -1,5 +1,5 @@
 "use client";
-import Footer from "@/components/Footer";
+
 import { motion } from "framer-motion";
 import SpotlightCard from "@/components/ui/SpotlightCard";
 
@@ -151,8 +151,6 @@ export default function UpdatesPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

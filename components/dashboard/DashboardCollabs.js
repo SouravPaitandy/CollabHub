@@ -57,17 +57,17 @@ const DashboardCollabs = ({ adminCollabs, memberCollabs, username }) => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3 aura-text-glow">
+          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3 font-hacker uppercase">
             Collaborations
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <p className="text-muted-foreground mt-1 text-sm font-geist-sans">
             Manage your projects and collaborations in one place.
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-border mb-8">
+      <div className="border-b border-white/10 mb-8">
         <div className="flex space-x-8">
           <TabButton
             isActive={activeTab === "admin"}
@@ -143,7 +143,9 @@ const TabButton = ({ isActive, onClick, icon, label, count }) => (
     {label}
     <span
       className={`ml-1 text-xs px-2 py-0.5 rounded-full transition-colors duration-300 ${
-        isActive ? "bg-white/10 text-primary" : "bg-muted text-muted-foreground"
+        isActive
+          ? "bg-primary/10 text-primary"
+          : "bg-muted text-muted-foreground"
       }`}
     >
       {count}
@@ -192,9 +194,9 @@ const ProjectGrid = ({
             variants={itemVariants}
             className="h-full"
           >
-            <SpotlightCard className="h-full flex flex-col overflow-hidden bg-white/80 dark:bg-black/40 backdrop-blur-2xl border-white/50 dark:border-white/10">
+            <SpotlightCard className="h-full flex flex-col overflow-hidden bg-white/80 dark:bg-black/40 backdrop-blur-xl border-border/50 dark:border-white/10 hover:border-primary/30 transition-colors">
               {/* Card Header image pattern (abstract) */}
-              <div className="h-24 w-full bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 group-hover:from-indigo-50 group-hover:to-purple-50 dark:group-hover:from-indigo-950/30 dark:group-hover:to-purple-950/30 transition-colors duration-300 relative z-10" />
+              <div className="h-24 w-full bg-gradient-to-r from-slate-100 to-slate-200 dark:from-zinc-900 dark:to-black relative z-10 opacity-50" />
 
               <div className="p-5 flex-1 flex flex-col relative z-20">
                 {/* Icon Badge */}

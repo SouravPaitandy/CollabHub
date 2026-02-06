@@ -23,6 +23,10 @@ export default function NavbarWrapper() {
         "/terms",
         "/privacy",
         "/support",
+        "/security",
+        "/press",
+        "/careers",
+        "/manifesto",
       ].includes(pathname));
 
   if (isExcludedPage) {

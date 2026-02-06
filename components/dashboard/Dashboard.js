@@ -357,11 +357,11 @@ const Dashboard = ({
 
   return (
     <div className="min-h-screen relative bg-background text-foreground">
-      {/* Background Decor */}
+      {/* Background Decor - Cosmic Liquid (Void Theme) */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse-slow" />
-        <div className="absolute top-[40%] left-[40%] w-[20%] h-[20%] rounded-full bg-purple-500/5 blur-[100px] animate-pulse-slow delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[100px] animate-pulse-slow" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px]" />
       </div>
 
       {/* Offline Banner */}
@@ -417,15 +417,15 @@ const Dashboard = ({
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 aura-text-glow">
+                  <h1 className="text-3xl md:text-5xl font-black font-hacker tracking-tight mb-2 text-foreground">
                     {isSessionExpired
-                      ? "Dashboard Preview"
-                      : `Welcome back, ${displayName.split(" ")[0]}`}
+                      ? "DASHBOARD PREVIEW"
+                      : `WELCOME BACK, ${displayName.split(" ")[0]}`}
                   </h1>
-                  <p className="text-muted-foreground text-base md:text-lg">
+                  <p className="text-muted-foreground font-geist-sans text-base md:text-lg">
                     {isSessionExpired
                       ? "Log in to access your full workspace."
-                      : "Here's what's happening today."}
+                      : "Ready to accelerate your workflow?"}
                   </p>
                 </div>
               </div>
@@ -572,8 +572,8 @@ const Dashboard = ({
                 </motion.div>
               )}
 
-            {/* 4. Footer Info (Moved to Sidebar) */}
-            <div className="pt-6 text-center text-xs text-muted-foreground/40 uppercase lg:hidden">
+            {/* 4. Footer Info */}
+            <div className="pt-6 text-center text-xs text-muted-foreground/40 uppercase">
               <p>
                 <span className="font-geist-sans">©</span>{" "}
                 {new Date().getFullYear()} Coordly

@@ -9,7 +9,6 @@ import {
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import SpotlightCard from "@/components/ui/SpotlightCard";
-import Footer from "@/components/Footer";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -60,7 +59,7 @@ export default function ContactPage() {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
-      <div className="relative z-10 pt-40 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,7 +69,7 @@ export default function ContactPage() {
           <h1 className="text-5xl md:text-7xl font-bold font-hacker mb-6 bg-clip-text text-transparent bg-gradient-to-br from-white via-indigo-200 to-indigo-400">
             Get in Touch
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl font-geist-sans text-gray-400 max-w-2xl mx-auto leading-relaxed">
             Have questions about Coordly? We&apos;re here to help you
             revolutionize your team&apos;s workflow.
           </p>
@@ -87,7 +86,7 @@ export default function ContactPage() {
             <h2 className="text-3xl font-bold font-hacker text-white">
               Contact Information
             </h2>
-            <p className="text-gray-400">
+            <p className="text-gray-400 font-geist-sans">
               Fill out the form and our team will get back to you within 24
               hours.
             </p>
@@ -102,10 +101,10 @@ export default function ContactPage() {
                     <h3 className="text-lg font-semibold text-white mb-1">
                       Our Office
                     </h3>
-                    <p className="text-gray-400">
-                      123 Collaboration Street
+                    <p className="text-gray-400 font-geist-sans">
+                      NO PHYSICAL OFFICE
                       <br />
-                      Tech City, TC 90210
+                      We are a remote-first company
                     </p>
                   </div>
                 </div>
@@ -120,8 +119,10 @@ export default function ContactPage() {
                     <h3 className="text-lg font-semibold text-white mb-1">
                       Phone
                     </h3>
-                    <p className="text-gray-400">+1 (555) 123-4567</p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-gray-400 font-geist-sans">
+                      +91 90645 40995
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1 font-geist-sans">
                       Mon-Fri from 8am to 5pm
                     </p>
                   </div>
@@ -137,8 +138,10 @@ export default function ContactPage() {
                     <h3 className="text-lg font-semibold text-white mb-1">
                       Email
                     </h3>
-                    <p className="text-gray-400">contact@coordly.com</p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-gray-400 font-geist-sans">
+                      souravpaitandy@gmail.com
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1 font-geist-sans">
                       For general inquiries
                     </p>
                   </div>
@@ -173,7 +176,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     disabled={isSubmitting}
-                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white placeholder-gray-500 transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3 font-geist-sans bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white placeholder-gray-500 transition-all disabled:opacity-50"
                     placeholder="John Doe"
                   />
                 </div>
@@ -192,7 +195,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     disabled={isSubmitting}
-                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white placeholder-gray-500 transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3 font-geist-sans bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white placeholder-gray-500 transition-all disabled:opacity-50"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -211,14 +214,14 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     disabled={isSubmitting}
-                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white placeholder-gray-500 transition-all disabled:opacity-50 resize-none"
+                    className="w-full px-4 py-3 font-geist-sans bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white placeholder-gray-500 transition-all disabled:opacity-50 resize-none"
                     placeholder="Tell us about your project..."
                   ></textarea>
                 </div>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black transition-all duration-300 ease-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center shadow-lg shadow-indigo-500/25"
+                  className="w-full font-geist-sans bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black transition-all duration-300 ease-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center shadow-lg shadow-indigo-500/25"
                 >
                   {isSubmitting ? (
                     <>
@@ -256,7 +259,6 @@ export default function ContactPage() {
           </motion.div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

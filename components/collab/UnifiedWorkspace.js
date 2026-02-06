@@ -42,7 +42,7 @@ function WorkspaceShell({ collabId }) {
 
   const [activeView, setActiveView] = useState(() => {
     const view = searchParams.get("view");
-    return view === "tasks" || view === "settings" ? view : "docs";
+    return view === "tasks" || view === "settings" ? view : "welcome";
   });
   const [isChatOpen, setIsChatOpen] = useState(
     searchParams.get("view") === "chat",
@@ -85,16 +85,16 @@ function WorkspaceShell({ collabId }) {
       <motion.nav
         initial={{ width: 80 }}
         animate={{ width: isSidebarCollapsed ? 80 : 260 }}
-        className="hidden md:flex z-50 h-full bg-black/40 backdrop-blur-2xl border-r border-white/5 flex-col justify-between shrink-0 transition-all duration-300 ease-in-out relative group"
+        className="hidden md:flex z-50 h-full bg-black/20 backdrop-blur-3xl border-r border-white/10 flex-col justify-between shrink-0 transition-all duration-300 ease-in-out relative group"
       >
         {/* Logo / Header */}
-        <div className="p-4 flex items-center gap-3 h-20 border-b border-white/5">
+        <div className="p-4 flex items-center gap-3 h-20 border-b border-white/10">
           <div className="relative w-10 h-10 shrink-0">
             <Image
               src="/favicon.png"
               alt="Logo"
               fill
-              className="object-contain drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+              className="object-contain drop-shadow-[0_0_15px_rgba(99,102,241,0.6)]"
             />
           </div>
           <AnimatePresence>
@@ -105,7 +105,7 @@ function WorkspaceShell({ collabId }) {
                 exit={{ opacity: 0, x: -10 }}
                 className="overflow-hidden whitespace-nowrap"
               >
-                <h1 className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 truncate w-32">
+                <h1 className="font-bold font-hacker text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 truncate w-32 tracking-wider">
                   {collabName}
                 </h1>
               </motion.div>
@@ -281,6 +281,22 @@ function WorkspaceShell({ collabId }) {
         {/* Content Views */}
         <div className="flex-1 relative z-10 w-full h-full overflow-hidden">
           <AnimatePresence mode="wait">
+            {activeView === "welcome" && (
+              <motion.div
+                key="welcome"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="w-full h-full flex items-center justify-center p-6"
+              >
+                <WorkspaceWelcome
+                  collabName={collabName}
+                  onNavigate={setActiveView}
+                  onStartChat={() => setIsChatOpen(true)}
+                />
+              </motion.div>
+            )}
+
             {activeView === "docs" && (
               <motion.div
                 key="docs"
@@ -316,7 +332,7 @@ function WorkspaceShell({ collabId }) {
               >
                 <Chat
                   collabId={collabId}
-                  onClose={() => setActiveView("docs")}
+                  onClose={() => setActiveView("welcome")}
                 />
               </motion.div>
             )}
@@ -346,6 +362,100 @@ function WorkspaceShell({ collabId }) {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function WorkspaceWelcome({ collabName, onNavigate, onStartChat }) {
+  return (
+    <div className="max-w-2xl w-full text-center space-y-8">
+      <div className="space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold font-hacker uppercase tracking-widest animate-pulse-slow">
+          <span className="w-2 h-2 rounded-full bg-indigo-500" />
+          <span>System Ready</span>
+        </div>
+        <h1 className="text-4xl md:text-6xl font-black font-hacker text-white tracking-tight uppercase drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+          Welcome back to <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+            {collabName}
+          </span>
+        </h1>
+        <p className="text-zinc-400 text-lg max-w-lg mx-auto font-geist-sans">
+          Your Workspace is active. Choose a module to begin operations.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <WelcomeAction
+          icon={FileText}
+          label="Documents"
+          desc="Access classified files"
+          color="text-blue-400"
+          bg="bg-blue-500/10"
+          border="border-blue-500/20"
+          onClick={() => onNavigate("docs")}
+        />
+        <WelcomeAction
+          icon={CheckSquare}
+          label="Task Board"
+          desc="Review mission objectives"
+          color="text-emerald-400"
+          bg="bg-emerald-500/10"
+          border="border-emerald-500/20"
+          onClick={() => onNavigate("tasks")}
+        />
+        <WelcomeAction
+          icon={MessageSquare}
+          label="Comms Uplink"
+          desc="Secure team channel"
+          color="text-purple-400"
+          bg="bg-purple-500/10"
+          border="border-purple-500/20"
+          onClick={onStartChat}
+        />
+      </div>
+      {/* 4. Footer Info */}
+      <div className="pt-6 text-center text-xs text-muted-foreground/40 uppercase">
+        <p>
+          <span className="font-geist-sans">©</span> {new Date().getFullYear()}{" "}
+          Coordly
+        </p>
+        <p className="mt-1">Crafted for the community</p>
+      </div>
+    </div>
+  );
+}
+
+function WelcomeAction({
+  icon: Icon,
+  label,
+  desc,
+  color,
+  bg,
+  border,
+  onClick,
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all duration-300 group text-left relative overflow-hidden`}
+    >
+      <div
+        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent to-white/5`}
+      />
+
+      <div
+        className={`w-12 h-12 rounded-xl ${bg} ${border} border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+      >
+        <Icon className={`w-6 h-6 ${color}`} />
+      </div>
+
+      <h3 className="text-lg font-bold text-white font-hacker mb-1 group-hover:translate-x-1 transition-transform">
+        {label}
+      </h3>
+      <p className="text-xs text-zinc-500 font-mono group-hover:text-zinc-400 transition-colors">
+        {desc}
+      </p>
+    </button>
   );
 }
 
@@ -385,8 +495,8 @@ const NavButton = ({
       className={`relative flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group
         ${
           isActive
-            ? "border border-primary-foreground text-primary shadow-lg shadow-indigo-500/20"
-            : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+            ? "bg-white/5 border border-white/10 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]"
+            : "text-muted-foreground hover:bg-white/5 hover:text-foreground hover:border-white/5 border border-transparent"
         }
         ${isCollapsed ? "justify-center" : ""}
       `}
@@ -396,7 +506,7 @@ const NavButton = ({
         {icon}
         {alertColor && (
           <span
-            className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-background ${alertColor}`}
+            className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-black ${alertColor}`}
           />
         )}
       </div>

@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+export const metadata = {
+  title: "Terms of Service | Coordly",
+  description: "Read the Terms of Service for using the Coordly platform.",
+};
+
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 font-geist-sans">

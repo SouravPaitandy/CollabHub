@@ -3,6 +3,12 @@ import FeatureList from "@/components/features/FeatureList";
 import FeatureComparison from "@/components/features/FeatureComparison";
 import FeatureCTA from "@/components/features/FeatureCTA";
 
+export const metadata = {
+  title: "Features | Coordly",
+  description:
+    "Explore the powerful suite of collaboration tools: Real-time Editing, HD Video Calls, Kanban Tasks, and more.",
+};
+
 export default function FeaturesPage() {
   return (
     <div className="min-h-screen text-foreground overflow-x-hidden selection:bg-primary/20 font-geist-sans">

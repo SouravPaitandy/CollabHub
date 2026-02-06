@@ -47,15 +47,15 @@ export default function NotFound() {
                 glitchActive ? "translate-x-1 opacity-80" : ""
               } transition-transform duration-75`}
             >
-              404
+              404!
             </h1>
             {glitchActive && (
               <>
                 <h1 className="absolute top-0 left-0 text-9xl font-bold font-hacker tracking-tighter text-red-500 opacity-50 translate-x-[-2px] mix-blend-screen">
-                  404
+                  404!
                 </h1>
                 <h1 className="absolute top-0 left-0 text-9xl font-bold font-hacker tracking-tighter text-blue-500 opacity-50 translate-x-[2px] mix-blend-screen">
-                  404
+                  404!
                 </h1>
               </>
             )}

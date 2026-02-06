@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+export const metadata = {
+  title: "Privacy Policy | Coordly",
+  description:
+    "We are committed to protecting your data. Read our Privacy Policy.",
+};
+
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 font-geist-sans">
